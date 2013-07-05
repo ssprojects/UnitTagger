@@ -1,0 +1,3963 @@
+<?xml version="1.0"?>
+<!-- sunita: 8 Sep 2012: most of the lemmas and typical usage were garbage in the initial version; removed those manually :( -->
+<!-- sunita: 6 Sep 2012: Added SI units, otherwise the conversions were meaningless -->
+<!-- sunita: 6 Sep 2012: Added Numers -->
+
+<root>
+  <concept name="Percent">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="percent" symbol="%" conversionFactor="">
+      <lemmaset>
+	<String>per</String>			  
+	<String frequency="0.99">p</String>			  
+	<String>percentage</String>			  
+      </lemmaset>
+    </unit>
+  </concept>		
+  <concept name="Number">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="" symbol="" conversionFactor="">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="thousand" symbol="thousand" conversionFactor="= 1000">
+      <lemmaset>
+	<String>thou</String>			  
+      </lemmaset>
+    </unit>
+    <unit name="lakh" symbol="lakh" conversionFactor="= 100000">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="million" symbol="million" conversionFactor="= 1000000">
+      <lemmaset>
+	<String>mil</String>			  
+	<String>m</String>			  
+	<String>milion</String>			  
+	<String>mln</String>			  
+      </lemmaset>
+    </unit>
+    <unit name="billion" symbol="billion" conversionFactor="= 1000000000">
+      <lemmaset>
+	<String>bil</String>			  
+	<String>bilion</String>			  
+	<String>bln</String>
+	<String>b</String>
+      </lemmaset>
+    </unit>
+  </concept>
+  <concept name="Currency">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="United States dollar (SI base unit)" symbol="$" conversionFactor=" = 1">
+      <lemmaset>
+	<String>USD</String>
+	<String>US $</String>
+	<String frequency="0.99">$</String>
+      </lemmaset>
+    </unit>
+    <unit name="British pound" symbol="£" conversionFactor=" = 1.5">
+      <lemmaset>
+	<String>GBP</String>
+	<String>Pound</String>
+	<String frequency="0.99">£</String>
+      </lemmaset>
+    </unit>
+
+    <unit name="Franc" symbol="F" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.99">F</String>
+	<String frequency="0.99">Franc</String>
+      </lemmaset>
+    </unit>
+    <unit name="Abkhazian apsar" symbol="" conversionFactor="">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="Russian ruble" symbol="р." conversionFactor="">
+      <lemmaset>
+	<String>RUB</String>
+      </lemmaset>
+    </unit>
+    <unit name="Afghan afghani" symbol="؋" conversionFactor="">
+      <lemmaset>
+	<String>AFN</String>
+      </lemmaset>
+    </unit>
+    <unit name="Euro" symbol="€" conversionFactor="">
+      <lemmaset>
+	<String>EUR</String>
+      </lemmaset>
+    </unit>
+    <unit name="Albanian lek" symbol="L" conversionFactor="">
+      <lemmaset>
+	<String>ALL</String>
+      </lemmaset>
+    </unit>
+    <unit name="Alderney pound" symbol="£" conversionFactor="">
+      <lemmaset>
+	<String></String>
+      </lemmaset>
+    </unit>
+    <unit name="Guernsey pound" symbol="£" conversionFactor="">
+      <lemmaset>
+	<String>GGP</String>
+      </lemmaset>
+    </unit>
+    <unit name="Algerian dinar" symbol="د.ج" conversionFactor="">
+      <lemmaset>
+	<String>DZD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Angolan kwanza" symbol="Kz" conversionFactor="">
+      <lemmaset>
+	<String>AOA</String>
+      </lemmaset>
+    </unit>
+    <unit name="East Caribbean dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String>XCD</String>
+	<String frequency="0.0001">$</String>
+      </lemmaset>
+    </unit>
+    <unit name="Argentine peso" symbol="$" conversionFactor="">
+      <lemmaset>
+		<String frequency="0.0001">$</String>
+	<String>ARS</String>
+      </lemmaset>
+    </unit>
+    <unit name="Armenian dram" symbol="" conversionFactor="">
+      <lemmaset>
+	<String>AMD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Aruban florin" symbol="ƒ" conversionFactor="">
+      <lemmaset>
+	<String>AWG</String>
+      </lemmaset>
+    </unit>
+    <unit name="Ascension pound" symbol="£" conversionFactor="">
+      <lemmaset>
+	<String></String>
+      </lemmaset>
+    </unit>
+    <unit name="Saint Helena pound" symbol="£" conversionFactor="">
+      <lemmaset>
+	<String>SHP</String>
+      </lemmaset>
+    </unit>
+    <unit name="Australian dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+		<String frequency="0.001">$</String>
+	<String>AUD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Azerbaijani manat" symbol="" conversionFactor="">
+      <lemmaset>
+	<String>AZN</String>
+      </lemmaset>
+    </unit>
+    <unit name="Bahamian dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+		<String frequency="0.0001">$</String>
+	<String>BSD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Bahraini dinar" symbol=".د.ب" conversionFactor="">
+      <lemmaset>
+	<String>BHD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Bangladeshi taka" symbol="৳" conversionFactor="">
+      <lemmaset>
+	<String>BDT</String>
+      </lemmaset>
+    </unit>
+    <unit name="Barbadian dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>BBD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Belarusian ruble" symbol="Br" conversionFactor="">
+      <lemmaset>
+	<String>BYR</String>
+      </lemmaset>
+    </unit>
+    <unit name="Belize dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>BZD</String>
+      </lemmaset>
+    </unit>
+    <unit name="West African CFA franc" symbol="Fr" conversionFactor="">
+      <lemmaset>
+	<String>XOF</String>
+      </lemmaset>
+    </unit>
+    <unit name="Bermudian dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>BMD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Bhutanese ngultrum" symbol="Nu." conversionFactor="">
+      <lemmaset>
+	<String>BTN</String>
+      </lemmaset>
+    </unit>
+    <unit name="Indian rupee" symbol="" conversionFactor="">
+      <lemmaset>
+	<String>INR</String>
+      </lemmaset>
+    </unit>
+    <unit name="Bolivian boliviano" symbol="Bs." conversionFactor="">
+      <lemmaset>
+	<String>BOB</String>
+      </lemmaset>
+    </unit>
+    <unit name="Bosnia and Herzegovina convertible mark" symbol="KM" conversionFactor="">
+      <lemmaset>
+	<String>BAM</String>
+      </lemmaset>
+    </unit>
+    <unit name="Botswana pula" symbol="P" conversionFactor="">
+      <lemmaset>
+	<String>BWP</String>
+	<String frequency="0.001">p</String>			  
+      </lemmaset>
+    </unit>
+    <unit name="Brazilian real" symbol="R$" conversionFactor="">
+      <lemmaset>
+	<String>BRL</String>
+      </lemmaset>
+    </unit>
+    <unit name="British Virgin Islands dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String></String>
+      </lemmaset>
+    </unit>
+    <unit name="Brunei dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>BND</String>
+      </lemmaset>
+    </unit>
+    <unit name="Singapore dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>SGD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Bulgarian lev" symbol="лв" conversionFactor="">
+      <lemmaset>
+	<String>BGN</String>
+      </lemmaset>
+    </unit>
+    <unit name="Burmese kyat" symbol="Ks" conversionFactor="">
+      <lemmaset>
+	<String>MMK</String>
+      </lemmaset>
+    </unit>
+    <unit name="Burundian franc" symbol="Fr" conversionFactor="">
+      <lemmaset>
+	<String>BIF</String>
+      </lemmaset>
+    </unit>
+    <unit name="Cambodian riel" symbol="៛" conversionFactor="">
+      <lemmaset>
+	<String>KHR</String>
+      </lemmaset>
+    </unit>
+    <unit name="Central African CFA franc" symbol="Fr" conversionFactor="">
+      <lemmaset>
+	<String>XAF</String>
+      </lemmaset>
+    </unit>
+    <unit name="Canadian dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>CAD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Cape Verdean escudo" symbol="Esc; $" conversionFactor="">
+      <lemmaset>
+	<String>CVE</String>
+	<String frequency="0.0001">$</String>
+      </lemmaset>
+    </unit>
+    <unit name="Cayman Islands dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>KYD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Chilean peso" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>CLP</String>
+      </lemmaset>
+    </unit>
+    <unit name="Chinese yuan" symbol="¥; 元" conversionFactor="">
+      <lemmaset>
+	<String>CNY</String>
+      </lemmaset>
+    </unit>
+    <unit name="Colombian peso" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>COP</String>
+      </lemmaset>
+    </unit>
+    <unit name="Comorian franc" symbol="Fr" conversionFactor="">
+      <lemmaset>
+	<String>KMF</String>
+      </lemmaset>
+    </unit>
+    <unit name="Congolese franc" symbol="Fr" conversionFactor="">
+      <lemmaset>
+	<String>CDF</String>
+      </lemmaset>
+    </unit>
+    <unit name="New Zealand dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>NZD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Cook Islands dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String></String>
+      </lemmaset>
+    </unit>
+    <unit name="Costa Rican colón" symbol="₡" conversionFactor="">
+      <lemmaset>
+	<String>CRC</String>
+      </lemmaset>
+    </unit>
+    <unit name="Croatian kuna" symbol="kn" conversionFactor="">
+      <lemmaset>
+	<String>HRK</String>
+      </lemmaset>
+    </unit>
+    <unit name="Cuban convertible peso" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>CUC</String>
+      </lemmaset>
+    </unit>
+    <unit name="Cuban peso" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>CUP</String>
+      </lemmaset>
+    </unit>
+    <unit name="Netherlands Antillean guilder" symbol="ƒ" conversionFactor="">
+      <lemmaset>
+	<String>ANG</String>
+      </lemmaset>
+    </unit>
+    <unit name="Czech koruna" symbol="Kč" conversionFactor="">
+      <lemmaset>
+	<String>CZK</String>
+      </lemmaset>
+    </unit>
+    <unit name="Danish krone" symbol="kr" conversionFactor="">
+      <lemmaset>
+	<String>DKK</String>
+      </lemmaset>
+    </unit>
+    <unit name="Djiboutian franc" symbol="Fr" conversionFactor="">
+      <lemmaset>
+	<String>DJF</String>
+      </lemmaset>
+    </unit>
+    <unit name="Dominican peso" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>DOP</String>
+      </lemmaset>
+    </unit>
+    <unit name="Egyptian pound" symbol="£; ج.م" conversionFactor="">
+      <lemmaset>
+	<String>EGP</String>
+      </lemmaset>
+    </unit>
+    <unit name="Salvadoran colón" symbol="₡" conversionFactor="">
+      <lemmaset>
+	<String>SVC</String>
+      </lemmaset>
+    </unit>
+    <unit name="Eritrean nakfa" symbol="Nfk" conversionFactor="">
+      <lemmaset>
+	<String>ERN</String>
+      </lemmaset>
+    </unit>
+    <unit name="Ethiopian birr" symbol="Br" conversionFactor="">
+      <lemmaset>
+	<String>ETB</String>
+      </lemmaset>
+    </unit>
+    <unit name="Falkland Islands pound" symbol="£" conversionFactor="">
+      <lemmaset>
+	<String>FKP</String>
+      </lemmaset>
+    </unit>
+    <unit name="Faroese króna" symbol="kr" conversionFactor="">
+      <lemmaset>
+	<String></String>
+      </lemmaset>
+    </unit>
+    <unit name="Fijian dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>FJD</String>
+      </lemmaset>
+    </unit>
+    <unit name="CFP franc" symbol="Fr" conversionFactor="">
+      <lemmaset>
+	<String>XPF</String>
+      </lemmaset>
+    </unit>
+    <unit name="Gambian dalasi" symbol="D" conversionFactor="">
+      <lemmaset>
+	<String>GMD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Georgian lari" symbol="ლ" conversionFactor="">
+      <lemmaset>
+	<String>GEL</String>
+      </lemmaset>
+    </unit>
+    <unit name="Ghana cedi" symbol="₵" conversionFactor="">
+      <lemmaset>
+	<String>GHS</String>
+      </lemmaset>
+    </unit>
+    <unit name="Gibraltar pound" symbol="£" conversionFactor="">
+      <lemmaset>
+	<String>GIP</String>
+      </lemmaset>
+    </unit>
+    <unit name="Guatemalan quetzal" symbol="Q" conversionFactor="">
+      <lemmaset>
+	<String>GTQ</String>
+      </lemmaset>
+    </unit>
+    <unit name="Guinean franc" symbol="Fr" conversionFactor="">
+      <lemmaset>
+	<String>GNF</String>
+      </lemmaset>
+    </unit>
+    <unit name="Guyanese dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>GYD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Haitian gourde" symbol="G" conversionFactor="">
+      <lemmaset>
+	<String>HTG</String>
+      </lemmaset>
+    </unit>
+    <unit name="Honduran lempira" symbol="L" conversionFactor="">
+      <lemmaset>
+	<String>HNL</String>
+      </lemmaset>
+    </unit>
+    <unit name="Hong Kong dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String>HKD</String>
+	<String frequency="0.0001">$</String>
+      </lemmaset>
+    </unit>
+    <unit name="Hungarian forint" symbol="Ft" conversionFactor="">
+      <lemmaset>
+	<String>HUF</String>
+      </lemmaset>
+    </unit>
+    <unit name="Icelandic króna" symbol="kr" conversionFactor="">
+      <lemmaset>
+	<String>ISK</String>
+      </lemmaset>
+    </unit>
+    <unit name="Indonesian rupiah" symbol="Rp" conversionFactor="">
+      <lemmaset>
+	<String>IDR</String>
+      </lemmaset>
+    </unit>
+    <unit name="Iranian rial" symbol="﷼" conversionFactor="">
+      <lemmaset>
+	<String>IRR</String>
+      </lemmaset>
+    </unit>
+    <unit name="Iraqi dinar" symbol="ع.د" conversionFactor="">
+      <lemmaset>
+	<String>IQD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Manx pound" symbol="£" conversionFactor="">
+      <lemmaset>
+	<String>IMP</String>
+      </lemmaset>
+    </unit>
+    <unit name="Israeli new shekel" symbol="₪" conversionFactor="">
+      <lemmaset>
+	<String>ILS</String>
+      </lemmaset>
+    </unit>
+    <unit name="Jamaican dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>JMD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Japanese yen" symbol="¥" conversionFactor="">
+      <lemmaset>
+	<String>JPY</String>
+      </lemmaset>
+    </unit>
+    <unit name="Jersey pound" symbol="£" conversionFactor="">
+      <lemmaset>
+	<String>JEP</String>
+      </lemmaset>
+    </unit>
+    <unit name="Jordanian dinar" symbol="د.ا" conversionFactor="">
+      <lemmaset>
+	<String>JOD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Kazakhstani tenge" symbol="₸" conversionFactor="">
+      <lemmaset>
+	<String>KZT</String>
+      </lemmaset>
+    </unit>
+    <unit name="Kenyan shilling" symbol="Sh" conversionFactor="">
+      <lemmaset>
+	<String>KES</String>
+      </lemmaset>
+    </unit>
+    <unit name="Kiribati dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String></String>
+      </lemmaset>
+    </unit>
+    <unit name="North Korean won" symbol="₩" conversionFactor="">
+      <lemmaset>
+	<String>KPW</String>
+      </lemmaset>
+    </unit>
+    <unit name="South Korean won" symbol="₩" conversionFactor="">
+      <lemmaset>
+	<String>KRW</String>
+      </lemmaset>
+    </unit>
+    <unit name="Kuwaiti dinar" symbol="د.ك" conversionFactor="">
+      <lemmaset>
+	<String>KWD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Kyrgyzstani som" symbol="лв" conversionFactor="">
+      <lemmaset>
+	<String>KGS</String>
+      </lemmaset>
+    </unit>
+    <unit name="Lao kip" symbol="₭" conversionFactor="">
+      <lemmaset>
+	<String>LAK</String>
+      </lemmaset>
+    </unit>
+    <unit name="Latvian lats" symbol="Ls" conversionFactor="">
+      <lemmaset>
+	<String>LVL</String>
+      </lemmaset>
+    </unit>
+    <unit name="Lebanese pound" symbol="ل.ل" conversionFactor="">
+      <lemmaset>
+	<String>LBP</String>
+      </lemmaset>
+    </unit>
+    <unit name="Lesotho loti" symbol="L" conversionFactor="">
+      <lemmaset>
+	<String>LSL</String>
+      </lemmaset>
+    </unit>
+    <unit name="South African rand" symbol="R" conversionFactor="">
+      <lemmaset>
+	<String>ZAR</String>
+      </lemmaset>
+    </unit>
+    <unit name="Liberian dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>LRD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Libyan dinar" symbol="ل.د" conversionFactor="">
+      <lemmaset>
+	<String>LYD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Swiss franc" symbol="Fr" conversionFactor="">
+      <lemmaset>
+	<String>CHF</String>
+      </lemmaset>
+    </unit>
+    <unit name="Lithuanian litas" symbol="Lt" conversionFactor="">
+      <lemmaset>
+	<String>LTL</String>
+      </lemmaset>
+    </unit>
+    <unit name="Macanese pataca" symbol="P" conversionFactor="">
+      <lemmaset>
+	<String>MOP</String>
+	<String frequency="0.001">p</String>			  
+      </lemmaset>
+    </unit>
+    <unit name="Macedonian denar" symbol="ден" conversionFactor="">
+      <lemmaset>
+	<String>MKD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Malagasy ariary" symbol="Ar" conversionFactor="">
+      <lemmaset>
+	<String>MGA</String>
+      </lemmaset>
+    </unit>
+    <unit name="Malawian kwacha" symbol="MK" conversionFactor="">
+      <lemmaset>
+	<String>MWK</String>
+      </lemmaset>
+    </unit>
+    <unit name="Malaysian ringgit" symbol="RM" conversionFactor="">
+      <lemmaset>
+	<String>MYR</String>
+      </lemmaset>
+    </unit>
+    <unit name="Maldivian rufiyaa" symbol=".ރ" conversionFactor="">
+      <lemmaset>
+	<String>MVR</String>
+      </lemmaset>
+    </unit>
+    <unit name="Mauritanian ouguiya" symbol="UM" conversionFactor="">
+      <lemmaset>
+	<String>MRO</String>
+      </lemmaset>
+    </unit>
+    <unit name="Mauritian rupee" symbol="₨" conversionFactor="">
+      <lemmaset>
+	<String>MUR</String>
+      </lemmaset>
+    </unit>
+    <unit name="Mexican peso" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>MXN</String>
+      </lemmaset>
+    </unit>
+    <unit name="Micronesian dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String></String>
+      </lemmaset>
+    </unit>
+    <unit name="Moldovan leu" symbol="L" conversionFactor="">
+      <lemmaset>
+	<String>MDL</String>
+      </lemmaset>
+    </unit>
+    <unit name="Mongolian tögrög" symbol="₮" conversionFactor="">
+      <lemmaset>
+	<String>MNT</String>
+      </lemmaset>
+    </unit>
+    <unit name="Moroccan dirham" symbol="د.م." conversionFactor="">
+      <lemmaset>
+	<String>MAD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Mozambican metical" symbol="MT" conversionFactor="">
+      <lemmaset>
+	<String>MZN</String>
+      </lemmaset>
+    </unit>
+    <unit name="Nagorno-Karabakh dram" symbol="դր." conversionFactor="">
+      <lemmaset>
+	<String></String>
+      </lemmaset>
+    </unit>
+    <unit name="Namibian dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>NAD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Nauruan dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String></String>
+      </lemmaset>
+    </unit>
+    <unit name="Nepalese rupee" symbol="₨" conversionFactor="">
+      <lemmaset>
+	<String>NPR</String>
+      </lemmaset>
+    </unit>
+    <unit name="Nicaraguan córdoba" symbol="C$" conversionFactor="">
+      <lemmaset>
+	<String>NIO</String>
+      </lemmaset>
+    </unit>
+    <unit name="Nigerian naira" symbol="₦" conversionFactor="">
+      <lemmaset>
+	<String>NGN</String>
+      </lemmaset>
+    </unit>
+    <unit name="Niuean dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String></String>
+      </lemmaset>
+    </unit>
+    <unit name="Turkish lira" symbol="" conversionFactor="">
+      <lemmaset>
+	<String>TRY</String>
+      </lemmaset>
+    </unit>
+    <unit name="Norwegian krone" symbol="kr" conversionFactor="">
+      <lemmaset>
+	<String>NOK</String>
+      </lemmaset>
+    </unit>
+    <unit name="Omani rial" symbol="ر.ع." conversionFactor="">
+      <lemmaset>
+	<String>OMR</String>
+      </lemmaset>
+    </unit>
+    <unit name="Pakistani rupee" symbol="₨" conversionFactor="">
+      <lemmaset>
+	<String>PKR</String>
+      </lemmaset>
+    </unit>
+    <unit name="Palauan dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String></String>
+      </lemmaset>
+    </unit>
+    <unit name="Panamanian balboa" symbol="B/." conversionFactor="">
+      <lemmaset>
+	<String>PAB</String>
+      </lemmaset>
+    </unit>
+    <unit name="Papua New Guinean kina" symbol="K" conversionFactor="">
+      <lemmaset>
+	<String>PGK</String>
+      </lemmaset>
+    </unit>
+    <unit name="Paraguayan guaraní" symbol="₲" conversionFactor="">
+      <lemmaset>
+	<String>PYG</String>
+      </lemmaset>
+    </unit>
+    <unit name="Peruvian nuevo sol" symbol="S/." conversionFactor="">
+      <lemmaset>
+	<String>PEN</String>
+      </lemmaset>
+    </unit>
+    <unit name="Philippine peso" symbol="₱" conversionFactor="">
+      <lemmaset>
+	<String>PHP</String>
+      </lemmaset>
+    </unit>
+    <unit name="Pitcairn Islands dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String></String>
+      </lemmaset>
+    </unit>
+    <unit name="Polish złoty" symbol="zł" conversionFactor="">
+      <lemmaset>
+	<String>PLN</String>
+      </lemmaset>
+    </unit>
+    <unit name="Qatari riyal" symbol="ر.ق" conversionFactor="">
+      <lemmaset>
+	<String>QAR</String>
+      </lemmaset>
+    </unit>
+    <unit name="Romanian leu" symbol="L" conversionFactor="">
+      <lemmaset>
+	<String>RON</String>
+      </lemmaset>
+    </unit>
+    <unit name="Rwandan franc" symbol="Fr" conversionFactor="">
+      <lemmaset>
+	<String>RWF</String>
+      </lemmaset>
+    </unit>
+    <unit name="Sahrawi peseta" symbol="Ptas" conversionFactor="">
+      <lemmaset>
+	<String></String>
+      </lemmaset>
+    </unit>
+    <unit name="Samoan tālā" symbol="T" conversionFactor="">
+      <lemmaset>
+	<String>WST</String>
+      </lemmaset>
+    </unit>
+    <unit name="São Tomé and Príncipe dobra" symbol="Db" conversionFactor="">
+      <lemmaset>
+	<String>STD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Saudi riyal" symbol="ر.س" conversionFactor="">
+      <lemmaset>
+	<String>SAR</String>
+      </lemmaset>
+    </unit>
+    <unit name="Serbian dinar" symbol="дин.; din." conversionFactor="">
+      <lemmaset>
+	<String>RSD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Seychellois rupee" symbol="₨" conversionFactor="">
+      <lemmaset>
+	<String>SCR</String>
+      </lemmaset>
+    </unit>
+    <unit name="Sierra Leonean leone" symbol="Le" conversionFactor="">
+      <lemmaset>
+	<String>SLL</String>
+      </lemmaset>
+    </unit>
+    <unit name="Solomon Islands dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>SBD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Somali shilling" symbol="Sh" conversionFactor="">
+      <lemmaset>
+	<String>SOS</String>
+      </lemmaset>
+    </unit>
+    <unit name="Somaliland shilling" symbol="Sh" conversionFactor="">
+      <lemmaset>
+	<String></String>
+      </lemmaset>
+    </unit>
+    <unit name="South Georgia and the South Sandwich Islands pound" symbol="£" conversionFactor="">
+      <lemmaset>
+	<String></String>
+      </lemmaset>
+    </unit>
+    <unit name="South Sudanese pound" symbol="£" conversionFactor="">
+      <lemmaset>
+	<String>SSP</String>
+      </lemmaset>
+    </unit>
+    <unit name="Sri Lankan rupee" symbol="Rs; රු" conversionFactor="">
+      <lemmaset>
+	<String>LKR</String>
+      </lemmaset>
+    </unit>
+    <unit name="Sudanese pound" symbol="£" conversionFactor="">
+      <lemmaset>
+	<String>SDG</String>
+      </lemmaset>
+    </unit>
+    <unit name="Surinamese dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>SRD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Swazi lilangeni" symbol="L" conversionFactor="">
+      <lemmaset>
+	<String>SZL</String>
+      </lemmaset>
+    </unit>
+    <unit name="Swedish krona" symbol="kr" conversionFactor="">
+      <lemmaset>
+	<String>SEK</String>
+      </lemmaset>
+    </unit>
+    <unit name="Syrian pound" symbol="£; ل.س" conversionFactor="">
+      <lemmaset>
+	<String>SYP</String>
+      </lemmaset>
+    </unit>
+    <unit name="New Taiwan dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>TWD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Tajikistani somoni" symbol="ЅМ" conversionFactor="">
+      <lemmaset>
+	<String>TJS</String>
+      </lemmaset>
+    </unit>
+    <unit name="Tanzanian shilling" symbol="Sh" conversionFactor="">
+      <lemmaset>
+	<String>TZS</String>
+      </lemmaset>
+    </unit>
+    <unit name="Thai baht" symbol="฿" conversionFactor="">
+      <lemmaset>
+	<String>THB</String>
+      </lemmaset>
+    </unit>
+    <unit name="Tongan paʻanga" symbol="T$" conversionFactor="">
+      <lemmaset>
+	<String>TOP</String>
+      </lemmaset>
+    </unit>
+    <unit name="Transnistrian ruble" symbol="р." conversionFactor="">
+      <lemmaset>
+	<String>PRB</String>
+      </lemmaset>
+    </unit>
+    <unit name="Trinidad and Tobago dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>TTD</String>
+      </lemmaset>
+    </unit>
+    <unit name="Tristan da Cunha pound" symbol="£" conversionFactor="">
+      <lemmaset>
+	<String></String>
+      </lemmaset>
+    </unit>
+    <unit name="Tunisian dinar" symbol="د.ت" conversionFactor="">
+      <lemmaset>
+	<String>TND</String>
+      </lemmaset>
+    </unit>
+    <unit name="Turkmenistan manat" symbol="m" conversionFactor="">
+      <lemmaset>
+	<String>TMT</String>
+      </lemmaset>
+    </unit>
+    <unit name="Tuvaluan dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String></String>
+      </lemmaset>
+    </unit>
+    <unit name="Ugandan shilling" symbol="Sh" conversionFactor="">
+      <lemmaset>
+	<String>UGX</String>
+      </lemmaset>
+    </unit>
+    <unit name="Ukrainian hryvnia" symbol="₴" conversionFactor="">
+      <lemmaset>
+	<String>UAH</String>
+      </lemmaset>
+    </unit>
+    <unit name="United Arab Emirates dirham" symbol="د.إ" conversionFactor="">
+      <lemmaset>
+	<String>AED</String>
+      </lemmaset>
+    </unit>
+    <unit name="Uruguayan peso" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>UYU</String>
+      </lemmaset>
+    </unit>
+    <unit name="Uzbekistani som" symbol="лв" conversionFactor="">
+      <lemmaset>
+	<String>UZS</String>
+      </lemmaset>
+    </unit>
+    <unit name="Vanuatu vatu" symbol="Vt" conversionFactor="">
+      <lemmaset>
+	<String>VUV</String>
+      </lemmaset>
+    </unit>
+    <unit name="Venezuelan bolívar" symbol="Bs F" conversionFactor="">
+      <lemmaset>
+	<String>VEF</String>
+      </lemmaset>
+    </unit>
+    <unit name="Vietnamese đồng" symbol="₫" conversionFactor="">
+      <lemmaset>
+	<String>VND</String>
+      </lemmaset>
+    </unit>
+    <unit name="Yemeni rial" symbol="﷼" conversionFactor="">
+      <lemmaset>
+	<String>YER</String>
+      </lemmaset>
+    </unit>
+    <unit name="Zambian kwacha" symbol="ZK" conversionFactor="">
+      <lemmaset>
+	<String>ZMW</String>
+      </lemmaset>
+    </unit>
+    <unit name="Zimbabwean dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.0001">$</String>
+	<String>ZWL</String>
+      </lemmaset>
+    </unit>
+  </concept>
+  <concept name="Length">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="angstrom" symbol="Å" conversionFactor="≡ 0.1 nm">
+      <lemmaset>
+	<String>angstrom</String>
+	<String>angstroms</String>
+      </lemmaset>
+    </unit>
+    <unit name="astronomical unit" symbol="AU" conversionFactor="≈ 149597871464 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="barleycorn (H)" symbol=" " conversionFactor="≈ 8.46×10−3 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="bohr, atomic unit of length" symbol="a0" conversionFactor="≈ 5.2917720859×10−11 ± 3.6×10−20 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <!--
+	<unit name="cable length (imperial)" symbol=" " conversionFactor="≈ 185.3184 m">
+	<lemmaset>
+	</lemmaset>
+	</unit>
+	<unit name="cable length (US)" symbol=" " conversionFactor="= 219.456 m">
+	<lemmaset>
+	</lemmaset>
+	</unit>
+    -->
+    <unit name="cable length (International)" symbol=" " conversionFactor="≡ 185.2 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="chain (Gunter's; Surveyor's)" symbol="ch" conversionFactor="≈ 20.11684 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="cubit (H)" symbol=" " conversionFactor="≈ 0.5 m">
+      <lemmaset>
+	<String>cubic ft</String>
+	<String>cubit</String>
+	<String>cubic</String>
+      </lemmaset>
+    </unit>
+    <unit name="ell (H)" symbol="ell" conversionFactor="= 1.143 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="fathom" symbol="fm" conversionFactor="= 1.8288 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="fermi" symbol="fm" conversionFactor="≡ 1×10−15 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="finger" symbol=" " conversionFactor="= 0.022225 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="finger (cloth)" symbol=" " conversionFactor="= 0.1143 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <!--
+	<unit name="foot (Benoît) (H)" symbol="ft (Ben)" conversionFactor="≈ 0.304799735 m">
+	<lemmaset>
+	<String>foot</String>
+	<String>feet</String>
+	</lemmaset>
+	</unit>
+	<unit name="foot (Clarke's; Cape) (H)" symbol="ft (Cla)" conversionFactor="≈ 0.3047972654 m">
+	<lemmaset>
+	<String>ft thomas</String>
+	</lemmaset>
+	</unit>
+	<unit name="foot (Indian) (H)" symbol="ft Ind" conversionFactor="≈ 0.304799514 m">
+	<lemmaset>
+	<String>foot</String>
+	</lemmaset>
+	</unit>
+	<unit name="foot (Sear's) (H)" symbol="ft (Sear)" conversionFactor="≈ 0.30479947 m">
+	<lemmaset>
+	</lemmaset>
+	</unit>
+	<unit name="foot (US Survey)" symbol="ft (US)" conversionFactor="≈ 0.304800610 m">
+	<lemmaset>
+	<String>foot</String>
+	<String>feet</String>
+	<String>ft</String>
+	</lemmaset>
+	</unit>
+    -->
+    <unit name="foot (International)" symbol="ft" conversionFactor="≡ 0.3048 m">
+      <lemmaset>
+	<String>feet</String>
+      </lemmaset>
+    </unit>
+    <unit name="french; charriere" symbol="F" conversionFactor="= 0.3 ×10−3 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="furlong" symbol="fur" conversionFactor="= 201.168 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="hand" symbol=" " conversionFactor="≡ 0.1016 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="inch (International)" symbol="in" conversionFactor="≡ 0.0254 m">
+      <lemmaset>
+	<String>"</String>
+	<String>inches</String>
+      </lemmaset>
+    </unit>
+    <unit name="league (land)" symbol="lea" conversionFactor="= 4828.032 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="light-day" symbol=" " conversionFactor="≡ 2.59020683712×1013 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="light-hour" symbol=" " conversionFactor="≡ 1.0792528488×1012 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="light-minute" symbol=" " conversionFactor="≡ 1.798754748×1010 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="light-second" symbol=" " conversionFactor="≡ 299792458 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="light-year" symbol="ly" conversionFactor="= 9.4607304725808×1015 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="line" symbol="ln" conversionFactor="= 0.002116 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="link (Gunter's; Surveyor's)" symbol="lnk" conversionFactor="= 0.201168 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="link (Ramsden's; Engineer's)" symbol="lnk" conversionFactor="= 0.3048 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="metre (SI base unit)" symbol="m" conversionFactor="≡ 1 m">
+      <lemmaset>
+	<String>meter</String>
+      </lemmaset>
+    </unit>
+    <unit name="kilometre" symbol="km" conversionFactor="≡ 1000 m">
+      <lemmaset>
+	<String>kilometer</String>
+	<String>kilometers</String>
+	<String>kms</String>
+      </lemmaset>
+    </unit>
+    <unit name="centimetre" symbol="cm" conversionFactor="≡ 0.01 m">
+      <lemmaset>
+	<String>centimeter</String>
+	<String>centimeters</String>
+	<String>cms</String>
+      </lemmaset>
+    </unit>
+    <unit name="mickey" symbol=" " conversionFactor="= 1.27×10−4 m">
+      <lemmaset>
+	<String>mickey</String>
+      </lemmaset>
+    </unit>
+    <unit name="micron" symbol="µ" conversionFactor="≡ 1×10−6 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="mil;" symbol="mil" conversionFactor="≡ 2.54×10−5 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="mil (Sweden and Norway)" symbol="mil" conversionFactor="= 10000 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="mile (international)" symbol="mi" conversionFactor="≡ 1609.344 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <!--
+	<unit name="mile (geographical) (H)" symbol="" conversionFactor="= 1853.7936 m">
+	<lemmaset>
+	</lemmaset>
+	</unit>
+	<unit name="mile (tactical or data)" symbol="" conversionFactor="≡ 1828.8 m">
+	<lemmaset>
+	</lemmaset>
+	</unit>
+	<unit name="mile (telegraph) (H)" symbol="mi" conversionFactor="= 1855.3176 m">
+	<lemmaset>
+	</lemmaset>
+	</unit>
+	<unit name="mile (US Survey)" symbol="mi" conversionFactor="≈ 1609.347219 m">
+	<lemmaset>
+	</lemmaset>
+	</unit>
+    -->
+    <unit name="nail (cloth)" symbol=" " conversionFactor="= 0.057 15 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="nanometer" symbol="nm" conversionFactor="≡ 1×10−9 m">
+      <lemmaset>
+	<String>nanometers</String>
+      </lemmaset>
+    </unit>
+    <unit name="nautical league" symbol="NL; nl" conversionFactor="= 5556 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="nautical mile (international)" symbol="NM; nmi" conversionFactor="≡ 1852 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <!--
+	<unit name="nautical mile (Admiralty)" symbol="NM (Adm); nmi (Adm)" conversionFactor="= 1853.184 m">
+	<lemmaset>
+	<String>nautical mile</String>
+	<String>nautical miles</String>
+	</lemmaset>
+	</unit>
+	<unit name="nautical mile (US pre 1954)" symbol="" conversionFactor="≡ 1853.248 m">
+	<lemmaset>
+	</lemmaset>
+	</unit>
+    -->
+    <unit name="pace" symbol=" " conversionFactor="= 0.762 m">
+      <lemmaset>
+	<String>pace</String>
+	<String>pacey</String>
+	<String>paces</String>
+      </lemmaset>
+    </unit>
+    <unit name="palm" symbol=" " conversionFactor="= 0.0762 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="parsec" symbol="pc" conversionFactor="≈ 3.085 677 82×1016 ± 6×106 m [10]">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="pica" symbol=" " conversionFactor="Dependent on point measures.">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="point (American, English)" symbol="pt" conversionFactor="≈ 0.000 351 450 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <!--
+	<unit name="point (Didot; European) [12][13]" symbol="pt" conversionFactor="≈ 0.000 375 97 m;   After 1878: ≈ 0.000 375 939 85 m">
+	<lemmaset>
+	<String>point</String>
+	<String>pt</String>
+	<String>points</String>
+	<String>pointe</String>
+	</lemmaset>
+	</unit>
+	<unit name="point (PostScript) [11]" symbol="pt" conversionFactor="= 0.000 352 7 m">
+	<lemmaset>
+	<String>point</String>
+	<String>pt</String>
+	<String>points</String>
+	<String>pointe</String>
+	</lemmaset>
+	</unit>
+	<unit name="point (TeX) [11]" symbol="pt" conversionFactor="= 0.000 351 4598 m">
+	<lemmaset>
+	<String>point</String>
+	<String>pt</String>
+	<String>points</String>
+	<String>pointe</String>
+	</lemmaset>
+	</unit>
+    -->
+    <unit name="quarter" symbol=" " conversionFactor="= 0.2286 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="rod; pole; perch (H)" symbol="rd" conversionFactor="= 5.0292 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="rope (H)" symbol="rope" conversionFactor="= 6.096 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="span (H)" symbol=" " conversionFactor="= 0.2286 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="spat" symbol="" conversionFactor="≡ 1×1012 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="stick (H)" symbol=" " conversionFactor="= 0.0508 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="stigma; bicron (picometre)" symbol="pm" conversionFactor="≡ 1×10−12 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="twip" symbol="twp" conversionFactor="= 1.7638×10−5 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="x unit; siegbahn" symbol="xu" conversionFactor="≈ 1.0021×10−13 m [4]">
+      <lemmaset>
+	<String>x u</String>
+	<String>x units</String>
+      </lemmaset>
+    </unit>
+    <unit name="yard (International)" symbol="yd" conversionFactor="≡ 0.9144 m">
+      <lemmaset>
+	<String>y d</String>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Area">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="acre (international)" symbol="ac" conversionFactor="≡ 4 046.856 4224 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <!--
+	<unit name="acre (U. S. survey)" symbol="ac" conversionFactor="≈ 4 046.873 m2 [15]">
+	<lemmaset>
+	</lemmaset>
+	</unit>
+    -->
+    <unit name="are" symbol="a" conversionFactor="= 100 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="barn" symbol="b" conversionFactor="= 1×10−28 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="barony" symbol=" " conversionFactor="≈ 1.618 742×107 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="board" symbol="bd" conversionFactor="= 7.741 92×10−3 m2">
+      <lemmaset>
+	<String>boards</String>
+      </lemmaset>
+    </unit>
+    <unit name="boiler horsepower equivalent direct radiation" symbol="bhp EDR" conversionFactor="≈ 12.958 174 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="circular inch" symbol="circ in" conversionFactor="≈ 5.067 075×10−4 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="circular mil; circular thou" symbol="circ mil" conversionFactor="≈ 5.067 075×10−10 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="cord" symbol=" " conversionFactor="= 1.486 448 64 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="dunam" symbol=" " conversionFactor="= 1 000 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="guntha" symbol=" " conversionFactor="≈ 101.17 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="hectare" symbol="ha" conversionFactor="≡ 10 000 m2">
+      <lemmaset>
+	<String>hectares</String>
+	<String>hectare.</String>
+	<String>hectare ha</String>
+	<String>hectar</String>
+      </lemmaset>
+    </unit>
+    <unit name="hide" symbol=" " conversionFactor="≈ 5×105 m2">
+      <lemmaset>
+	<String>hides</String>
+	<String>hide</String>
+      </lemmaset>
+    </unit>
+    <unit name="rood" symbol="ro" conversionFactor="= 1 011.714 1056 m2">
+      <lemmaset>
+	<String>roods</String>
+      </lemmaset>
+    </unit>
+    <unit name="section" symbol="" conversionFactor="= 2.589 988 110 336×106 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="shed" symbol=" " conversionFactor="= 1×10−52 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="square (roofing)" symbol="" conversionFactor="= 9.290 304 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="square chain (international)" symbol="sq ch" conversionFactor="≡ 404.685 642 24 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="square chain (US Survey)" symbol="sq ch" conversionFactor="≈ 404.687 3 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="square foot" symbol="sq ft" conversionFactor="≡ 9.290 304×10−2 m2">
+      <lemmaset>
+	<String>square feet</String>
+	<String>Sft</String>
+      </lemmaset>
+    </unit>
+    <!--
+	<unit name="square foot (US Survey)" symbol="sq ft" conversionFactor="≈ 9.290 341 161 327 49×10−2 m2">
+	<lemmaset>
+	<String>square feet</String>
+	<String>Sft</String>
+	</lemmaset>
+	</unit>
+    -->
+    <unit name="square inch" symbol="sq in" conversionFactor="≡ 6.4516×10−4 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="square kilometre" symbol="km2" conversionFactor="= 1×106 m2">
+      <lemmaset>
+	<String>square kilometer</String>
+	<String>sq-km</String>
+	<String>sq km</String>
+	<String>Km²</String>
+      </lemmaset>
+    </unit>
+
+
+    <unit name="square link (Gunter's)(International)" symbol="sq lnk" conversionFactor="= 4.046 856 4224×10−2 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="square link (Gunter's)(US Survey)" symbol="sq lnk" conversionFactor="≈ 4.046 872×10−2 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="square link (Ramsden's)" symbol="sq lnk" conversionFactor="= 0.09290304 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="square metre (SI unit)" symbol="m2; sq m" conversionFactor="= 1 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="square mil; square thou" symbol="sq mil" conversionFactor="= 6.4516×10−10 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="square mile" symbol="sq mi" conversionFactor="= 2.589 988 110 336×106 m2">
+      <lemmaset>
+	<String>squaremiles</String>
+      </lemmaset>
+    </unit>
+    <!--
+	<unit name="square mile (US Survey)" symbol="sq mi" conversionFactor="≈ 2.589 998 47×106 m2">
+	<lemmaset>
+	<String>square mile</String>
+	<String>squaremiles</String>
+	<String>sq mi</String>
+	<String>square miles</String>
+	<String>square miles (2)</String>
+	</lemmaset>
+	</unit>
+    -->
+    <unit name="square rod/pole/perch" symbol="sq rd" conversionFactor="= 25.292 852 64 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="square yard (International)" symbol="sq yd" conversionFactor="≡ 0.836 127 36 m2">
+      <lemmaset>
+	<String>sq yards</String>
+	<String>sq yard</String>
+      </lemmaset>
+    </unit>
+    <unit name="stremma" symbol=" " conversionFactor="= 1 000 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="township" symbol=" " conversionFactor="≈ 9.323 994×107 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="yardland" symbol=" " conversionFactor="≈ 1.2×105 m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Volume">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="acre-foot" symbol="ac ft" conversionFactor="= 1 233.481 837 547 52 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="acre-inch" symbol=" " conversionFactor="= 102.790 153 128 96 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="barrel (imperial)" symbol="bl (imp)" conversionFactor="= 0.163 659 24 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="barrel (petroleum)" symbol="bl; bbl" conversionFactor="= 0.158 987 294 928 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="barrel (US dry)" symbol="bl (US)" conversionFactor="= 0.115 628 198 985 075 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="barrel (US fluid)" symbol="fl bl (US)" conversionFactor="= 0.119 240 471 196 m3">
+      <lemmaset>
+	<String>barrels</String>
+	<String>barrel</String>
+      </lemmaset>
+    </unit>
+    <unit name="board-foot" symbol="fbm" conversionFactor="≡ 2.359 737 216×10−3 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="bucket (imperial)" symbol="bkt" conversionFactor="= 0.018 184 36 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="bushel (imperial)" symbol="bu (imp)" conversionFactor="= 0.036 368 72 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="bushel (US dry heaped)" symbol="bu (US)" conversionFactor="= 0.044 048 837 7086 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="bushel (US dry level)" symbol="bu (US lvl)" conversionFactor="= 0.035 239 070 166 88 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="butt, pipe" symbol=" " conversionFactor="= 0.476 961 884 784 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="coomb" symbol=" " conversionFactor="= 0.145 474 88 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="cord (firewood)" symbol=" " conversionFactor="= 3.624 556 363 776 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="cord-foot" symbol=" " conversionFactor="= 0.453 069 545 472 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="cubic fathom" symbol="cu fm" conversionFactor="= 6.116 438 863 872 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="cubic foot" symbol="cu ft" conversionFactor="≡ 0.028 316 846 592 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="cubic inch" symbol="cu in" conversionFactor="≡ 16.387 064×10−6 m3">
+      <lemmaset>
+	<String>cubic in.</String>
+	<String>cu. in.</String>
+      </lemmaset>
+    </unit>
+    <unit name="cubic metre (SI unit)" symbol="m3" conversionFactor="≡ 1 m3">
+      <lemmaset>
+	<String>m 3</String>
+      </lemmaset>
+    </unit>
+    <unit name="cubic mile" symbol="cu mi" conversionFactor="≡ 4 168 181 825.440 579 584 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="cubic yard" symbol="cu yd" conversionFactor="≡ 0.764 554 857 984 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <!--
+	<unit name="cup (breakfast)" symbol=" " conversionFactor="= 284.130 625×10−6 m3">
+	<lemmaset>
+	</lemmaset>
+	</unit>
+	<unit name="cup (Canadian)" symbol="c (CA)" conversionFactor="= 227.3045×10−6 m3">
+	<lemmaset>
+	</lemmaset>
+	</unit>
+    -->
+    <unit name="cup (metric)" symbol="c" conversionFactor="= 250.0×10−6 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <!--
+	<unit name="cup (US customary)" symbol="c (US)" conversionFactor="= 236.588 2365×10−6 m3">
+	<lemmaset>
+	<String>cup</String>
+	<String>cups</String>
+	<String>c</String>
+	</lemmaset>
+	</unit>
+	<unit name="cup (US food nutrition labeling)" symbol="c (US)" conversionFactor="= 2.4×10−4 m3">
+	<lemmaset>
+	</lemmaset>
+	</unit>
+    -->
+    <unit name="dash (imperial)" symbol=" " conversionFactor="= 369.961 751 302 08 3×10−9 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="dash (US)" symbol=" " conversionFactor="= 308.057 599 609 375×10−9 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="dessertspoon (imperial)" symbol=" " conversionFactor="= 11.838 776 0416×10−6 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="drop (imperial)" symbol="gtt" conversionFactor="= 98.656 467 013 8×10−9 m3">
+      <lemmaset>
+	<String>drop</String>
+      </lemmaset>
+    </unit>
+    <unit name="drop (imperial) (alt)" symbol="gtt" conversionFactor="≈ 77.886 684×10−9 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="drop (medical)" symbol=" " conversionFactor="= 83.03×10−9 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="drop (metric)" symbol=" " conversionFactor="= 50.0×10−9 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="drop (US)" symbol="gtt" conversionFactor="= 82.148 693 22916×10−9 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="drop (US) (alt)" symbol="gtt" conversionFactor="≈ 64.854 231×10−9 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="fifth" symbol=" " conversionFactor="= 757.082 3568×10−6 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="firkin" symbol=" " conversionFactor="= 0.034 068 706 056 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="fluid drachm (imperial)" symbol="fl dr" conversionFactor="= 3.551 632 8125×10−6 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="fluid dram (US); US fluidram" symbol="fl dr" conversionFactor="= 3.696 691 195 3125×10−6 m3">
+      <lemmaset>
+	<String>fluidram</String>
+      </lemmaset>
+    </unit>
+    <unit name="fluid scruple (imperial)" symbol="fl s" conversionFactor="= 1.183 877 60416×10−6 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="gallon (beer)" symbol="beer gal" conversionFactor="= 4.621 152 048×10−3 m3">
+      <lemmaset>
+	<String>galllons</String>
+      </lemmaset>
+    </unit>
+    <unit name="gallon (imperial)" symbol="gal (imp)" conversionFactor="≡ 4.546 09×10−3 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="gallon (US dry)" symbol="gal (US)" conversionFactor="= 4.404 883 770 86×10−3 m3">
+      <lemmaset>
+	<String>gall</String>
+      </lemmaset>
+    </unit>
+    <unit name="gallon (US fluid; Wine)" symbol="gal (US)" conversionFactor="≡ 3.785 411 784×10−3 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="gill (imperial); Noggin" symbol="gi (imp); nog" conversionFactor="= 142.065 3125×10−6 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="gill (US)" symbol="gi (US)" conversionFactor="= 118.294 118 25×10−6 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="hogshead (imperial)" symbol="hhd (imp)" conversionFactor="= 0.327 318 48 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="hogshead (US)" symbol="hhd (US)" conversionFactor="= 0.238 480 942 392 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="jigger (bartending)" symbol=" " conversionFactor="≈ 44.36×10−6 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="kilderkin" symbol=" " conversionFactor="= 0.081 829 62 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="lambda" symbol="λ" conversionFactor="= 1×10−9 m3">
+      <lemmaset>
+	<String>lambda</String>
+      </lemmaset>
+    </unit>
+    <unit name="last" symbol=" " conversionFactor="= 2.909 4976 m3">
+      <lemmaset>
+	<String>last</String>
+	<String>last yr</String>
+      </lemmaset>
+    </unit>
+    <unit name="litre" symbol="L" conversionFactor="≡ 0.001 m3">
+      <lemmaset>
+	<String>litre</String>
+	<String>litres f</String>
+	<String>litres</String>
+      </lemmaset>
+    </unit>
+    <unit name="millilitre" symbol="ML" conversionFactor="≡ 0.000001 m3">
+      <lemmaset>
+	<String>milliliter</String>
+      </lemmaset>
+    </unit>
+    <unit name="load" symbol=" " conversionFactor="= 1.415 842 3296 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="minim (imperial)" symbol="min" conversionFactor="= 59.193 880 208 3×10−9 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="minim (US)" symbol="min" conversionFactor="= 61.611 519 921 875×10−9 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="ounce (fluid imperial)" symbol="fl oz (imp)" conversionFactor="≡ 28.413 0625×10−6 m3">
+      <lemmaset>
+	<String>ounces</String>
+	<String>ounce</String>
+	<String>fl oz</String>
+      </lemmaset>
+    </unit>
+    <unit name="ounce (fluid US customary)" symbol="US fl oz" conversionFactor="≡ 29.573 529 5625×10−6 m3">
+      <lemmaset>
+	<String>ounces</String>
+	<String>ounce</String>
+      </lemmaset>
+    </unit>
+    <unit name="ounce (fluid US food nutrition labeling)" symbol="US fl oz" conversionFactor="≡ 3×10−5 m3">
+      <lemmaset>
+	<String>ounces</String>
+	<String>ounce</String>
+      </lemmaset>
+    </unit>
+    <unit name="peck (imperial)" symbol="pk" conversionFactor="= 9.092 18×10−3 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="peck (US dry)" symbol="pk" conversionFactor="= 8.809 767 541 72×10−3 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="perch" symbol="per" conversionFactor="= 0.700 841 953 152 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="pinch (imperial)" symbol=" " conversionFactor="= 739.923 502 60416×10−9 m3">
+      <lemmaset>
+	<String>pinch</String>
+      </lemmaset>
+    </unit>
+    <unit name="pinch (US)" symbol=" " conversionFactor="= 616.115 199 218 75×10−9 m3">
+      <lemmaset>
+	<String>pinch</String>
+      </lemmaset>
+    </unit>
+    <unit name="pint (imperial)" symbol="pt (imp)" conversionFactor="= 568.261 25×10−6 m3">
+      <lemmaset>
+	<String>pint</String>
+	<String>pt</String>
+	<String>pints</String>
+      </lemmaset>
+    </unit>
+    <unit name="pint (US dry)" symbol="pt (US dry)" conversionFactor="= 550.610 471 3575×10−6 m3">
+      <lemmaset>
+	<String>pint</String>
+	<String>pt</String>
+	<String>pints</String>
+      </lemmaset>
+    </unit>
+    <unit name="pint (US fluid)" symbol="pt (US fl)" conversionFactor="= 473.176 473×10−6 m3">
+      <lemmaset>
+	<String>pint</String>
+	<String>pt</String>
+	<String>pints</String>
+      </lemmaset>
+    </unit>
+    <unit name="pony" symbol=" " conversionFactor="= 22.180 147 171 875×10−6 m3">
+      <lemmaset>
+	<String>pony</String>
+      </lemmaset>
+    </unit>
+    <unit name="pottle; quartern" symbol=" " conversionFactor="= 2.273 045×10−3 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="quart (imperial)" symbol="qt (imp)" conversionFactor="= 1.136 5225×10−3 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="quart (US dry)" symbol="qt (US)" conversionFactor="= 1.101 220 942 715×10−3 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="quart (US fluid)" symbol="qt (US)" conversionFactor="= 946.352 946×10−6 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="quarter; pail" symbol=" " conversionFactor="= 0.290 949 76 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="register ton" symbol=" " conversionFactor="= 2.831 684 6592 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="sack (imperial); bag" symbol=" " conversionFactor="= 0.109 106 16 m3">
+      <lemmaset>
+	<String>sack</String>
+	<String>sacks</String>
+      </lemmaset>
+    </unit>
+    <unit name="sack (US)" symbol=" " conversionFactor="= 0.105 717 210 500 64 m3">
+      <lemmaset>
+	<String>sack</String>
+	<String>sacks</String>
+      </lemmaset>
+    </unit>
+    <unit name="seam" symbol=" " conversionFactor="= 0.281 912 561 335 04 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="shot" symbol=" " conversionFactor="≈ 29.57×10−6 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="strike (imperial)" symbol=" " conversionFactor="= 0.072 737 44 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="strike (US)" symbol=" " conversionFactor="= 0.070 478 140 333 76 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <!--
+	<unit name="tablespoon (Australian metric)" symbol=" " conversionFactor="≡ 20.0×10−6 m3">
+	<lemmaset>
+	<String>tablespoons</String>
+	<String>tablespoon</String>
+	<String>tablespoom</String>
+	</lemmaset>
+	</unit>
+	<unit name="tablespoon (Canadian)" symbol="tbsp" conversionFactor="= 14.206 531 25×10−6 m3">
+	<lemmaset>
+	<String>tbsps</String>
+	<String>tablespoons</String>
+	<String>tbs</String>
+	<String>tbsp</String>
+	<String>tablespoon</String>
+	<String>tablespoom</String>
+	</lemmaset>
+	</unit>
+	<unit name="tablespoon (imperial)" symbol="tbsp" conversionFactor="= 17.758 164 0625×10−6 m3">
+	<lemmaset>
+	<String>tbsps</String>
+	<String>tablespoons</String>
+	<String>tbs</String>
+	<String>tbsp</String>
+	<String>tablespoon</String>
+	<String>tablespoom</String>
+	</lemmaset>
+	</unit>
+    -->
+    <unit name="tablespoon (metric)" symbol="tbsp" conversionFactor="≡ 15.0×10−6 m3">
+      <lemmaset>
+	<String>tablespoons</String>
+	<String>tablespoon</String>
+	<String>tablespoom</String>
+      </lemmaset>
+    </unit>
+    <!--
+	<unit name="tablespoon (US customary)" symbol="tbsp" conversionFactor="= 14.786 764 7825×10−6 m3">
+	<lemmaset>
+	<String>tbsps</String>
+	<String>tablespoons</String>
+	<String>tbs</String>
+	<String>tbsp</String>
+	<String>tablespoon</String>
+	<String>tablespoom</String>
+	</lemmaset>
+	</unit>
+	<unit name="tablespoon (US food nutrition labeling)" symbol="tbsp" conversionFactor="= 1.5×10−5 m3">
+	<lemmaset>
+	<String>tbsps</String>
+	<String>tablespoons</String>
+	<String>tbs</String>
+	<String>tbsp</String>
+	<String>tablespoon</String>
+	<String>tablespoom</String>
+	</lemmaset>
+	</unit>
+    -->
+    <!--
+	<unit name="teaspoon (Canadian)" symbol="tsp" conversionFactor="= 4.735 510 416×10−6 m3">
+	<lemmaset>
+	<String>teaspooms</String>
+	<String>teaspoons</String>
+	<String>tsps</String>
+	<String>teaspoon</String>
+	<String>tsp</String>
+	<String>teaspoon tsp</String>
+	</lemmaset>
+	</unit>
+	<unit name="teaspoon (imperial)" symbol="tsp" conversionFactor="= 5.919 388 02083×10−6 m3">
+	<lemmaset>
+	<String>teaspooms</String>
+	<String>teaspoons</String>
+	<String>tsps</String>
+	<String>teaspoon</String>
+	<String>tsp</String>
+	<String>teaspoon tsp</String>
+	</lemmaset>
+	</unit>
+    -->
+    <unit name="teaspoon (metric)" symbol="tsp" conversionFactor="= 5.0×10−6 m3">
+      <lemmaset>
+	<String>teaspooms</String>
+	<String>teaspoon tsp</String>
+	<String>teaspoons</String>
+	<String>teaspoon</String>
+      </lemmaset>
+    </unit>
+    <!--
+	<unit name="teaspoon (US customary)" symbol="tsp" conversionFactor="= 4.928 921 595×10−6 m3">
+	<lemmaset>
+	<String>teaspooms</String>
+	<String>teaspoons</String>
+	<String>tsps</String>
+	<String>teaspoon</String>
+	<String>tsp</String>
+	<String>teaspoon tsp</String>
+	</lemmaset>
+	</unit>
+
+<unit name="teaspoon (US food nutrition labeling)" symbol="tsp" conversionFactor="= 5×10−6 m3">
+<lemmaset>
+<String>teaspooms</String>
+<String>teaspoons</String>
+<String>tsps</String>
+<String>teaspoon</String>
+<String>tsp</String>
+<String>teaspoon tsp</String>
+</lemmaset>
+</unit>
+    -->
+    <unit name="timber foot" symbol=" " conversionFactor="= 0.028 316 846 592 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="ton (displacement)" symbol=" " conversionFactor="= 0.991 089 630 72 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="ton (freight)" symbol=" " conversionFactor="= 1.132 673 863 68 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="ton (water)" symbol=" " conversionFactor="= 1.018 324 16 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="tun" symbol=" " conversionFactor="= 0.953 923 769 568 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="wey (US)" symbol=" " conversionFactor="= 1.409 562 806 6752 m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Plane angle">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="angular mil" symbol="µ" conversionFactor="≈ 0.981 748×10−3 rad">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="arcminute; MOA" symbol="'" conversionFactor="≈ 0.290 888×10−3 rad">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="arcsecond" symbol="" conversionFactor="≈ 4.848 137×10−6 rad">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="centesimal minute of arc" symbol="'" conversionFactor="≈ 0.157 080×10−3 rad">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="centesimal second of arc" symbol="" conversionFactor="≈ 1.570 796×10−6 rad">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="degree (of arc)" symbol="°" conversionFactor="≈ 17.453 293×10−3 rad">
+      <lemmaset>
+	<String>degrees f</String>
+	<String>degrees</String>
+	<String>degrees c</String>
+	<String>degree c</String>
+	<String>°</String>
+      </lemmaset>
+    </unit>
+    <unit name="grad; gradian; gon" symbol="grad" conversionFactor="≈ 15.707 963×10−3 rad">
+      <lemmaset>
+	<String>grad</String>
+	<String>grady</String>
+	<String>grado</String>
+      </lemmaset>
+    </unit>
+    <unit name="octant" symbol=" " conversionFactor="≈ 0.785 398 rad">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="quadrant" symbol=" " conversionFactor="≈ 1.570 796 rad">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="radian (SI unit)" symbol="rad" conversionFactor="= 1 rad">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="sextant" symbol=" " conversionFactor="≈ 1.047 198 rad">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="sign" symbol=" " conversionFactor="≈ 0.523 599 rad">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Solid angle">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="steradian (SI unit)" symbol="sr" conversionFactor="= 1 sr">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Mass">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+      <String>weight</String>
+      <String>amount</String>
+    </typicalUsage>
+    <unit name="atomic mass unit, unified" symbol="u; AMU" conversionFactor="≈ 1.660 538 73×10−27 ± 1.3×10−36 kg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="atomic unit of mass, electron rest mass" symbol="me" conversionFactor="≈ 9.109 382 15×10−31 ± 45×10−39 kg [18]">
+      <lemmaset>
+	<String>me</String>
+	<String>mg equiv/kg</String>
+      </lemmaset>
+    </unit>
+    <unit name="bag (coffee)" symbol=" " conversionFactor="= 60 kg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="bag (Portland cement)" symbol=" " conversionFactor="= 42.637 682 78 kg">
+      <lemmaset>
+	<String>bags **</String>
+	<String>bag</String>
+	<String>bags</String>
+      </lemmaset>
+    </unit>
+    <unit name="barge" symbol=" " conversionFactor="= 20 411.656 65 kg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="carat" symbol="kt" conversionFactor="≈ 205.196 548 333 mg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="carat (metric)" symbol="ct" conversionFactor="= 200 mg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="clove" symbol=" " conversionFactor="= 3.628 738 96 kg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="crith" symbol=" " conversionFactor="≈ 89.9349 mg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="dalton" symbol="Da" conversionFactor="≈ 1.660 902 10×10−27 ± 1.3×10−36 kg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="dram (apothecary; troy)" symbol="dr t" conversionFactor="= 3.887 9346 g">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="dram (avoirdupois)" symbol="dr av" conversionFactor="= 1.771 845 195 3125 g">
+      <lemmaset>
+
+      </lemmaset>
+    </unit>
+    <unit name="electronvolt" symbol="eV" conversionFactor="= 1.7826×10−36 kg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="gamma" symbol="γ" conversionFactor="= 1 μg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="grain" symbol="gr" conversionFactor="≡ 64.798 91 mg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="grave" symbol="G" conversionFactor="≡ 1 kg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="hundredweight (long)" symbol="long cwt or cwt" conversionFactor="= 50.802 345 44 kg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="hundredweight (short); cental" symbol="sh cwt" conversionFactor="= 45.359 237 kg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="kilogram (SI base unit)" symbol="kg" conversionFactor="">
+      <lemmaset>
+	<String>kilogrames</String>
+	<String>k g</String>
+      </lemmaset>
+    </unit>
+    <unit name="gram" symbol="g" conversionFactor="= 0.001 kg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="milligram" symbol="mg" conversionFactor="= 0.000001 kg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="kip" symbol="kip" conversionFactor="= 453.592 37 kg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="mark" symbol=" " conversionFactor="= 248.827 8144 g">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="mite" symbol=" " conversionFactor="= 3.239 9455 mg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="mite (metric)" symbol=" " conversionFactor="= 50 mg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="ounce (apothecary; troy)" symbol="oz t" conversionFactor="= 31.103 4768 g">
+      <lemmaset>
+	<String>ounces</String>
+	<String>ounce</String>
+      </lemmaset>
+    </unit>
+    <unit name="ounce (avoirdupois)" symbol="oz av" conversionFactor="= 28.349 523 125 g">
+      <lemmaset>
+	<String>ounces</String>
+	<String>ounce</String>
+      </lemmaset>
+    </unit>
+    <unit name="ounce (US food nutrition labeling)" symbol="oz" conversionFactor="= 28 g">
+      <lemmaset>
+	<String>o z</String>
+      </lemmaset>
+    </unit>
+    <unit name="pennyweight" symbol="dwt; pwt" conversionFactor="= 1.555 173 84 g">
+      <lemmaset>
+	<String>pennyweights</String>
+	<String>pennyweight</String>
+      </lemmaset>
+    </unit>
+    <unit name="point" symbol=" " conversionFactor="= 2 mg">
+      <lemmaset>
+	<String>point</String>
+	<String>points</String>
+	<String>pointe</String>
+      </lemmaset>
+    </unit>
+    <unit name="pound" symbol="lb" conversionFactor="= 0.45359237 kg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="pound (avoirdupois)" symbol="lb av" conversionFactor="≡ 0.453 592 37 kg">
+      <lemmaset>
+	<String>pounds *</String>
+	<String>pounds</String>
+	<String>pounds)</String>
+	<String>pounds:</String>
+	<String>pounds **</String>
+	<String>pound</String>
+      </lemmaset>
+    </unit>
+    <unit name="pound (metric)" symbol=" " conversionFactor="= 500 g">
+      <lemmaset>
+	<String>pounds *</String>
+	<String>pounds</String>
+	<String>pounds)</String>
+	<String>pounds:</String>
+	<String>pounds **</String>
+	<String>pound</String>
+      </lemmaset>
+    </unit>
+    <unit name="pound (troy)" symbol="lb t" conversionFactor="= 0.373 241 7216 kg">
+      <lemmaset>
+	<String>pounds *</String>
+	<String>pounds</String>
+	<String>pounds)</String>
+	<String>pounds:</String>
+	<String>pounds **</String>
+	<String>pound</String>
+      </lemmaset>
+    </unit>
+    <unit name="quarter (imperial)" symbol=" " conversionFactor="= 12.700 586 36 kg">
+      <lemmaset>
+	<String>quartal</String>
+	<String>quarte</String>
+	<String>quart</String>
+	<String>quarts</String>
+	<String>quartz</String>
+	<String>quarter</String>
+      </lemmaset>
+    </unit>
+    <unit name="quarter (informal)" symbol=" " conversionFactor="= 226.796 185 kg">
+      <lemmaset>
+	<String>quartal</String>
+	<String>quarte</String>
+	<String>quart</String>
+	<String>quarts</String>
+	<String>quartz</String>
+	<String>quarter</String>
+      </lemmaset>
+    </unit>
+    <unit name="quarter, long (informal)" symbol=" " conversionFactor="= 254.011 7272 kg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="quintal (metric)" symbol="q" conversionFactor="= 100 kg">
+      <lemmaset>
+	<String>quintal</String>
+	<String>q</String>
+	<String>quintals</String>
+	<String>quintals)</String>
+      </lemmaset>
+    </unit>
+    <unit name="scruple (apothecary)" symbol="s ap" conversionFactor="= 1.295 9782 g">
+      <lemmaset>
+	<String>scruple</String>
+	<String>scruples</String>
+	<String>scrupler</String>
+      </lemmaset>
+    </unit>
+    <unit name="sheet" symbol=" " conversionFactor="= 647.9891 mg">
+      <lemmaset>
+	<String>sheets</String>
+	<String>sheets ico</String>
+	<String>sheet/h</String>
+	<String>sheet</String>
+	<String>sheets bmp</String>
+      </lemmaset>
+    </unit>
+    <unit name="slug; geepound; hyl" symbol="slug" conversionFactor="≈ 14.593 903 kg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="stone" symbol="st" conversionFactor="= 6.350 293 18 kg">
+      <lemmaset>
+	<String>short ton</String>
+	<String>sostone</String>
+	<String>short tons</String>
+	<String>ton shorty</String>
+	<String>stoney</String>
+	<String>stone</String>
+	<String>st</String>
+	<String>stones</String>
+	<String>stoner</String>
+      </lemmaset>
+    </unit>
+    <unit name="ton, assay (long)" symbol="AT" conversionFactor="≈ 32.666 667 g">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="ton, assay (short)" symbol="AT" conversionFactor="≈ 29.166 667 g">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="ton, long" symbol="long tn ; ton" conversionFactor="= 1 016.046 9088 kg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="ton, short" symbol="sh tn" conversionFactor="= 907.184 74 kg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="tonne (mts unit)" symbol="t" conversionFactor="= 1 000 kg">
+      <lemmaset>
+	<String>tones</String>
+      </lemmaset>
+    </unit>
+    <unit name="wey" symbol=" " conversionFactor="= 114.305 277 24 kg (variants exist)">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="Zentner" symbol="Ztr." conversionFactor="">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Density">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="gram per millilitre" symbol="g/mL" conversionFactor="= 1,000 kg/m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="kilogram per cubic metre (SI unit)" symbol="kg/m3" conversionFactor="= 1 kg/m3">
+      <lemmaset>
+	<String>kg/mq</String>
+	<String>kg/m³</String>
+      </lemmaset>
+    </unit>
+    <unit name="kilogram per litre" symbol="kg/L" conversionFactor="= 1,000 kg/m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="ounce (avoirdupois) per cubic foot" symbol="oz/ft3" conversionFactor="≈ 1.001153961 kg/m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="ounce (avoirdupois) per cubic inch" symbol="oz/in3" conversionFactor="≈ 1.729994044×103 kg/m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="ounce (avoirdupois) per gallon (imperial)" symbol="oz/gal" conversionFactor="≈ 6.236023291 kg/m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="ounce (avoirdupois) per gallon (US fluid)" symbol="oz/gal" conversionFactor="≈ 7.489151707 kg/m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="pound (avoirdupois) per cubic foot" symbol="lb/ft3" conversionFactor="≈ 16.01846337 kg/m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="pound (avoirdupois) per cubic inch" symbol="lb/in3" conversionFactor="≈ 2.767990471×104 kg/m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="pound (avoirdupois) per gallon (imperial)" symbol="lb/gal" conversionFactor="≈ 99.77637266 kg/m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="pound (avoirdupois) per gallon (US fluid)" symbol="lb/gal" conversionFactor="≈ 119.8264273 kg/m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="slug per cubic foot" symbol="slug/ft3" conversionFactor="≈ 515.3788184 kg/m3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Time">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+      <String>tot uptime</String>
+      <String>cpu time</String>
+      <String>half-life</String>
+      <String>duration</String>
+      <String>total time</String>
+      <String>max uptime</String>
+      <String>delivery within</String>
+      <String>period</String>
+      <String>age</String>
+      <String>averaging period (min) : 90</String>
+      <String>freshness : 58</String>
+      <String>cpu(hours) : 101</String>
+      <String>range : 160</String>
+      <String>duration : 248</String>
+      <String>delivery : 2328</String>
+      <String>totalduration : 122</String>
+      <String>utc offset : 5509</String>
+      <String>version : 210</String>
+      <String>cpu time : 852</String>
+      <String>period : 480</String>
+      <String>ref no : 94</String>
+      <String>score : 322</String>
+      <String>exp time (s) : 108</String>
+      <String>running time (seconds) : 108</String>
+      <String>time (min) : 107</String>
+      <String>availability : 70</String>
+      <String>age adjusted rate(c) : 52</String>
+      <String>wave period(s) : 65</String>
+      <String>validity : 89</String>
+      <String>strength : 124</String>
+      <String>closes : 138</String>
+      <String>tot uptime : 254</String>
+      <String>total allocation time (hours) : 68</String>
+      <String>time : 749</String>
+      <String>exposure time (s) : 265</String>
+      <String>last activity : 210</String>
+      <String>age : 214</String>
+      <String>kernel time : 110</String>
+      <String>duration (min) : 109</String>
+      <String>term : 288</String>
+      <String>tot.cpu : 2599</String>
+      <String>date : 7340</String>
+      <String>time left : 1405</String>
+      <String>duration : 205</String>
+      <String>time : 80</String>
+      <String>forecasttime (h) : 82</String>
+      <String>time zonegmt : 97</String>
+      <String>time : 581</String>
+      <String>prep.time : 88</String>
+      <String>avg uptime : 54</String>
+      <String>prep.time : 81</String>
+      <String>shipping_time[?] : 116</String>
+      <String>half-life : 137</String>
+      <String>age (days) : 74</String>
+      <String>period : 419</String>
+      <String>kernel time : 661</String>
+      <String>interval : 102</String>
+      <String>duration : 90</String>
+      <String>rate period : 64</String>
+      <String>period : 426</String>
+      <String>time : 54</String>
+      <String>totalduration : 65</String>
+    </typicalUsage>
+    <unit name="atomic unit of time" symbol="au" conversionFactor="≈ 2.418 884 254×10−17 s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="Callippic cycle" symbol=" " conversionFactor="= 2.398 3776×109 s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="century" symbol="c" conversionFactor="= 31 556 952×102 s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="megayear" symbol="" conversionFactor="= 31 556 952×106 s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="day" symbol="d" conversionFactor="= 1440 min = 86400 s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <!--
+	<unit name="day (sidereal)" symbol="d" conversionFactor="≈ 86 164.1 s">
+	<lemmaset>
+	</lemmaset>
+	</unit>
+    -->
+    <unit name="decade" symbol="dec" conversionFactor="= 31 556 952×101 s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="fortnight" symbol="fn" conversionFactor="= 1 209 600 s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="helek" symbol="" conversionFactor="= 3.3 s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="Hipparchic cycle" symbol=" " conversionFactor="= 9.593 424×109 s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="hour" symbol="h" conversionFactor="= 3 600 s">
+      <lemmaset>
+	<String>hours</String>
+	<String>hourss</String>
+	<String>hour</String>
+	<String>hr</String>
+      </lemmaset>
+    </unit>
+    <unit name="jiffy" symbol="j" conversionFactor="= .016 s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="jiffy (alternate)" symbol="ja" conversionFactor="= 10 ms">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="ke (quarter of an hour)" symbol=" " conversionFactor="= 60 × 60 / 4 s = 900 s = 60 / 4 min = 15 min">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="ke (traditional)" symbol=" " conversionFactor="= 24 × 60 × 60 / 100 s = 864 s = 24 * 60 / 100 min = 14.4 min">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="lustre; lustrum" symbol=" " conversionFactor="= 1.5768×108 s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="Metonic cycle; enneadecaeteris" symbol=" " conversionFactor="= 5.996 16×108 s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="millennium" symbol=" " conversionFactor="= 31 556 952×103 s">
+      <lemmaset>
+	<String>millennia</String>
+	<String>millennium</String>
+	<String>millenium</String>
+      </lemmaset>
+    </unit>
+    <unit name="milliday" symbol="md" conversionFactor="= 24 × 60 × 60 / 1 000 s = 86.4 s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="minute" symbol="min" conversionFactor="= 60 s" popularity="100">
+      <lemmaset>
+	<String>minuites</String>
+	<String>mins.</String>
+      </lemmaset>
+    </unit>
+    <unit name="moment" symbol=" " conversionFactor="= 90 s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <!--
+	<unit name="month (full)" symbol="mo" conversionFactor="= 2 592 000 s">
+	<lemmaset>
+	<String>months</String>
+	<String>mo</String>
+	<String>monthly</String>
+	<String>months old</String>
+	</lemmaset>
+	</unit>
+    -->
+    <unit name="month (Greg. av.)" symbol="mo" conversionFactor="≈ 2.6297×106 s">
+      <lemmaset>
+	<String>monthly</String>
+      </lemmaset>
+    </unit>
+    <!--
+	<unit name="month (hollow)" symbol="mo" conversionFactor="= 2 505 600 s">
+	<lemmaset>
+	<String>months</String>
+	<String>mo</String>
+	<String>monthly</String>
+	<String>months old</String>
+	</lemmaset>
+	</unit>
+	<unit name="month (synodic)" symbol="mo" conversionFactor="≈ 2.551×106 s">
+	<lemmaset>
+	<String>months</String>
+	<String>mo</String>
+	<String>monthly</String>
+	<String>months old</String>
+	</lemmaset>
+	</unit>
+    -->
+    <unit name="octaeteris" symbol=" " conversionFactor="= 2.524 608×108 s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="Planck time" symbol=" " conversionFactor="≈ 1.351 211 868×10−43 s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="second (SI base unit)" symbol="s" conversionFactor="">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="shake" symbol=" " conversionFactor="= 10 ns">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="sigma" symbol=" " conversionFactor="= 1 μs">
+      <lemmaset>
+	<String>sigma</String>
+      </lemmaset>
+    </unit>
+    <unit name="Sothic cycle" symbol=" " conversionFactor="= 4.607 4096×1010 s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="svedberg" symbol="S" conversionFactor="= 100 fs">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="week" symbol="wk" conversionFactor="= 168 h = 10 080 min = 604 800 s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="year; Julian year" symbol="a; y; yr" conversionFactor="= 31 557 600 s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <!--
+	<unit name="year (Gregorian)" symbol="a; y; yr" conversionFactor="= 31 556 952 s" popularity="100">
+	<lemmaset>
+	<String>years%</String>
+	<String>years $</String>
+	<String>years m</String>
+	<String>yearsr</String>
+	<String>year:</String>
+	<String>yeara</String>
+	<String>years*</String>
+	<String>year</String>
+	<String>years</String>
+	<String>yearn</String>
+	<String>years to</String>
+	<String>years)</String>
+	</lemmaset>
+	</unit>
+
+<unit name="year (sidereal)" symbol="a; y; yr" conversionFactor="≈ 31 558 149.7632 s">
+<lemmaset>
+<String>years%</String>
+<String>years $</String>
+<String>years m</String>
+<String>yearsr</String>
+<String>year:</String>
+<String>yeara</String>
+<String>years*</String>
+<String>year</String>
+<String>years</String>
+<String>yearn</String>
+<String>years to</String>
+<String>years)</String>
+</lemmaset>
+</unit>
+<unit name="year (tropical)" symbol="a; y; yr" conversionFactor="≈ 31 556 925 s">
+<lemmaset>
+<String>years%</String>
+<String>years $</String>
+<String>years m</String>
+<String>yearsr</String>
+<String>year:</String>
+<String>yeara</String>
+<String>years*</String>
+<String>year</String>
+<String>years</String>
+<String>yearn</String>
+<String>years to</String>
+<String>years)</String>
+</lemmaset>
+</unit>
+<unit name="Where UTC is observed, the length of time units longer than 1 s may increase or decrease by 1 s if a leap second occurs during the time interval of interest." symbol="null" conversionFactor="null">
+<lemmaset>
+</lemmaset>
+</unit>
+    -->
+    </concept><concept name="Frequency">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+      <String>rotational speed</String>
+    </typicalUsage>
+    <unit name="hertz (SI unit)" symbol="Hz" conversionFactor="= 1 Hz = 1/s">
+      <lemmaset>
+	<String>hertz</String>
+	<String>herts</String>
+      </lemmaset>
+    </unit>
+    <unit name="megahertz" symbol="MHz" conversionFactor="= 1000000 Hz = 1/s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="gigahertz" symbol="GHz" conversionFactor="= 1000000000 Hz = 1/s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="revolutions per minute" symbol="rpm" conversionFactor="≈ 0.104719755 rad/s">
+      <lemmaset>
+	<String>rpm</String>
+	<String>roubles per month</String>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Speed">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+      <String>runner : 212</String>
+      <String>speed (km/h) : 625</String>
+      <String>speed (mph) : 50</String>
+      <String>wind (knots) : 93</String>
+      <String>wind(km/h) : 66</String>
+      <String>wind speed : 863</String>
+      <String>avg. speed : 139</String>
+      <String>wind gust(mph) : 89</String>
+      <String>gusts (knots) : 70</String>
+      <String>average speed (mph) : 55</String>
+      <String>gust speed : 117</String>
+    </typicalUsage>
+    <unit name="foot per hour" symbol="fph" conversionFactor="≈ 8.466 667×10−5 m/s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="foot per minute" symbol="fpm" conversionFactor="= 5.08×10−3 m/s">
+      <lemmaset>
+	<String>f p m</String>
+      </lemmaset>
+    </unit>
+    <unit name="foot per second" symbol="fps" conversionFactor="= 3.048×10−1 m/s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="furlong per fortnight" symbol=" " conversionFactor="≈ 1.663 095×10−4 m/s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="inch per hour" symbol="iph" conversionFactor="≈ 7.05 556×10−6 m/s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="inch per minute" symbol="ipm" conversionFactor="≈ 4.23 333×10−4 m/s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="inch per second" symbol="ips" conversionFactor="= 2.54×10−2 m/s">
+      <lemmaset>
+	<String>ips</String>
+	<String>inches per second</String>
+      </lemmaset>
+    </unit>
+    <unit name="kilometre per hour" symbol="km/h" conversionFactor="≈ 2.777 778×10−1 m/s">
+      <lemmaset>
+	<String>km/hr</String>
+	<String>kmph</String>
+      </lemmaset>
+    </unit>
+    <unit name="knot" symbol="kn, kt" conversionFactor="≈ 0.514 444 m/s">
+      <lemmaset>
+	<String>knots</String>
+	<String>knott</String>
+      </lemmaset>
+    </unit>
+    <unit name="knot (Admiralty)" symbol="kn" conversionFactor="= 0.514 773 m/s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="mach number" symbol="M" conversionFactor="≈ 340 to 295 m/s for aircraft">
+      <lemmaset>
+	<String>mach</String>
+      </lemmaset>
+    </unit>
+    <unit name="metre per second (SI unit)" symbol="m/s" conversionFactor="= 1 m/s">
+      <lemmaset>
+	<String>m/sn</String>
+      </lemmaset>
+    </unit>
+
+    <unit name="kilometre per second" symbol="km/s" conversionFactor="≡ 1000 m/s">
+      <lemmaset>
+	<String>kilometers per second</String>
+	<String>kms/s</String>
+      </lemmaset>
+    </unit>
+
+    <unit name="centimetre per second" symbol="cm/s" conversionFactor="≡ 0.01 m/s">
+      <lemmaset>
+	<String>centimeters per second</String>
+	<String>cms/s</String>
+      </lemmaset>
+    </unit>
+
+    <unit name="mile per hour" symbol="mph" conversionFactor="= 0.447 04 m/s">
+      <lemmaset>
+	<String>miles per hour</String>
+	<String>mls per hour</String>
+      </lemmaset>
+    </unit>
+    <unit name="mile per minute" symbol="mpm" conversionFactor="= 26.8224 m/s">
+      <lemmaset>
+	<String>miles per minute</String>
+
+      </lemmaset>
+    </unit>
+    <unit name="mile per second" symbol="mps" conversionFactor="= 1 609.344 m/s">
+      <lemmaset>
+	<String>miles per second</String>
+      </lemmaset>
+    </unit>
+    <unit name="speed of light in vacuum" symbol="c" conversionFactor="= 299 792 458 m/s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="speed of sound in air" symbol="s" conversionFactor="≈ 340 to 295 m/s at aircraft altitudes">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Flow">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="cubic foot per minute" symbol="CFM" conversionFactor="= 4.719474432×10−4 m3/s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="cubic foot per second" symbol="ft3/s" conversionFactor="= 0.028316846592 m3/s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="cubic inch per minute" symbol="in3/min" conversionFactor="= 2.7311773×10−7 m3/s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="cubic inch per second" symbol="in3/s" conversionFactor="= 1.6387064×10−5 m3/s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="cubic metre per second (SI unit)" symbol="m3/s" conversionFactor="= 1 m3/s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="gallon (US fluid) per day" symbol="GPD" conversionFactor="= 4.381263638×10−8 m3/s">
+      <lemmaset>
+	<String>galllons</String>
+      </lemmaset>
+    </unit>
+    <unit name="gallon (US fluid) per hour" symbol="GPH" conversionFactor="= 1.051503273×10−6 m3/s">
+      <lemmaset>
+	<String>galllons</String>
+      </lemmaset>
+    </unit>
+    <unit name="gallon (US fluid) per minute" symbol="GPM" conversionFactor="= 6.30901964×10−5 m3/s">
+      <lemmaset>
+	<String>galllons</String>
+      </lemmaset>
+    </unit>
+    <unit name="litre per minute" symbol="LPM" conversionFactor="= 1.6×10−5 m3/s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Acceleration">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="foot per hour per second" symbol="fph/s" conversionFactor="≈ 8.466 667×10−5 m/s2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="foot per minute per second" symbol="fpm/s" conversionFactor="= 5.08×10−3 m/s2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="foot per second squared" symbol="fps2" conversionFactor="= 3.048×10−1 m/s2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="gal; galileo" symbol="Gal" conversionFactor="= 1×10−2 m/s2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="inch per minute per second" symbol="ipm/s" conversionFactor="≈ 4.233 333×10−4 m/s2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="inch per second squared" symbol="ips2" conversionFactor="= 2.54×10−2 m/s2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="knot per second" symbol="kn/s" conversionFactor="≈ 5.144 444×10−1 m/s2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="metre per second squared (SI unit)" symbol="m/s2" conversionFactor="= 1 m/s2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="mile per hour per second" symbol="mph/s" conversionFactor="= 4.4704×10−1 m/s2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="mile per minute per second" symbol="mpm/s" conversionFactor="= 26.8224 m/s2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="mile per second squared" symbol="mps2" conversionFactor="= 1.609 344×103 m/s2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="standard gravity" symbol="g" conversionFactor="= 9.806 65 m/s2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Force">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+      <String>strength : 124</String>
+    </typicalUsage>
+    <unit name="atomic unit of force" symbol="" conversionFactor="≈ 8.238 722 06×10−8 N [24]">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="dyne (cgs unit)" symbol="dyn" conversionFactor="= 1×10−5 N">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="kilogram-force; kilopond; grave-force" symbol="kgf; kp; Gf" conversionFactor="= 9.806 65 N">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="kip; kip-force" symbol="kip; kipf; klbf" conversionFactor="= 4.448 221 615 2605×103 N">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="milligrave-force, gravet-force" symbol="mGf; gf" conversionFactor="= 9.806 65 mN">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="newton (SI unit)" symbol="N" conversionFactor="= 1 N = 1 kg·m/s2">
+      <lemmaset>
+	<String>newton</String>
+	<String>newtons</String>
+      </lemmaset>
+    </unit>
+    <unit name="ounce-force" symbol="ozf" conversionFactor="= 0.278 013 850 953 7812 N">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="pound-force" symbol="lbf" conversionFactor="= 4.448 221 615 2605 N">
+      <lemmaset>
+	<String>lbf</String>
+      </lemmaset>
+    </unit>
+    <unit name="poundal" symbol="pdl" conversionFactor="= 0.138 254 954 376 N">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="sthene (mts unit)" symbol="sn" conversionFactor="= 1×103 N">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="ton-force" symbol="tnf" conversionFactor="= 8.896 443 230 521×103 N">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Pressure">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="atmosphere (standard)" symbol="atm" conversionFactor="≡ 101 325 Pa [26]">
+      <lemmaset>
+	<String>atm</String>
+	<String>atmosphere</String>
+      </lemmaset>
+    </unit>
+    <!--
+	<unit name="atmosphere (technical)" symbol="at" conversionFactor="= 9.806 65×104 Pa [26]">
+	<lemmaset>
+	</lemmaset>
+	</unit>
+    -->
+    <unit name="bar" symbol="bar" conversionFactor="≡ 105 Pa">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="barye (cgs unit)" symbol=" " conversionFactor="= 0.1 Pa">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="centimetre of mercury" symbol="cmHg" conversionFactor="≈ 1.333 22×103 Pa [26]">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="centimetre of water (4 °C)" symbol="cmH2O" conversionFactor="≈ 98.063 8 Pa [26]">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="foot of mercury (conventional)" symbol="ftHg" conversionFactor="≈ 40.636 66×103 Pa [26]">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="foot of water (39.2 °F)" symbol="ftH2O" conversionFactor="≈ 2.988 98×103 Pa [26]">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="inch of mercury (conventional)" symbol="inHg" conversionFactor="≈ 3.386 389×103 Pa [26]">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="inch of water (39.2 °F)" symbol="inH2O" conversionFactor="≈ 249.082 Pa [26]">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="kilogram-force per square millimetre" symbol="kgf/mm2" conversionFactor="= 9.806 65×106 Pa [26]">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="kip per square inch" symbol="ksi" conversionFactor="≈ 6.894 757×106 Pa [26]">
+      <lemmaset>
+	<String>ksi</String>
+      </lemmaset>
+    </unit>
+    <unit name="micron (micrometre) of mercury" symbol="mHg" conversionFactor="≈ 0.133 322 4 Pa [26]">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="millimetre of mercury" symbol="mmHg" conversionFactor="≈ 133.3224 Pa [26]">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="millimetre of water (3.98 °C)" symbol="mmH2O" conversionFactor="= 9.806 38 Pa">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="pascal (SI unit)" symbol="Pa" conversionFactor="= 1 Pa [27]">
+      <lemmaset>
+	<String>pascal</String>
+      </lemmaset>
+    </unit>
+    <unit name="pièze (mts unit)" symbol="pz" conversionFactor="= 1×103 Pa = 1 kPa">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="pound per square foot" symbol="psf" conversionFactor="≈ 47.880 26 Pa [26]">
+      <lemmaset>
+      </lemmaset>
+    </unit> 
+    <unit name="pound per square inch" symbol="psi" conversionFactor="≈ 6.894 757×103 Pa [26]">
+      <lemmaset>
+	<String>poundsper square inch</String>
+      </lemmaset>
+    </unit>
+    <unit name="poundal per square foot" symbol="pdl/sq ft" conversionFactor="≈ 1.488 164 Pa [26]">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="short ton per square foot" symbol=" " conversionFactor="≈ 95.760 518×103 Pa">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="torr" symbol="torr" conversionFactor="≈ 133.322 4 Pa [26]">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Torque">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="foot-pound force" symbol="ft lbf" conversionFactor="= 1.355 817 948 331 4004 N·m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="foot-poundal" symbol="ft pdl" conversionFactor="= 4.214 011 009 380 48×10−2 N·m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="inch-pound force" symbol="in lbf" conversionFactor="= 0.112 984 829 027 6167 N·m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="metre kilogram" symbol="m kg" conversionFactor="≈ 0.101 971 621 N·m">
+      <lemmaset>
+	<String>m kg</String>
+      </lemmaset>
+    </unit>
+    <unit name="Newton metre (SI unit)" symbol="N·m" conversionFactor="= 1 N·m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Energy">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="barrel of oil equivalent" symbol="bboe" conversionFactor="≈ 6.12×109 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="British thermal unit (ISO)" symbol="BTUISO" conversionFactor="= 1.0545×103 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="British thermal unit (International Table)" symbol="BTUIT" conversionFactor="= 1.055 055 852 62×103 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="British thermal unit (mean)" symbol="BTUmean" conversionFactor="≈ 1.055 87×103 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="British thermal unit (thermochemical)" symbol="BTUth" conversionFactor="≈ 1.054 350×103 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="British thermal unit (39 °F)" symbol="BTU39 °F" conversionFactor="≈ 1.059 67×103 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="British thermal unit (59 °F)" symbol="BTU59 °F" conversionFactor="= 1.054 804×103 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="British thermal unit (60 °F)" symbol="BTU60 °F" conversionFactor="≈ 1.054 68×103 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="British thermal unit (63 °F)" symbol="BTU63 °F" conversionFactor="≈ 1.0546×103 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="calorie (International Table)" symbol="cal" conversionFactor="= 4.1868 J">
+      <lemmaset>
+	<String>calories</String>
+	<String>calorie</String>
+      </lemmaset>
+    </unit>
+    <unit name="calorie (mean)" symbol="calmean" conversionFactor="≈ 4.190 02 J">
+      <lemmaset>
+	<String>calories</String>
+	<String>calorie</String>
+      </lemmaset>
+    </unit>
+    <unit name="calorie (thermochemical)" symbol="calth" conversionFactor="= 4.184 J">
+      <lemmaset>
+	<String>calories</String>
+	<String>calorie</String>
+      </lemmaset>
+    </unit>
+    <unit name="calorie (3.98 °C)" symbol="cal3.98 °C" conversionFactor="≈ 4.2045 J">
+      <lemmaset>
+	<String>calories</String>
+	<String>calorie</String>
+      </lemmaset>
+    </unit>
+    <unit name="calorie (15 °C)" symbol="cal15 °C" conversionFactor="= 4.1855 J">
+      <lemmaset>
+	<String>calories</String>
+	<String>calorie</String>
+      </lemmaset>
+    </unit>
+    <unit name="calorie (20 °C)" symbol="cal20 °C" conversionFactor="≈ 4.1819 J">
+      <lemmaset>
+	<String>calories</String>
+	<String>calorie</String>
+      </lemmaset>
+    </unit>
+    <unit name="Celsius heat unit (International Table)" symbol="CHUIT" conversionFactor="= 1.899 100 534 716×103 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="cubic centimetre of atmosphere; standard cubic centimetre" symbol="cc atm; scc" conversionFactor="= 0.101 325 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="cubic foot of atmosphere; standard cubic foot" symbol="cu ft atm; scf" conversionFactor="= 2.869 204 480 9344×103 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="cubic foot of natural gas" symbol=" " conversionFactor="= 1.055 055 852 62×106 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="cubic yard of atmosphere; standard cubic yard" symbol="cu yd atm; scy" conversionFactor="= 77.468 520 985 2288×103 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="electronvolt" symbol="eV" conversionFactor="≈ 1.602 177 33×10−19 ± 4.9×10−26 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="mega electronvolt" symbol="MeV" conversionFactor="≈ 1.602 177 33×10−19 ± 4.9×10−26 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="erg (cgs unit)" symbol="erg" conversionFactor="= 1×10−7 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="foot-pound force" symbol="ft lbf" conversionFactor="= 1.355 817 948 331 4004 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="foot-poundal" symbol="ft pdl" conversionFactor="= 4.214 011 009 380 48×10−2 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="gallon-atmosphere (imperial)" symbol="imp gal atm" conversionFactor="= 460.632 569 25 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="gallon-atmosphere (US)" symbol="US gal atm" conversionFactor="= 383.556 849 0138 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="hartree, atomic unit of energy" symbol="Eh" conversionFactor="≈ 4.359 744×10−18 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="horsepower-hour" symbol="hp·h" conversionFactor="= 2.684 519 537 696 172 792×106 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="inch-pound force" symbol="in lbf" conversionFactor="= 0.112 984 829 027 6167 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="joule (SI unit)" symbol="J" conversionFactor="= 1 J = 1 m·N = 1 kg·m2/s2 = 1 C·V = 1 W·s">
+      <lemmaset>
+	<String>joules</String>
+      </lemmaset>
+    </unit>
+    <unit name="mega joule" symbol="MJ" conversionFactor="= 1000 000 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="mega joule per kilogram" symbol="MJ/KG" conversionFactor="= 1000 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="kilo joule" symbol="KJ" conversionFactor="= 1000 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="kilo joule per kilogram" symbol="KJ/KG" conversionFactor="= 1000 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="kilocalorie; large calorie" symbol="kcal; Cal" conversionFactor="= 4.1868×103 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="kilowatt-hour; Board of Trade Unit" symbol="kW·h; B.O.T.U." conversionFactor="= 3.6×106 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="litre-atmosphere" symbol="l atm; sl" conversionFactor="= 101.325 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="quad" symbol=" " conversionFactor="= 1.055 055 852 62×1018 J">
+      <lemmaset>
+	<String>quad</String>
+      </lemmaset>
+    </unit>
+    <unit name="rydberg" symbol="Ry" conversionFactor="≈ 2.179 872×10−18 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="therm (E.C.)" symbol=" " conversionFactor="= 105.505 585 262×106 J">
+      <lemmaset>
+	<String>therm.</String>
+	<String>thermal</String>
+	<String>therms</String>
+	<String>therm</String>
+      </lemmaset>
+    </unit>
+    <unit name="therm (US)" symbol=" " conversionFactor="= 105.4804×106 J">
+      <lemmaset>
+	<String>therm.</String>
+	<String>thermal</String>
+	<String>therms</String>
+	<String>therm</String>
+      </lemmaset>
+    </unit>
+    <unit name="thermie" symbol="th" conversionFactor="= 4.1868×106 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="ton of coal equivalent" symbol="TCE" conversionFactor="= 29.3076×109 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="ton of oil equivalent" symbol="TOE" conversionFactor="= 41.868×109 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="ton of TNT" symbol="tTNT" conversionFactor="= 4.184×109 J">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Power">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="atmosphere-cubic centimetre per minute" symbol="atm ccm" conversionFactor="= 1.688 75×10−3 W">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="atmosphere-cubic centimetre per second" symbol="atm ccs" conversionFactor="= 0.101 325 W">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="atmosphere-cubic foot per hour" symbol="atm cfh" conversionFactor="= 0.797 001 244 704 W">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="atmosphere-cubic foot per minute" symbol="atm·cfm" conversionFactor="= 47.820 074 682 24 W">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="atmosphere-cubic foot per second" symbol="atm cfs" conversionFactor="= 2.869 204 480 9344×103 W">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="BTU (International Table) per hour" symbol="BTUIT/h" conversionFactor="≈ 0.293 071 W">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="BTU (International Table) per minute" symbol="BTUIT/min" conversionFactor="≈ 17.584 264 W">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="BTU (International Table) per second" symbol="BTUIT/s" conversionFactor="= 1.055 055 852 62×103 W">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="calorie (International Table) per second" symbol="calIT/s" conversionFactor="= 4.1868 W">
+      <lemmaset>
+	<String>calories</String>
+	<String>calorie</String>
+      </lemmaset>
+    </unit>
+    <unit name="erg per second" symbol="erg/s" conversionFactor="= 1×10−7 W">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="foot-pound-force per hour" symbol="ft lbf/h" conversionFactor="≈ 3.766 161×10−4 W">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="foot-pound-force per minute" symbol="ft lbf/min" conversionFactor="= 2.259 696 580 552 334×10−2 W">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="foot-pound-force per second" symbol="ft lbf/s" conversionFactor="= 1.355 817 948 331 4004 W">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="horsepower (boiler)" symbol="bhp" conversionFactor="≈ 9.810 657×103 W">
+      <lemmaset>
+	<String>bhp</String>
+	<String>horsepower</String>
+	<String>bhps</String>
+      </lemmaset>
+    </unit>
+    <!--
+	<unit name="horsepower (European electrical)" symbol="hp" conversionFactor="= 736 W">
+	<lemmaset>
+	<String>hp</String>
+	<String>high performance</String>
+	<String>horsepower</String>
+	</lemmaset>
+	</unit>
+	<unit name="horsepower (imperial electrical)" symbol="hp" conversionFactor="= 746 W">
+	<lemmaset>
+	<String>hp</String>
+	<String>high performance</String>
+	<String>horsepower</String>
+	</lemmaset>
+	</unit>
+	<unit name="horsepower (imperial mechanical)" symbol="hp" conversionFactor="= 745.699 871 582 270 22 W">
+	<lemmaset>
+	<String>hp</String>
+	<String>high performance</String>
+	<String>horsepower</String>
+	</lemmaset>
+	</unit>
+    -->
+    <unit name="horsepower (metric)" symbol="hp" conversionFactor="= 735.498 75 W">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="litre-atmosphere per minute" symbol="L·atm/min" conversionFactor="= 1.688 75 W">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="litre-atmosphere per second" symbol="L·atm/s" conversionFactor="= 101.325 W">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="lusec" symbol="lusec" conversionFactor="≈ 1.333×10−4 W">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="poncelet" symbol="p" conversionFactor="= 980.665 W">
+      <lemmaset>
+	<String frequency="0.001">p</String>			  
+	<String>p</String>
+      </lemmaset>
+    </unit>
+    <unit name="square foot equivalent direct radiation" symbol="sq ft EDR" conversionFactor="≈ 70.337 057 W">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="ton of air conditioning" symbol=" " conversionFactor="≈ 3 504 W">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="ton of refrigeration (imperial)" symbol=" " conversionFactor="≈ 3.938 875×103 W">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="ton of refrigeration (IT)" symbol=" " conversionFactor="≈ 3.516 853×103 W">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="watt (SI unit)" symbol="W" conversionFactor="= 1 W = 1 J/s = 1 N·m/s = 1 kg·m2/s3">
+      <lemmaset>
+	<String>watts dc</String>
+	<String>watts</String>
+	<String>wattts</String>
+	<String>watt</String>
+	<String>watts cw</String>
+	<String>wats</String>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Action">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="atomic unit of action (SI unit)" symbol="au" conversionFactor="≈ 1.054 571 68×10−34 J·s[28]">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Dynamic">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="pascal second (SI unit)" symbol="Pa·s" conversionFactor="= 1 Pa·s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="poise (cgs unit)" symbol="P" conversionFactor="= 0.1 Pa·s">
+      <lemmaset>
+	<String>poise</String>
+	<String frequency="0.001">p</String>			  
+      </lemmaset>
+    </unit>
+    <unit name="pound per foot hour" symbol="lb/(ft·h)" conversionFactor="≈ 4.133 789×10−4 Pa·s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="pound per foot second" symbol="lb/(ft·s)" conversionFactor="≈ 1.488164 Pa·s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="pound-force second per square foot" symbol="lbf·s/ft2" conversionFactor="≈ 47.88026 Pa·s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="pound-force second per square inch" symbol="lbf·s/in2" conversionFactor="≈ 6,894.757 Pa·s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Kinematic">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="square foot per second" symbol="ft2/s" conversionFactor="= 0.09290304 m2/s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="square metre per second (SI unit)" symbol="m2/s" conversionFactor="= 1 m2/s">
+      <lemmaset>
+	<String>m2/s</String>
+      </lemmaset>
+    </unit>
+    <unit name="stokes (cgs unit)" symbol="St" conversionFactor="= 1×10−4 m2/s">
+      <lemmaset>
+	<String>stoke</String>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Electric current">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="ampere (SI base unit)" symbol="A" conversionFactor="= 1 A">
+      <lemmaset>
+	<String>ampers</String>
+	<String>amperes</String>
+	<String>ampere</String>
+      </lemmaset>
+    </unit>
+    <unit name="electromagnetic unit; abampere (cgs unit)" symbol="abamp" conversionFactor="= 10 A">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="esu per second; statampere (cgs unit)" symbol="esu/s" conversionFactor="≈ 3.335641×10−10 A">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Electric charge">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="abcoulomb; electromagnetic unit (cgs unit)" symbol="abC; emu" conversionFactor="= 10 C">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="atomic unit of charge" symbol="au" conversionFactor="≈ 1.602 176 462×10−19 C">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="coulomb (SI unit)" symbol="C" conversionFactor="= 1 C = 1 A·s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="faraday" symbol="F" conversionFactor="≈ 96 485.3383 C">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="statcoulomb; franklin; electrostatic unit (cgs unit)" symbol="statC; Fr; esu" conversionFactor="≈ 3.335 641×10−10 C">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Electric dipole">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="atomic unit of electric dipole moment" symbol="ea0" conversionFactor="≈ 8.478 352 81×10−30 C·m[29]">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="coulomb meter (SI unit)" symbol="C·m" conversionFactor="= 1 C · 1 m">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="debye" symbol="D" conversionFactor="= 3.33564095×10−30 C·m [30]">
+      <lemmaset>
+	<String>debye</String>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Voltage">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="abvolt (cgs unit)" symbol="abV" conversionFactor="= 1×10−8 V">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="statvolt (cgs unit)" symbol="statV" conversionFactor="= 299.792 458 V">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="volt (SI unit)" symbol="V" conversionFactor="= 1 V = 1 W/A = 1 kg·m2/(A·s3)">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Electrical resistance">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="ohm (SI unit)" symbol="Ω" conversionFactor="= 1 Ω = 1 V/A = 1 kg·m2/(A2·s3)">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Capacitor">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="farad (SI unit)" symbol="F" conversionFactor="= 1 F = 1 C/V = 1 A2·s4/(kg·m2)">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="magnetic flux">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="maxwell (CGS unit)" symbol="Mx" conversionFactor="= 1×10−8 Wb">
+      <lemmaset>
+	<String>maxwell</String>
+      </lemmaset>
+    </unit>
+    <unit name="weber (SI unit)" symbol="Wb" conversionFactor="= 1 Wb = 1 V·s = 1 kg·m2/(A·s2)">
+      <lemmaset>
+	<String>webber</String>
+	<String>weber</String>
+      </lemmaset>
+    </unit>
+    </concept><concept name="What physicists call">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="gauss (CGS unit)" symbol="G" conversionFactor="= 1×10−4 T [32]">
+      <lemmaset>
+	<String>gauss</String>
+	<String>gaussm</String>
+      </lemmaset>
+    </unit>
+    <unit name="tesla (SI unit)" symbol="T" conversionFactor="= 1 T = 1 Wb/m2 = 1 kg/(A·s2)">
+      <lemmaset>
+	<String>tesla</String>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Inductance">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="henry (SI unit)" symbol="H" conversionFactor="= 1 H = 1 Wb/A = 1 kg·m2/(A·s)2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Temperature">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="degree Celsius" symbol="°C" conversionFactor="[K] ≡ [°C] + 273.15">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="degree Delisle" symbol="°De" conversionFactor="[K] = 373.15 − [°De] × 2/3">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="degree Fahrenheit" symbol="°F" conversionFactor="[K] ≡ ([°F] + 459.67) × 5/9">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="degree Newton" symbol="°N" conversionFactor="[K] = [°N] × 100/33 + 273.15">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="degree Rankine" symbol="°R;" conversionFactor="[K] ≡ [°R] × 5/9">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="degree Réaumur" symbol="°Ré" conversionFactor="[K] = [°Ré] × 5/4 + 273.15">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="degree Rømer" symbol="°Rø" conversionFactor="[K] = ([°Rø] − 7.5) × 40/21 + 273.15">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="kelvin (SI base unit)" symbol="K" conversionFactor="≡ 1 K">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Information entropy">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="SI unit (SI unit)" symbol="J/K" conversionFactor="= 1 J/K">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="nat; nip; nepit" symbol="nat" conversionFactor="= 1.380 650 5(23)×10−23 J/K">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="ban; hartley" symbol="ban; Hart" conversionFactor="= 3.179 065 3(53)×10−23 J/K">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="nibble" symbol="nibble" conversionFactor="= 3.827 976 0(64)×10−23 J/K">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Data size">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+      <String>file size</String>
+      <String>file</String>
+      <String>size</String>
+      <String>bytes served</String>
+      <String>file size(bytes) : 62</String>
+      <String>kbps : 2191</String>
+      <String>bandwidth : 120</String>
+      <String>total : 203</String>
+      <String>size (bytes) : 1409</String>
+    </typicalUsage>
+    <unit name="bit; shannon (SI unit)" symbol="bit; b; Sh" conversionFactor="= 1 b">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="byte" symbol="B" conversionFactor="= 8 b">
+      <lemmaset>
+	<String>bytes</String>
+	<String>byte</String>
+      </lemmaset>
+    </unit>
+    <unit name="kilobyte (decimal)" symbol="kB" conversionFactor= " = 8000 b">
+      <lemmaset>
+	<String>kilobyte</String>
+	<String>kilobytes</String>
+	<String>kilo bytes (kb</String>
+	<String>kilo bytes</String>
+	<String>k</String>
+      </lemmaset>
+    </unit>
+    <unit name="megabyte (decimal)" symbol="mB" conversionFactor= " = 8000000 b">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="gigabyte (decimal)" symbol="gB" conversionFactor= " = 8000000000 b">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <!--
+	<unit name="kilobyte (kibibyte)" symbol="KB; KiB" conversionFactor="= 7.839 695 (13)×10−20 J/K">
+	<lemmaset>
+	<String>kilobyte</String>
+	<String>kilobytes</String>
+	<String>kilo bytes (kb</String>
+	<String>kilo bytes</String>
+	</lemmaset>
+	</unit>
+    -->
+    </concept><concept name="Luminous intensity">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+      <String> : 60</String>
+      <String> : 307</String>
+    </typicalUsage>
+    <unit name="candle; candela (SI base unit)" symbol="cd" conversionFactor="= 1 cd">
+      <lemmaset>
+	<String>complete/no delay</String>
+	<String>cd</String>
+      </lemmaset>
+    </unit>
+    <unit name="candlepower (new)" symbol="cp" conversionFactor="= 1 cd">
+      <lemmaset>
+	<String>cp</String>
+	<String>contact point</String>
+      </lemmaset>
+    </unit>
+    <!--
+	<unit name="candlepower (old, pre-1948)" symbol="cp" conversionFactor="≈ 0.981 cd">
+	<lemmaset>
+	<String>cp</String>
+	<String>contact point</String>
+	</lemmaset>
+	</unit>
+    -->
+    </concept><concept name="Luminance">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="candela per square foot" symbol="cd/ft2" conversionFactor="≈ 10.763910417 cd/m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="candela per square inch" symbol="cd/in2" conversionFactor="≈ 1,550.0031 cd/m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="candela per square metre (SI unit)" symbol="cd/m2" conversionFactor="= 1 cd/m2">
+      <lemmaset>
+	<String>cd/m2</String>
+	<String>cd/mm²</String>
+	<String>cd/m²</String>
+	<String>cd/m</String>
+      </lemmaset>
+    </unit>
+    <unit name="footlambert" symbol="fL" conversionFactor="≈ 3.4262590996 cd/m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="lambert" symbol="L" conversionFactor="≈ 3,183.0988618 cd/m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="stilb (CGS unit)" symbol="sb" conversionFactor="≈ 1×104 cd/m2">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Luminous flux">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="lumen (SI unit)" symbol="lm" conversionFactor="= 1 lm = 1 cd·sr">
+      <lemmaset>
+	<String>lm</String>
+	<String>lumen</String>
+	<String>lumens</String>
+	<String>lbs meats/a</String>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Illuminance">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="footcandle; lumen per square foot" symbol="fc" conversionFactor="= 10.763910417 lx">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="lumen per square inch" symbol="lm/in2" conversionFactor="≈ 1,550.0031 lx">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="lux (SI unit)" symbol="lx" conversionFactor="= 1 lx = 1 lm/m2">
+      <lemmaset>
+	<String>l xt</String>
+	<String>l x</String>
+	<String>litre x</String>
+	<String>lux</String>
+	<String>lb x</String>
+	<String>lb. x1000</String>
+	<String>lx</String>
+      </lemmaset>
+    </unit>
+    <unit name="phot (CGS unit)" symbol="ph" conversionFactor="= 1×104 lx">
+      <lemmaset>
+	<String>personal handicap</String>
+	<String>ph</String>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Radioactivity">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="becquerel (SI unit)" symbol="Bq" conversionFactor="= 1 Bq = 1/s">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="curie" symbol="Ci" conversionFactor="= 3.7×1010 Bq ">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="rutherford (H)" symbol="rd" conversionFactor="= 1×106 Bq">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Radiation - exposure">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="roentgen" symbol="R" conversionFactor="= 2.58×10−4 C/kg">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    </concept><concept name="Radiation">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="gray (SI unit)" symbol="Gy" conversionFactor="= 1 Gy">
+      <lemmaset>
+	<String>grays</String>
+	<String>gray</String>
+      </lemmaset>
+    </unit>
+    <unit name="rad" symbol="rad" conversionFactor="= 0.01 Gy">
+      <lemmaset>
+	<String>rads</String>
+      </lemmaset>
+    </unit>
+  </concept>
+  <!--
+      <concept name="Radiation -">
+      <Synset>
+      </Synset>
+      <typicalUsage>
+      </typicalUsage>
+      <unit name="Röntgen equivalent man" symbol="rem" conversionFactor="= 0.01 Sv">
+      <lemmaset>
+      <String>rem</String>
+      <String>rems</String>
+      </lemmaset>
+      </unit>
+      <unit name="sievert (SI unit)" symbol="Sv" conversionFactor="= 1 Sv">
+      <lemmaset>
+      </lemmaset>
+      </unit>
+      </concept>
+  -->
+</root>
