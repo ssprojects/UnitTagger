@@ -363,6 +363,9 @@ public class QuantityCatalog implements WordFrequency {
 	public DocResult subSequenceMatch(List<String> tokens, float threshold) {
 		return tokenDict.findSubsequenceMatchesCosine(signSet.toSignSet(tokens), threshold);
 	}
+	public DocResult subSequenceMatch(List<String> tokens, float threshold, boolean maximal) {
+		return tokenDict.findSubsequenceMatchesCosine(signSet.toSignSet(tokens), threshold, maximal);
+	}
 	public DocResult subSequenceMatch(List<String> tokens, float thresholds[]) {
 		float minThreshold = ArrayUtils.min(thresholds);
 		return tokenDict.findSubsequenceMatchesCosine(signSet.toSignSet(tokens), minThreshold);

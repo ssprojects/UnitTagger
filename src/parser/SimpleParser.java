@@ -58,6 +58,7 @@ public class SimpleParser {
 	}
 	
 	public List<EntryWithScore<Unit> > parseHeader(String hdr) throws IOException {
+		if (isURL(hdr)) return null;
 		List<String> hdrToks = quantityDict.getTokens(hdr);
 		DocResult res = quantityDict.subSequenceMatch(hdrToks, 0.7f);
 		TObjectIntHashMap<String> conceptsFound = new TObjectIntHashMap<String>();
@@ -119,6 +120,12 @@ public class SimpleParser {
 		}
 		return null;
 	}
+	protected static boolean isURL(String hdr) {
+		int cntSlash = 0;
+		for (int p = hdr.indexOf('/'); p >=0; cntSlash++, p = hdr.indexOf('/', p+1));
+		return (cntSlash >= 4);
+	}
+
 	public static float getUnitWeight(int start, int len, List<String> hdrToks, Unit unit) {
 		float wt = 1;
 		if (len==1 && hdrToks.get(start).length()==1 && Character.isLetter(hdrToks.get(start).charAt(0)))

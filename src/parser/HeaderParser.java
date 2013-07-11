@@ -510,7 +510,8 @@ public class HeaderParser extends SimpleParser {
 	public static class Params {
 		public enum FTypes {WithinBracket,ContextWord,UnitBias,UnitScoreBias,AfterIN,DictMatchWeight,
 			SINGLELetter,INLANG, MatchLength,Subsumed,SymbolDictMatchThreshold,LemmaDictMatchThreshold,PercentUnkInUnit,PercenUnkInUnitThreshold};
-			float weights[]=new float[]{0.5f,0.5f,-0.05f,-0.5f,0.5f,1f,-1f,-1f,0.01f,-0.5f,-0.9f,-0.9f,-2f,0.5f};
+			float weights[]=new float[]{0.5f,0.5f,-0.05f,-0.5f,0.5f,1f,
+					-1f,-1.1f,0.01f,-0.5f,-0.9f,-0.9f,-2f,0.5f};
 	}
 	public static class TokenScorer implements ConditionalLexicon {
 		private static final float NegInfty = -100;
@@ -1068,6 +1069,7 @@ public class HeaderParser extends SimpleParser {
 	List<EntryWithScore<Unit> > bestUnits2 = new ReusableVector<EntryWithScore<Unit>>();
 	public List<EntryWithScore<Unit>> parseHeader(String hdr, short[][] forcedTags) {
 		System.out.println(hdr);
+		if (isURL(hdr)) return null;
 		TIntArrayList brackets = new TIntArrayList();
 		List<String> hdrToks = quantityDict.getTokens(hdr,brackets);
 		if (hdrToks.size()==0) return null;
@@ -1136,6 +1138,8 @@ public class HeaderParser extends SimpleParser {
 		if (bestUTree != null) {
 			Unit bestUnits[] = tokenScorer.bestUnit[bestUTree.getSpan().getSource()][bestUTree.getSpan().getTarget()];
 			float scoreArr[] = tokenScorer.scores[bestUTree.getSpan().getSource()][bestUTree.getSpan().getTarget()];
+			
+			// a new compound unit.
 			if (bestUTree.numChildren()==1 && bestUTree.getChild(0).label().value().equals("CU2")&&tokenScorer.dictionaryMatch(bestUTree.getSpan().getSource(),bestUTree.getSpan().getTarget()) < 0.9) {
 				Vector<Tree> simpleUnits = new Vector<Tree>();
 				getUnitNodes(bestUTree, simpleUnits, Tags.SU.name());
@@ -1154,6 +1158,7 @@ public class HeaderParser extends SimpleParser {
 					}
 				}
 			} else if (bestUnits[tokenScorer.unitState] == null) {
+				// a new base unit.
 				bestUnits[tokenScorer.unitState] = quantityDict.newUnit(hdrToks.subList(bestUTree.getSpan().getSource(), bestUTree.getSpan().getTarget()+1));
 				if (tokenScorer.altUnitCounts > 1) bestUnits[tokenScorer.unitState+2] = null;
 				System.out.println("Created new unit "+bestUnits[tokenScorer.unitState]);
@@ -1172,11 +1177,12 @@ public class HeaderParser extends SimpleParser {
 			multUnit = tokenScorer.bestUnit[multTree.getSpan().getSource()][multTree.getSpan().getTarget()][tokenScorer.multUnitState];
 			multScore = tokenScorer.scores[multTree.getSpan().getSource()][multTree.getSpan().getTarget()][tokenScorer.multUnitState];
 		}
-		if (bestUnits != null) {
-			for (int a = 0; a < bestUnitsVec.size(); a++) {
-				Unit bestUnit = bestUnitsVec.get(a).getKey();
-				if (multUnit != null) {
-					bestUnitsVec.set(a,tmpEntry.init(new UnitMultPair(bestUnit, multUnit), (float)bestUnits.get(a).getScore()*multScore));
+		if (bestUnitsVec != null && bestUnitsVec.size()>0) {
+			if (multUnit != null) {
+				for (int a = 0; a < bestUnitsVec.size(); a++) {
+					Unit bestUnit = bestUnitsVec.get(a).getKey();
+					double score = bestUnitsVec.get(a).getScore();
+					bestUnitsVec.set(a,tmpEntry.init(new UnitMultPair(bestUnit, multUnit), (float)score*multScore));
 				} 
 			}
 		} else if (multUnit!=null) {
@@ -1224,12 +1230,15 @@ public class HeaderParser extends SimpleParser {
 	}
 
 	public static void main(String args[]) throws Exception {
-		List<EntryWithScore<Unit>> unitsR = new HeaderParser(null).parseHeader("Revenue in $");
+		List<EntryWithScore<Unit>> unitsR = new HeaderParser(null).parseHeader("Median Earnings (£/year)");
+		//"billions usd", new short[][]{{(short) Tags.Mult.ordinal()},{(short) Tags.SU.ordinal()}});
 		//Loading g / m ( gr / ft )"); 
 		// Max. 10-min. average sustained wind Km/h
 		// ("fl. oz (US)", new short[][]{{(short) Tags.SU_W.ordinal()},{(short) Tags.SU_W.ordinal()},{(short) Tags.SU_W.ordinal()}}); // getting wrongly matched to kg/L
-		for (EntryWithScore<Unit> unit : unitsR) {
-			System.out.println(unit.getKey().getBaseName()+ " " +unit.getScore());
+		if (unitsR != null) {
+			for (EntryWithScore<Unit> unit : unitsR) {
+				System.out.println(unit.getKey().getBaseName()+ " " +unit.getScore());
+			}
 		}
 		/*
 		NumericAnnotator[] parsers = new NumericAnnotator[]{new HeaderParser(null), new HeaderSegmenter(null)};
