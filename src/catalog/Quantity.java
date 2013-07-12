@@ -54,6 +54,6 @@ public class Quantity {
 	   return concept;
    }
    public static boolean isUnitLess(Quantity quant) {
-	 return quant == null || quant.getConcept().equals("Number");
+	 return quant == null || quant.getConcept().equals("Multiples");
    }
 }

@@ -83,7 +83,7 @@ public class QuantityCatalog implements WordFrequency {
 	
 	SignatureSetImpl<String> signSet;
 	Analyzer analyzer;
-	public static String impDelims = "£$\\/%\\(\\)\\[\\]";
+	public static String impDelims = "£$#\\/%\\(\\)\\[\\]";
 	public static String delims =impDelims +  "!#&'\\*\\+,-\\.:;\\<=\\>\\?@\\^\\_\\`\\{\\|\\}~ \t";//NumberUnitParser.numberUnitDelims+"|\\p{Punct})";//)";
 	public static List<String> getTokens(String name) {
 		return getTokens(name,null);
@@ -433,7 +433,7 @@ public class QuantityCatalog implements WordFrequency {
 		}
 	}
 	@Override
-	public void getRelativeFrequency(String str, List<EntryWithScore<String[]>> matchesArg) {
+	public boolean getRelativeFrequency(String str, List<EntryWithScore<String[]>> matchesArg) {
 		Collection matches = lemmaDict.getCollection(str);
 		matchesArg.clear();
 		if (matches != null) {

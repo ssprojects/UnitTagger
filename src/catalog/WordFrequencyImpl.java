@@ -11,7 +11,7 @@ public class WordFrequencyImpl implements WordFrequency {
 		dict = new Hashtable<String, List<EntryWithScore<String>>>();
 	}
 	@Override
-	public void getRelativeFrequency(String str,
+	public boolean getRelativeFrequency(String str,
 			List<EntryWithScore<String[]>> matches) {
 
 	}

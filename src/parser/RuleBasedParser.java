@@ -27,7 +27,7 @@ import catalog.WordnetFrequency;
 
 public class RuleBasedParser extends SimpleParser {
 	static final float ThresholdTight = 0.9f;
-	static final float UnitFrequencyThreshold = 0.8f;
+	static final float UnitFrequencyThreshold = 0.75f;
 	WordnetFrequency wordFreq;
 	public class State {
 		String hdr;
@@ -111,11 +111,12 @@ public class RuleBasedParser extends SimpleParser {
 			freq = 0.01f;
 			float relativeFreqInCatalog = 0;
 			int startM = dictMatch.hitPosition(singleUnitMatch);
-			wordFreq.getRelativeFrequency(tokens.get(startM),freqVector);
-			if (freqVector.size()==0) {
+			boolean inWordNet = wordFreq.getRelativeFrequency(tokens.get(startM),freqVector);
+			if (!inWordNet) {
 				relativeFreqInCatalog = quantityDict.getRelativeFrequency(dictMatch.hitDocId(singleUnitMatch));
-				if (relativeFreqInCatalog > Float.MIN_VALUE)
+				if (relativeFreqInCatalog > Float.MIN_VALUE) {
 					freq = relativeFreqInCatalog;
+				}
 			}
 			int numMatches = 0;
 			for (EntryWithScore<String[]> entry : freqVector) {
@@ -178,8 +179,7 @@ public class RuleBasedParser extends SimpleParser {
 						if (quantityDict.idToUnitMap.getType(id)!=quantityDict.idToUnitMap.ConceptMatch) {
 							float score = res.hitMatch(h);
 							String matchToken = pHdr.tokens.get(res.hitPosition(h));
-							if (score < ThresholdTight && matchToken.equals("number")) continue;
-							
+							if (score < ThresholdTight && (matchToken.equals("number") || matchToken.equals("#") || Character.isDigit(matchToken.charAt(0)))) continue;
 							numMatch = true;
 							break;
 						}
@@ -209,6 +209,30 @@ public class RuleBasedParser extends SimpleParser {
 		}
 	}
 
+	public static class NoUnitPatterns extends IsUrl {
+		public static String Patterns[][] = {{"s","#"}, {"sl", "no"}, {"w", "/", "l"}, {"u", "s"}};
+		@Override
+		public
+		List<EntryWithScore<Unit>> apply(String hdr,  State pHdr, List<String> applicableRules) {
+			pHdr.setTokens();
+			for (String[] pat : Patterns) {
+				if (pat.length==pHdr.tokens.size()) {
+					boolean match = true;
+					for (int i = 0; i < pat.length; i++) {
+						if (!pHdr.tokens.get(i).equals(pat[i])) {
+							match = false;
+							break;
+						}
+					}
+					if (match) {
+						applicableRules.add(name());
+						return null;
+					}
+				}
+			}
+			return null;
+		}
+	}
 	public class DictConceptMatch1Unit extends IsUrl {
 		@Override
 		public
@@ -329,6 +353,8 @@ public class RuleBasedParser extends SimpleParser {
 			pHdr.setDictMatch();
 			int bestUnitMatch = pHdr.setSingleUnitMatch();
 			if (bestUnitMatch < 0) return null;
+			if (pHdr.dictMatch.hitPosition(bestUnitMatch)!= 0 || pHdr.dictMatch.hitEndPosition(bestUnitMatch)!=pHdr.tokens.size()-1)
+				return null;
 			if (pHdr.setWordFrequency() > UnitFrequencyThreshold) {
 				applicableRules.add(name());
 				Unit unit = quantityDict.idToUnitMap.get(pHdr.dictMatch.hitDocId(bestUnitMatch));
@@ -365,7 +391,9 @@ public class RuleBasedParser extends SimpleParser {
 				if (quantityDict.idToUnitMap.getType(id)!=quantityDict.idToUnitMap.ConceptMatch) {
 					Unit unit =  quantityDict.idToUnitMap.get(res.hitDocId(h));
 					float score = res.hitMatch(h);
-					unitScore.adjustOrPutValue(unit, score, score);
+					if (!unitScore.contains(unit) || unitScore.get(unit) < score) {
+						unitScore.put(unit, score);
+					}
 				}
 			}
 			Vector<EntryWithScore<Unit> > units = new Vector<EntryWithScore<Unit>>();
@@ -386,6 +414,7 @@ public class RuleBasedParser extends SimpleParser {
 		rules = new Vector<RuleBasedParser.Rule>();
 		rules.add(new IsUrl());
 		rules.add(new NoUnit());
+		rules.add(new NoUnitPatterns());
 		rules.add(new PercentSymbolMatch());
 		rules.add(new DictConceptMatch1Unit());
 		rules.add(new YearUnit());
@@ -400,7 +429,7 @@ public class RuleBasedParser extends SimpleParser {
 	}
 	public static void main(String args[]) throws IOException, ParserConfigurationException, SAXException {
 		List<String> vec = new Vector<String>();
-		List<EntryWithScore<Unit>> unitsR = new RuleBasedParser(null,null).parseHeaderExplain("Mileage underway (km)", vec);
+		List<EntryWithScore<Unit>> unitsR = new RuleBasedParser(null,null).parseHeaderExplain("last win", vec);
 		System.out.println(unitsR);
 		System.out.println(Arrays.toString(vec.toArray()));
 	}
