@@ -30,6 +30,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import catalog.Co_occurrenceStatistics;
 import catalog.QuantityCatalog;
 import catalog.Unit;
 import catalog.UnitMultPair;
@@ -468,6 +469,7 @@ public class CFGParser extends SimpleParser {
 	TokenScorer tokenScorer;
 	Index<String> wordIndex;
 
+
 	public static class TagArrayIterator implements Iterator<IntTaggedWord> {
 		short tagArray[];
 		int word;
@@ -501,9 +503,9 @@ public class CFGParser extends SimpleParser {
 
 	public static class Params {
 		public enum FTypes {WithinBracket,ContextWord,UnitBias,UnitScoreBias,AfterIN,DictMatchWeight,
-			SINGLELetter,INLANG, MatchLength,Subsumed,SymbolDictMatchThreshold,LemmaDictMatchThreshold,PercentUnkInUnit,PercenUnkInUnitThreshold};
+			SINGLELetter,INLANG, MatchLength,Subsumed,SymbolDictMatchThreshold,LemmaDictMatchThreshold,PercentUnkInUnit,PercenUnkInUnitThreshold, Co_occurStats};
 			float weights[]=new float[]{0.5f,0.5f,-0.05f,-0.5f,0.5f,1f,
-					-1f,-1.1f,0.01f,-0.5f,-0.9f,-0.9f,-2f,0.5f};
+					-1f,-1.1f,0.01f,-0.5f,-0.9f,-0.9f,-2f,0.5f,0.5f};
 	}
 	public static class Token implements HasWord {
 		String wrd;
@@ -561,7 +563,7 @@ public class CFGParser extends SimpleParser {
 		}
 		ug.purgeRules();
 		Index<String> wordIndex = new WordIndex(this.quantityDict.tokenDict);
-		tokenScorer = new TokenScorer(index, tagIndex,quantityDict,wordIndex, new WordnetFrequency());
+		tokenScorer = new TokenScorer(index, tagIndex,quantityDict,wordIndex, new WordnetFrequency(),coOccurStats);
 		Options op = new Options();
 		op.dcTags=false;
 		//op.testOptions.verbose=true;
@@ -751,7 +753,7 @@ public class CFGParser extends SimpleParser {
 	}
 
 	public static void main(String args[]) throws Exception {
-		List<EntryWithScore<Unit>> unitsR = new CFGParser(null).parseHeader("total weeks at top");//, new short[][]{{(short) Tags.Mult.ordinal()},{(short) Tags.SU.ordinal()}});
+		List<EntryWithScore<Unit>> unitsR = new CFGParser(null).parseHeader("wavelength (nm)");//, new short[][]{{(short) Tags.Mult.ordinal()},{(short) Tags.SU.ordinal()}});
 		//"billions usd", new short[][]{{(short) Tags.Mult.ordinal()},{(short) Tags.SU.ordinal()}});
 		//Loading g / m ( gr / ft )"); 
 		// Max. 10-min. average sustained wind Km/h

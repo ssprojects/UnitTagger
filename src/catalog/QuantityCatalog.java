@@ -447,6 +447,7 @@ public class QuantityCatalog implements WordFrequency {
 				}
 			}
 		}
+		return matchesArg.size()>0;
 	}
 	public float getRelativeFrequency(int id) {
 		Unit u = idToUnitMap.get(id);
@@ -458,5 +459,11 @@ public class QuantityCatalog implements WordFrequency {
 			}
 		}
 		return 0;
+	}
+	public Unit getUnitFromBaseName(String unitName) {
+		Collection<Unit> units = nameDict.getCollection(unitName);
+		if (units != null && units.size()>0)
+			return units.iterator().next();
+		return null;
 	}
 }

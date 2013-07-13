@@ -429,7 +429,7 @@ public class RuleBasedParser extends SimpleParser {
 	}
 	public static void main(String args[]) throws IOException, ParserConfigurationException, SAXException {
 		List<String> vec = new Vector<String>();
-		List<EntryWithScore<Unit>> unitsR = new RuleBasedParser(null,null).parseHeaderExplain("last win", vec);
+		List<EntryWithScore<Unit>> unitsR = new RuleBasedParser(null,null).parseHeaderExplain("mileage (km)", vec);
 		System.out.println(unitsR);
 		System.out.println(Arrays.toString(vec.toArray()));
 	}

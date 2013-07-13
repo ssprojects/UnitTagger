@@ -17,6 +17,7 @@ import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+import catalog.Co_occurrenceStatistics;
 import catalog.Quantity;
 import catalog.QuantityCatalog;
 import catalog.QuantityReader;
@@ -44,17 +45,13 @@ public class SimpleParser {
 	boolean debug;
 	Element options;
 	QuantityCatalog quantityDict;
+	protected Co_occurrenceStatistics coOccurStats;
 	public SimpleParser(Element elem, QuantityCatalog dict) throws IOException, ParserConfigurationException, SAXException {
 		this.options = elem;
-		if (dict==null) {
-			String path = QuantityCatalog.QuantTaxonomyPath;
-			if (elem != null && elem.hasAttribute("quantity-taxonomy")) {
-				path = elem.getAttribute("quantity-taxonomy");
-			}
-			quantityDict = new QuantityCatalog(QuantityReader.loadQuantityTaxonomy(path));
-		} else 
-			quantityDict = dict;
-		
+		if (dict==null) 
+			dict = new QuantityCatalog(elem);
+		quantityDict = dict;
+		coOccurStats = new Co_occurrenceStatistics(elem, dict);
 	}
 	
 	public List<EntryWithScore<Unit> > parseHeader(String hdr) throws IOException {

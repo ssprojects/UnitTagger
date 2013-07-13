@@ -3,6 +3,7 @@ package catalog;
 import edu.stanford.nlp.io.EncodingPrintWriter.out;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TObjectIntHashMap;
+import gnu.trove.TObjectIntIterator;
 import gnu.trove.TObjectLongHashMap;
 import iitb.shared.StringIntPair;
 import iitb.shared.XMLConfigs;
@@ -27,21 +28,30 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class Co_occurrenceStatistics {
+	public static final String CoOccurFilePath = "configs/cooccurrence.txt";
 	QuantityCatalog quantityDict;
 	List<String> units = new Vector<String>();
 	TIntArrayList freqs = new TIntArrayList();
 	TObjectLongHashMap<String> word2UnitsHashMap = new TObjectLongHashMap<String>();
 	TObjectIntHashMap<StringIntPair> counts = new TObjectIntHashMap<StringIntPair>();
 	int numHdrs = 0;
-	public Co_occurrenceStatistics(Element elem, QuantityCatalog dict, String loadFile) throws IOException, ParserConfigurationException, SAXException {
-		if (dict==null) {
-			String path = QuantityCatalog.QuantTaxonomyPath;
-			if (elem != null && elem.hasAttribute("quantity-taxonomy")) {
-				path = elem.getAttribute("quantity-taxonomy");
+	public Co_occurrenceStatistics(QuantityCatalog dict) throws IOException, ParserConfigurationException, SAXException {
+		this(dict,null);
+	}
+	public Co_occurrenceStatistics(Element elem, QuantityCatalog dict) throws IOException, ParserConfigurationException, SAXException {
+		this(dict,extractLoadFile(elem));
+	}
+	private static String extractLoadFile(Element elem) {
+		if (elem != null) {
+			Element coOccurElem = XMLConfigs.getElement(elem, "co-occur-stats");
+			if (coOccurElem!=null && coOccurElem.hasAttribute("path")) {
+				return coOccurElem.getAttribute("path");
 			}
-			quantityDict = new QuantityCatalog(QuantityReader.loadQuantityTaxonomy(path));
-		} else 
-			quantityDict = dict;
+		}
+		return CoOccurFilePath;
+	}
+	public Co_occurrenceStatistics(QuantityCatalog dict, String loadFile) throws IOException, ParserConfigurationException, SAXException {
+		quantityDict = dict;
 		if (loadFile != null) {
 			load(new BufferedReader(new FileReader(new File(loadFile))));
 		}
@@ -118,6 +128,7 @@ public class Co_occurrenceStatistics {
 			int pos = units.size();
 			word2UnitsHashMap.put(tokens[0],pos);
 			int total = 0;
+			TObjectIntHashMap<String> conceptCount = new TObjectIntHashMap<String>();
 			for (int t = 1; t < tokens.length;t++) {
 				if (tokens[t].startsWith("=")) continue;
 				String e[] = tokens[t].split("\\|");
@@ -129,11 +140,20 @@ public class Co_occurrenceStatistics {
 				units.add(unitName);
 				freqs.add(cnt);
 				total += cnt;
+				Unit unit = quantityDict.getUnitFromBaseName(unitName);
+				if (unit!=null) {
+					conceptCount.adjustOrPutValue(unit.getParentQuantity().getConcept(), cnt, cnt);
+				}
+			}
+			for (TObjectIntIterator<String> iter = conceptCount.iterator(); iter.hasNext(); ) {
+				iter.advance();
+				units.add(iter.key());
+				freqs.add(iter.value());
 			}
 			units.add("="); freqs.add(total);
 		}
 	}
-	public int getOccurrenceFrequency(String word, String unitName, int total[]) {
+	public int getOccurrenceFrequency(String word, String unitName, String conceptName, int total[]) {
 		if (total != null) total[0] = 0;
 		if (!word2UnitsHashMap.contains(word)) {
 			return 0;
@@ -144,6 +164,9 @@ public class Co_occurrenceStatistics {
 		for (; p < units.size() && !units.get(p).equals("="); p++) {
 			if (units.get(p).equals(unitName)) {
 				freq = freqs.get(p);
+			}
+			if (conceptName != null && total != null && units.get(p).equals(conceptName)) {
+				total[1] = freqs.get(p);
 			}
 		}
 		if (total!=null) {
@@ -156,8 +179,11 @@ public class Co_occurrenceStatistics {
 		return (int) posLen;
 	}
 	public static void main(String args[]) throws IOException, ParserConfigurationException, SAXException {
-		int total[] = new int[1];
-		Co_occurrenceStatistics stats = new Co_occurrenceStatistics(null, null, "/tmp/cooccurrence6L.txt");
-		System.out.println(stats.getOccurrenceFrequency("weight", "gram", total));
+		int total[] = new int[2];
+		Co_occurrenceStatistics stats = new Co_occurrenceStatistics(null,"/tmp/cooccurrence6L.txt");
+		System.out.println(stats.getOccurrenceFrequency("weight", "gram", "weight", total));
+	}
+	public boolean tokenPresent(String word) {
+		return word2UnitsHashMap.contains(word);
 	}
 }
