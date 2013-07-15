@@ -741,7 +741,6 @@ public class CFGParser extends SimpleParser {
 		}
 		return null;
 	}
-
 	private void getUnitNodes(Tree tree, Vector<Tree> unitNodes, String unitLabel) {
 		if (tree.label().value().equals(unitLabel)) {
 			unitNodes.add(tree);
@@ -763,65 +762,6 @@ public class CFGParser extends SimpleParser {
 				System.out.println(unit.getKey().getBaseName()+ " " +unit.getScore());
 			}
 		}
-		/*
-		NumericAnnotator[] parsers = new NumericAnnotator[]{new HeaderParser(null), new HeaderSegmenter(null)};
-		String labeledDataFile="/mnt/a99/d0/WWT/workspace/WWT_GroundTruthV2/unitLabel4Headers.xml";
-		Element elem = iitb.wwt.common.Params.load(new FileReader(labeledDataFile));
-		NodeList nodeList = elem.getElementsByTagName("r");
-		int len = nodeList.getLength();
-
-		int total = 0;
-		int mistakes[] = new int[parsers.length];
-		for (int r = 0; r < len; r++) {
-			total++;
-			Element rec = (Element) nodeList.item(r);
-			String hdr = iitb.wwt.common.Params.getElement(rec, "h").getTextContent();
-			NodeList unitList = rec.getElementsByTagName("u");
-			HashSet<String> trueUnits = null;
-			if (unitList != null && unitList.getLength()>0) {
-				trueUnits = new HashSet<String>();
-				for (int u = 0; u < unitList.getLength();u++) {
-					trueUnits.add(unitList.item(u).getTextContent());
-				}
-			}
-			int p = -1;
-			boolean matchedA[] = new boolean[parsers.length];
-			Arrays.fill(matchedA, false);
-
-			for (NumericAnnotator parser : parsers) {
-				p++;
-				boolean matched=false;
-				List<EntryWithScore<Unit>> extractedUnits = parser.parseHeader(hdr);
-				System.out.println("Extracted from " + parser.getClass().getSimpleName() + " " + extractedUnits);
-				if ((trueUnits==null || trueUnits.size()==0) && (extractedUnits==null || extractedUnits.size()==0)) {
-					matched = true;
-				} else {
-					if (trueUnits != null && extractedUnits != null && trueUnits.size()==extractedUnits.size()) {
-						
-						matched=true;
-						for (EntryWithScore<Unit> unitScore : extractedUnits) {
-							Unit unit = unitScore.getKey();
-							if (!trueUnits.contains(unit.getBaseName())) {
-								matched=false;
-								break;
-							}
-						}
-					}
-				}
-				if (!matched) {
-					mistakes[p]++;
-				}
-				matchedA[p] = matched;
-			} 
-			if (p > 0 && matchedA[0] != matchedA[1]) {
-				System.out.println("Mismatched");
-			}
-		}
-		int p = 0;
-		for (NumericAnnotator parser : parsers) {
-			System.out.println(parser.getClass().getSimpleName() + "  " + mistakes[p]+ " / "+total);
-			p++;
-		}
-		*/
+		
 	}
 }

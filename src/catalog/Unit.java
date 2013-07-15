@@ -146,9 +146,8 @@ public class Unit {
 	{
 		StringBuffer strBuff = new StringBuffer();
 		strBuff.append("Name:="+name + " Symbol:="+symbol+" Conversion Factor:="+conversionFactor);
-		strBuff.append("\n");
-		if (lemmaSet!=null) {
-			strBuff.append("Lemmas := ");
+		if (lemmaSet!=null && lemmaSet.size() > 0) {
+			strBuff.append(" Lemmas := ");
 		for(String lemma : lemmaSet)
 			strBuff.append(lemma).append(", ");
 		}

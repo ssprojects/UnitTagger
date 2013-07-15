@@ -34,7 +34,7 @@ import iitb.shared.EntryWithScore;
 import iitb.shared.Timer;
 import iitb.shared.SignatureSetIndex.DocResult;
 
-public class SimpleParser {
+public class SimpleParser implements HeaderUnitParser{
 	private static final float Unit1Score = 0.5f;
 	private static final float WordSymbolScore = 0.5f;
 	public static String[] WordSymbols = {"in","sl","no","are","Ch","per","point", "at","line","league","sheet","weber","shed","last","french","a","hand","mark","number","length","time","us","standard","from","natural","mass"};
@@ -54,6 +54,10 @@ public class SimpleParser {
 		coOccurStats = new Co_occurrenceStatistics(elem, dict);
 	}
 	
+	/* (non-Javadoc)
+	 * @see parser.HeaderUnitParser#parseHeader(java.lang.String)
+	 */
+	@Override
 	public List<EntryWithScore<Unit> > parseHeader(String hdr) throws IOException {
 		if (isURL(hdr)) return null;
 		List<String> hdrToks = quantityDict.getTokens(hdr);
@@ -145,6 +149,13 @@ public class SimpleParser {
 		
 	}
 	public static void main(String args[]) throws Exception {
+	}
+
+	@Override
+	public List<EntryWithScore<Unit>> parseHeaderExplain(String hdr,
+			List<String> explanation) throws IOException {
+		if (explanation != null) explanation.clear();
+		return parseHeader(hdr);
 	}
 }
 

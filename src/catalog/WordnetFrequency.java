@@ -23,7 +23,7 @@ public class WordnetFrequency implements WordFrequency {
 	WordNetDatabase database;
 	float stopWordFreq = 0.9f;
 	// p -- percent as against poise and poncelet.
-	static String stopWords[] = new String[]{"in","are","at","a","from","of","to","the","for","and","with","on","total","per","no","number","amp","apos","quot"};
+	static String stopWords[] = new String[]{"in","are","at","a","from","of","to","the","for","and","with","on","total","per","no","number","amp","apos","quot","hr"};
 	static HashSet<String> stopWordsHash=new HashSet<String>(Arrays.asList(stopWords));
 	public WordnetFrequency() {
 		System.setProperty("wordnet.database.dir", "/mnt/b100/d0/library/public_html/wordnet/WordNet-2.1/dict");
@@ -92,7 +92,7 @@ public class WordnetFrequency implements WordFrequency {
 	 */
 	public static void main(String[] args) {
 		//args = HeaderSegmenter.WordSymbols;
-		args = new String[]{"period"};
+		args = new String[]{"t"};
 		WordnetFrequency wordFreq = new WordnetFrequency();
 		List<EntryWithScore<String[]>> matches = new Vector<EntryWithScore<String[]>>();
 		wordFreq.getRelativeFrequency(args[0], matches);

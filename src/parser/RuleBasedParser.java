@@ -28,6 +28,7 @@ import catalog.WordnetFrequency;
 public class RuleBasedParser extends SimpleParser {
 	static final float ThresholdTight = 0.9f;
 	static final float UnitFrequencyThreshold = 0.75f;
+	static final char[] SingleLetterUnits = {'d', 'r'}; // WARNING: keep this sorted at all times.
 	WordnetFrequency wordFreq;
 	public class State {
 		String hdr;
@@ -63,7 +64,7 @@ public class RuleBasedParser extends SimpleParser {
 				}
 			}
 		}
-		public int setSingleUnitMatch() {
+		public int setSingleSpanMatchesUnit() {
 			if (singleUnitMatch != -2) return singleUnitMatch;
 			DocResult res = dictMatch;
 			int matchId = -1;
@@ -241,22 +242,32 @@ public class RuleBasedParser extends SimpleParser {
 			pHdr.setConceptsFound();
 
 			DocResult res = pHdr.dictMatch;
-			int matchId = -1;
-			Unit singleUnit = null;
-			float maxScore = Float.NEGATIVE_INFINITY;
-			for (int h = res.numHits()-1; h >= 0; h--) {
-				int id = res.hitDocId(h);
-				byte type = quantityDict.idToUnitMap.getType(id);
-				if (quantityDict.idToUnitMap.getType(id)!=quantityDict.idToUnitMap.ConceptMatch) {
-					Unit unit =  quantityDict.idToUnitMap.get(res.hitDocId(h));
-					float score = res.hitMatch(h);
-					if (score < ThresholdTight) continue;
-					if (pHdr.conceptsFound.containsKey(unit.getParentQuantity().getConcept())) {
-						applicableRules.add(name());
-						List<EntryWithScore<Unit>> units = new Vector<EntryWithScore<Unit>>();
-						units.add(new EntryWithScore<Unit>(unit, pHdr.dictMatch.hitMatch(h)));
-						return units;
+			int matchId = pHdr.setSingleSpanMatchesUnit();
+			if (matchId >= 0) {
+				matchId = -1;
+				Unit singleUnit = null;
+				float maxScore = Float.NEGATIVE_INFINITY;
+				for (int h = res.numHits()-1; h >= 0; h--) {
+					int id = res.hitDocId(h);
+					byte type = quantityDict.idToUnitMap.getType(id);
+					if (quantityDict.idToUnitMap.getType(id)!=quantityDict.idToUnitMap.ConceptMatch) {
+						Unit unit =  quantityDict.idToUnitMap.get(res.hitDocId(h));
+						float score = res.hitMatch(h);
+						if (score < ThresholdTight) continue;
+						if (pHdr.conceptsFound.containsKey(unit.getParentQuantity().getConcept())) {
+							if (matchId >= 0) {
+								return null;
+							}
+							matchId = h;
+						}
 					}
+				}
+				if (matchId >= 0) {
+					Unit unit =  quantityDict.idToUnitMap.get(res.hitDocId(matchId));
+					applicableRules.add(name());
+					List<EntryWithScore<Unit>> units = new Vector<EntryWithScore<Unit>>();
+					units.add(new EntryWithScore<Unit>(unit, pHdr.dictMatch.hitMatch(matchId)));
+					return units;
 				}
 			}
 			return null;
@@ -269,10 +280,10 @@ public class RuleBasedParser extends SimpleParser {
 	public class PercentSymbolMatch extends IsUrl {
 		public List<EntryWithScore<Unit>> apply(String hdr, State pHdr, List<String> applicableRules) {
 			pHdr.setDictMatch();
-			int bestUnitMatch = pHdr.setSingleUnitMatch();
+			int bestUnitMatch = pHdr.setSingleSpanMatchesUnit();
 			if (bestUnitMatch < 0) return null;
 			Unit unit = quantityDict.idToUnitMap.get(pHdr.dictMatch.hitDocId(bestUnitMatch));
-			if (unit.getBaseSymbols()[0].equals("%")) {
+			if (unit.getBaseSymbols()[0].equals("%") && hdr.indexOf('/') < 0) {
 				applicableRules.add(name());
 				List<EntryWithScore<Unit>> units = new Vector<EntryWithScore<Unit>>();
 				units.add(new EntryWithScore<Unit>(unit, pHdr.dictMatch.hitMatch(bestUnitMatch)));
@@ -284,10 +295,10 @@ public class RuleBasedParser extends SimpleParser {
 	public class YearUnit extends IsUrl {
 		public List<EntryWithScore<Unit>> apply(String hdr, State pHdr, List<String> applicableRules) {
 			pHdr.setDictMatch();
-			int bestUnitMatch = pHdr.setSingleUnitMatch();
+			int bestUnitMatch = pHdr.setSingleSpanMatchesUnit();
 			if (bestUnitMatch < 0) return null;
 			Unit unit = quantityDict.idToUnitMap.get(pHdr.dictMatch.hitDocId(bestUnitMatch));
-			if (unit.getBaseName().equalsIgnoreCase("year")) {
+			if (unit.getBaseName().equalsIgnoreCase("year") && !hdr.toLowerCase().contains("year-")) {
 				applicableRules.add(name());
 				List<EntryWithScore<Unit>> units = new Vector<EntryWithScore<Unit>>();
 				units.add(new EntryWithScore<Unit>(unit, pHdr.dictMatch.hitMatch(bestUnitMatch)));
@@ -298,24 +309,23 @@ public class RuleBasedParser extends SimpleParser {
 	}
 
 	public class SingleLetterNotUnit extends IsUrl {
-		// unless it is m.
 		public List<EntryWithScore<Unit>> apply(String hdr, State pHdr, List<String> applicableRules) {
 			pHdr.setDictMatch();
-			int bestUnitMatch = pHdr.setSingleUnitMatch();
+			int bestUnitMatch = pHdr.setSingleSpanMatchesUnit();
 			if (bestUnitMatch < 0) return null;
 			int matchStart = pHdr.dictMatch.hitPosition(bestUnitMatch);
-			if (pHdr.tokens.get(matchStart).length()==1 && Character.isLetter(pHdr.tokens.get(matchStart).charAt(0))
-					&& pHdr.tokens.get(matchStart).charAt(0) != 'm') {
+			char letter = pHdr.tokens.get(matchStart).charAt(0);
+			if (pHdr.tokens.get(matchStart).length()==1 && Character.isLetter(letter) && Arrays.binarySearch(SingleLetterUnits, letter) >= 0) {
 				TIntArrayList brackets = pHdr.brackets;
 				/*for (int pos = 0; pos < brackets.size(); pos++) {
 					if (brackets.get(pos) < 0) continue; // mismatched brackets
 					int start = brackets.get(pos) >> 16;
 					int end = brackets.get(pos) & ((1<<16)-1);
 					if (start==end && pHdr.dictMatch.hitPosition(bestUnitMatch)==start) { */
-						applicableRules.add(name());
-						return null;
-//					}
-	//			}
+				applicableRules.add(name());
+				return null;
+				//					}
+				//			}
 			}
 			return null;
 		}
@@ -325,8 +335,9 @@ public class RuleBasedParser extends SimpleParser {
 		// unless it is m.
 		public List<EntryWithScore<Unit>> apply(String hdr, State pHdr, List<String> applicableRules) {
 			pHdr.setDictMatch();
-			int bestUnitMatch = pHdr.setSingleUnitMatch();
+			int bestUnitMatch = pHdr.setSingleSpanMatchesUnit();
 			if (bestUnitMatch < 0) return null;
+			if (pHdr.dictMatch.hitLength(bestUnitMatch)==1 && pHdr.tokens.get(pHdr.dictMatch.hitPosition(bestUnitMatch)).length() <= 1) return null;
 			TIntArrayList brackets = pHdr.brackets;
 			for (int pos = 0; pos < brackets.size(); pos++) {
 				if (brackets.get(pos) < 0) continue; // mismatched brackets
@@ -351,7 +362,7 @@ public class RuleBasedParser extends SimpleParser {
 		public List<EntryWithScore<Unit>> apply(String hdr, State pHdr,
 				List<String> applicableRules) {
 			pHdr.setDictMatch();
-			int bestUnitMatch = pHdr.setSingleUnitMatch();
+			int bestUnitMatch = pHdr.setSingleSpanMatchesUnit();
 			if (bestUnitMatch < 0) return null;
 			if (pHdr.dictMatch.hitPosition(bestUnitMatch)!= 0 || pHdr.dictMatch.hitEndPosition(bestUnitMatch)!=pHdr.tokens.size()-1)
 				return null;
@@ -367,6 +378,7 @@ public class RuleBasedParser extends SimpleParser {
 	}
 	List<Rule> rules;
 	public List<EntryWithScore<Unit> > parseHeaderExplain(String hdr, List<String> applicableRules) throws IOException {
+		applicableRules.clear();
 		State hdrToks = new State(hdr);
 		List<EntryWithScore<Unit> > unitsToRet = null;
 		for (Rule rule: rules) {
@@ -406,7 +418,7 @@ public class RuleBasedParser extends SimpleParser {
 		}
 		return unitsToRet;
 	}
-	
+
 	public RuleBasedParser(Element elem, QuantityCatalog dict)
 	throws IOException, ParserConfigurationException, SAXException {
 		super(elem, dict);
@@ -429,7 +441,8 @@ public class RuleBasedParser extends SimpleParser {
 	}
 	public static void main(String args[]) throws IOException, ParserConfigurationException, SAXException {
 		List<String> vec = new Vector<String>();
-		List<EntryWithScore<Unit>> unitsR = new RuleBasedParser(null,null).parseHeaderExplain("mileage (km)", vec);
+		List<EntryWithScore<Unit>> unitsR = new RuleBasedParser(null,null).parseHeaderExplain("Total area (in thousand sq ft)", vec);
+		//				"
 		System.out.println(unitsR);
 		System.out.println(Arrays.toString(vec.toArray()));
 	}
