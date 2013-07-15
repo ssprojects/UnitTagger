@@ -11,7 +11,9 @@ import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.Index;
 import gnu.trove.TFloatArrayList;
 import gnu.trove.TIntArrayList;
+import gnu.trove.TObjectDoubleHashMap;
 import iitb.shared.EntryWithScore;
+import iitb.shared.StringMap;
 import iitb.shared.SignatureSetIndex.DocResult;
 
 import java.io.BufferedReader;
@@ -47,6 +49,7 @@ public class TokenScorer implements ConditionalLexicon {
 	private static final float NegInfty = -100;
 	private static final float ScoreEps = 0.01f;
 	public static final float CoccurMixWeight=0.1f;
+	public static final float CoccurRatioSmooth=1f;
 	private DocResult dictMatches;
 	private List<Token> sentence;
 	List<String> hdrToks;
@@ -55,7 +58,7 @@ public class TokenScorer implements ConditionalLexicon {
 	Index<String> wordIndex;
 	StateIndex stateIndex;
 	QuantityCatalog matcher;
-	int altUnitCounts = 3;
+	int altUnitCounts = 5;
 	int numStatesWithFeatures=2;
 	int multUnitState=0;
 	int unitState=1;
@@ -174,13 +177,13 @@ public class TokenScorer implements ConditionalLexicon {
 						if (isUnit) {
 							numMatches++;
 							if (numMatches>1) {
-								System.out.println("Violated uniqueness assumption of base unit");
+								//System.out.println("Violated uniqueness assumption of base unit");
 							}
 							freq += (float) entry.getScore();
 						}
 					}
 					if (!found && relativeFreqInCatalog < Float.MIN_VALUE) {
-						System.out.println("Found no match in wordnet for "+hdrToks.get(startM) + " "+unit.getBaseName());
+						//System.out.println("Found no match in wordnet for "+hdrToks.get(startM) + " "+unit.getBaseName());
 					} else {
 						score += (1-freq)*params.weights[FTypes.INLANG.ordinal()];
 					}
@@ -227,10 +230,69 @@ public class TokenScorer implements ConditionalLexicon {
 		//
 		if (coOcurStats!=null) {
 			int total[] = new int[2];
-			int len =1;
-			for (int start = 0; start < scores.length-len+1; start++) {
-				int end = start+len-1;
-				if (!coOcurStats.tokenPresent(hdrToks.get(start))) continue;
+			StringMap<Unit> units = new StringMap<Unit>();
+			for (int start = 0; start < hdrToks.size(); start++) {
+				for (int end = start; end < hdrToks.size(); end++) {
+					for (int state = 0; state < 2; state++) {
+						for (int a = 0; a < altUnitCounts && bestUnit[start][end][a*2+state] != null; a++) {
+							units.add(bestUnit[start][end][a*2+state]);
+						}
+					}
+				}
+			}
+			if (units.size() > 1) {
+				float totalScores[] = new float[units.size()];
+				for (int start = 0; start < hdrToks.size(); start++) {
+					if (!coOcurStats.tokenPresent(hdrToks.get(start))) continue;
+					float freqs[] = new float[units.size()];
+					float totalFreq = CoccurRatioSmooth;
+					float maxFreq = Float.NEGATIVE_INFINITY;
+					float minFreq = Float.POSITIVE_INFINITY;
+					for (int id = units.size()-1; id >= 0; id--) {
+						Unit unit = units.get(id);
+						int freq = coOcurStats.getOccurrenceFrequency(hdrToks.get(start), unit.getBaseName(), unit.getParentQuantity().getConcept(), total);
+						float f = freq + CoccurMixWeight*total[1];
+						freqs[id] = f;
+						totalFreq += f;
+						maxFreq = Math.max(maxFreq, f);
+						minFreq = Math.min(minFreq, f);
+					}
+					if (maxFreq-minFreq > Float.MIN_VALUE) {
+						for (int id = 0; id < freqs.length; id++) {
+							float f = freqs[id];	
+							totalScores[id] += f/totalFreq;
+						}
+					}
+				}
+				// the total contribution from co-occurrence statistics is now available.
+				// now add the winning units in each slots.
+				for (int start = 0; start < hdrToks.size(); start++) {
+					for (int end = start; end < hdrToks.size(); end++) {
+						for (int state = 0; state < 2; state++) {
+							float maxFreq = Float.NEGATIVE_INFINITY;
+							for (int a = 0; a < altUnitCounts && bestUnit[start][end][a*2+state] != null; a++) {
+								int id = units.get(bestUnit[start][end][a*2+state]);
+								maxFreq = Math.max(maxFreq, totalScores[id]);
+							}
+							Unit unitsT[] = new Unit[altUnitCounts];
+							for (int a = 0, uCtr=0; a < altUnitCounts && bestUnit[start][end][a*2+state] != null; a++) {
+								int id = units.get(bestUnit[start][end][a*2+state]);
+								float f = totalScores[id];
+								if (f < maxFreq*0.9) {
+									bestUnit[start][end][a*2+state] = null;
+								} else {
+									unitsT[uCtr++] = bestUnit[start][end][a*2+state];
+								}
+							}
+							if (unitsT[0] != null) scores[start][end][state] += maxFreq*params.weights[FTypes.Co_occurStats.ordinal()];
+							for (int a = 0; a < unitsT.length && unitsT[a]!=null;a++) {
+								bestUnit[start][end][a*2+state] = unitsT[a];
+							}
+						}
+					}
+				}
+
+				/*
 				int numM = 0;
 				for(int p = 0; p < bestUnit[start][end].length&& p < 4; p++) {
 					if (bestUnit[start][end][p] != null) numM++;
@@ -267,6 +329,7 @@ public class TokenScorer implements ConditionalLexicon {
 						}
 					}
 				}
+				 */
 			}
 		}
 		// add features corresponding to subsumed matches...
@@ -518,8 +581,12 @@ public class TokenScorer implements ConditionalLexicon {
 
 
 			return score;
+		} else if (rule.parent == Tags.SU.ordinal() && (stateIndex.isState(States.SU_MW, rule.leftChild))) {
+			// 15 Jul 2013: should reward dictionary match only when a true compound unit otherwise things like "sq m" take double reward by
+			// outputing "sq (new unit) million"
+			return scoreSpan(start,end,stateToScorePosition(rule.parent));
 		}
-		return scoreSpan(start,end,stateToScorePosition(rule.parent));
+		return 0;
 	}
 
 	@Override

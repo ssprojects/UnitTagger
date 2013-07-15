@@ -20,6 +20,7 @@ import org.xml.sax.SAXException;
 import catalog.QuantityCatalog;
 import catalog.Unit;
 
+import parser.CFGParser;
 import parser.HeaderUnitParser;
 import parser.RuleBasedParser;
 
@@ -54,7 +55,7 @@ public class Test {
 				p++;
 				boolean matched=false;
 				List<EntryWithScore<Unit>> extractedUnits = parser.parseHeaderExplain(hdr, applicableRules);
-				System.out.println("Extracted from " + parser.getClass().getSimpleName() + " " + extractedUnits);
+				
 				if ((trueUnits==null || trueUnits.size()==0) && (extractedUnits==null || extractedUnits.size()==0)) {
 					matched = true;
 				} else {
@@ -75,6 +76,7 @@ public class Test {
 					if (applicableRules.size()==1) {
 						criticalMistakes[p]++;
 					}
+					System.out.println(hdr); //"Extracted from " + parser.getClass().getSimpleName() + " " + extractedUnits);
 				}
 				matchedA[p] = matched;
 			} 
@@ -89,7 +91,8 @@ public class Test {
 		}
 	}
 	public static void main(String args[]) throws IOException, ParserConfigurationException, SAXException {
-		HeaderUnitParser[] parsers = new HeaderUnitParser[]{new RuleBasedParser(null,null)};
+		QuantityCatalog dict = new QuantityCatalog((Element)null);
+		HeaderUnitParser[] parsers = new HeaderUnitParser[]{new CFGParser(null,dict)};
 		new Test(parsers,GroundTruthFile);
 	}
 }

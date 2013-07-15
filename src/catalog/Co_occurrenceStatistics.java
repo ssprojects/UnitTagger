@@ -154,7 +154,7 @@ public class Co_occurrenceStatistics {
 		}
 	}
 	public int getOccurrenceFrequency(String word, String unitName, String conceptName, int total[]) {
-		if (total != null) total[0] = 0;
+		if (total != null) {total[0] = 0;total[1]=0;}
 		if (!word2UnitsHashMap.contains(word)) {
 			return 0;
 		}

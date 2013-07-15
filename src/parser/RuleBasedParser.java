@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
+import javax.print.attribute.standard.PDLOverrideSupported;
 import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -39,6 +40,7 @@ public class RuleBasedParser extends SimpleParser {
 		int singleUnitMatch = -2;
 		Vector<EntryWithScore<String[]> > freqVector;
 		float freq=Float.NEGATIVE_INFINITY;
+		TIntArrayList altUnitMatches;
 		public State(String hdr) {
 			this.hdr= hdr;
 		}
@@ -86,14 +88,19 @@ public class RuleBasedParser extends SimpleParser {
 				}
 			}
 			if (matchId >= 0) {
+				altUnitMatches = new TIntArrayList();
 				// now make sure that for no other span we have a unit that is different.
 				for (int h = res.numHits()-1; h >= 0; h--) {
 					int id = res.hitDocId(h);
 					byte type = quantityDict.idToUnitMap.getType(id);
 					if (quantityDict.idToUnitMap.getType(id)!=quantityDict.idToUnitMap.ConceptMatch) {
 						float score = res.hitMatch(h);
-						if (res.hitPosition(h)==res.hitPosition(matchId) && res.hitLength(h)==res.hitLength(matchId) && score < maxScore-Double.MIN_VALUE)
+						if (res.hitPosition(h)==res.hitPosition(matchId) && res.hitLength(h)==res.hitLength(matchId)) {
+							 if (score > maxScore-Double.MIN_VALUE && h != matchId) {
+								altUnitMatches.add(h); 
+							 }
 							continue;
+						}
 						Unit unit =  quantityDict.idToUnitMap.get(res.hitDocId(h));
 						if (unit != singleUnit) {
 							matchId=-1;
@@ -211,7 +218,7 @@ public class RuleBasedParser extends SimpleParser {
 	}
 
 	public static class NoUnitPatterns extends IsUrl {
-		public static String Patterns[][] = {{"s","#"}, {"sl", "no"}, {"w", "/", "l"}, {"u", "s"}};
+		public static String Patterns[][] = {{"s","#"}, {"sl", "no"}, {"w", "/", "l"}, {"u", "s"}, {"*","in","last","*"}};
 		@Override
 		public
 		List<EntryWithScore<Unit>> apply(String hdr,  State pHdr, List<String> applicableRules) {
@@ -220,7 +227,7 @@ public class RuleBasedParser extends SimpleParser {
 				if (pat.length==pHdr.tokens.size()) {
 					boolean match = true;
 					for (int i = 0; i < pat.length; i++) {
-						if (!pHdr.tokens.get(i).equals(pat[i])) {
+						if (!pat[i].equals("*") && !pHdr.tokens.get(i).equals(pat[i])) {
 							match = false;
 							break;
 						}
@@ -281,7 +288,7 @@ public class RuleBasedParser extends SimpleParser {
 		public List<EntryWithScore<Unit>> apply(String hdr, State pHdr, List<String> applicableRules) {
 			pHdr.setDictMatch();
 			int bestUnitMatch = pHdr.setSingleSpanMatchesUnit();
-			if (bestUnitMatch < 0) return null;
+			if (bestUnitMatch < 0 || pHdr.altUnitMatches.size()>0) return null;
 			Unit unit = quantityDict.idToUnitMap.get(pHdr.dictMatch.hitDocId(bestUnitMatch));
 			if (unit.getBaseSymbols()[0].equals("%") && hdr.indexOf('/') < 0) {
 				applicableRules.add(name());
@@ -296,7 +303,7 @@ public class RuleBasedParser extends SimpleParser {
 		public List<EntryWithScore<Unit>> apply(String hdr, State pHdr, List<String> applicableRules) {
 			pHdr.setDictMatch();
 			int bestUnitMatch = pHdr.setSingleSpanMatchesUnit();
-			if (bestUnitMatch < 0) return null;
+			if (bestUnitMatch < 0 || pHdr.altUnitMatches.size()>0) return null;
 			Unit unit = quantityDict.idToUnitMap.get(pHdr.dictMatch.hitDocId(bestUnitMatch));
 			if (unit.getBaseName().equalsIgnoreCase("year") && !hdr.toLowerCase().contains("year-")) {
 				applicableRules.add(name());
@@ -439,9 +446,9 @@ public class RuleBasedParser extends SimpleParser {
 		// multiples and units juxtaposed million $
 		// TODO: filter out easy cases using rules, and see cfg for complicated compound units etc.
 	}
-	public static void main(String args[]) throws IOException, ParserConfigurationException, SAXException {
+	public static void main(String args[])  throws Exception {
 		List<String> vec = new Vector<String>();
-		List<EntryWithScore<Unit>> unitsR = new RuleBasedParser(null,null).parseHeaderExplain("Total area (in thousand sq ft)", vec);
+		List<EntryWithScore<Unit>> unitsR = new RuleBasedParser(null,null).parseHeaderExplain("Murphy (D)", vec);
 		//				"
 		System.out.println(unitsR);
 		System.out.println(Arrays.toString(vec.toArray()));

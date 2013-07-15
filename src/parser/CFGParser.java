@@ -60,7 +60,7 @@ import edu.stanford.nlp.util.IntPair;
 import edu.stanford.nlp.util.ScoredObject;
 import edu.stanford.nlp.util.StringUtils;
 
-public class CFGParser extends SimpleParser {
+public class CFGParser extends RuleBasedParser {
 	/*
 	 * 
 	 */
@@ -591,7 +591,7 @@ public class CFGParser extends SimpleParser {
 	List<EntryWithScore<Unit> > bestUnits = new ReusableVector<EntryWithScore<Unit>>();
 	List<EntryWithScore<Unit> > bestUnits2 = new ReusableVector<EntryWithScore<Unit>>();
 	public List<EntryWithScore<Unit>> parseHeader(String hdr, short[][] forcedTags) {
-		System.out.println(hdr);
+		//System.out.println(hdr);
 		if (isURL(hdr)) return null;
 		TIntArrayList brackets = new TIntArrayList();
 		List<String> hdrToks = quantityDict.getTokens(hdr,brackets);
@@ -607,7 +607,7 @@ public class CFGParser extends SimpleParser {
 				Vector<Tree> unitNodes = new Vector<Tree>();
 				tree.setSpans();
 				getUnitNodes(tree, unitNodes,StateIndex.States.U.name());
-				System.out.println(tree + " " + tree.score()+ " "+parser.scoreBinarizedTree(tree, 0));
+				//System.out.println(tree + " " + tree.score()+ " "+parser.scoreBinarizedTree(tree, 0));
 
 				if (unitNodes.size() > 2) throw new NotImplementedException();
 				if (unitNodes.size()==0) continue;
@@ -640,7 +640,7 @@ public class CFGParser extends SimpleParser {
 				return possibleUnits;
 			} 
 		} else {
-			System.out.println("No unit");
+		//	System.out.println("No unit");
 		}
 		return null;
 	}
@@ -750,9 +750,17 @@ public class CFGParser extends SimpleParser {
 			getUnitNodes(kid, unitNodes, unitLabel);
 		}
 	}
-
+	@Override
+	public List<EntryWithScore<Unit>> parseHeaderExplain(String hdr,
+			List<String> explanation) throws IOException {
+		List<EntryWithScore<Unit>> units = super.parseHeaderExplain(hdr, explanation);
+		if (explanation != null && explanation.size()==1) {
+			return units;
+		}
+		return parseHeader(hdr);
+	}
 	public static void main(String args[]) throws Exception {
-		List<EntryWithScore<Unit>> unitsR = new CFGParser(null).parseHeader("wavelength (nm)");//, new short[][]{{(short) Tags.Mult.ordinal()},{(short) Tags.SU.ordinal()}});
+		List<EntryWithScore<Unit>> unitsR = new CFGParser(null).parseHeader("Size in sq m (Avg)");//, new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.SU_W.ordinal()},{(short) Tags.SU_W.ordinal()},{(short) Tags.W.ordinal()}});
 		//"billions usd", new short[][]{{(short) Tags.Mult.ordinal()},{(short) Tags.SU.ordinal()}});
 		//Loading g / m ( gr / ft )"); 
 		// Max. 10-min. average sustained wind Km/h

@@ -284,6 +284,7 @@ public class ConditionalCFGParser implements Scorer, KBestViterbiParser {
       // }
       float score = lex.score(iTW, start, wordStr, null);
       tree.setScore(score);
+      //System.out.println(score + " "+tree.getSpan());
       return score;
     }
     int parent = stateIndex.indexOf(tree.label().value());
@@ -298,6 +299,7 @@ public class ConditionalCFGParser implements Scorer, KBestViterbiParser {
       double score = ug.scoreRule(ur) + scoreBinarizedTree(tree.children()[0], start)
       				+ lex.score(ur,start,start+tree.children()[0].yield().size());
       tree.setScore(score);
+     // System.out.println(score + " "+tree.getSpan());
       return score;
     }
     int secondChild = stateIndex.indexOf(tree.children()[1].label().value());
@@ -313,6 +315,7 @@ public class ConditionalCFGParser implements Scorer, KBestViterbiParser {
     double score = bg.scoreRule(br) + scoreBinarizedTree(tree.children()[0], start) + scoreBinarizedTree(tree.children()[1], start + sz0)
     +lex.score(br,start,start+sz0+tree.children()[1].yield().size(),start + sz0);
     tree.setScore(score);
+   // System.out.println(score + " "+tree.getSpan());
     return score;
   }
 
