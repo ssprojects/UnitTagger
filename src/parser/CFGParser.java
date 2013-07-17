@@ -120,6 +120,7 @@ public class CFGParser extends RuleBasedParser {
 		"SU ::- SU_MW SU_W 1f"+ "\n" +
 
 		"SU_MW ::- SU_W 1f"+ "\n" + 
+		"SU_MW ::- SU_W Op 1f"+ "\n" + 
 		"SU_MW ::- SU_MW SU_W 1f"+ "\n"
 		;
 
@@ -503,9 +504,9 @@ public class CFGParser extends RuleBasedParser {
 
 	public static class Params {
 		public enum FTypes {WithinBracket,ContextWord,UnitBias,UnitScoreBias,AfterIN,DictMatchWeight,
-			SINGLELetter,INLANG, MatchLength,Subsumed,SymbolDictMatchThreshold,LemmaDictMatchThreshold,PercentUnkInUnit,PercenUnkInUnitThreshold, Co_occurStats};
+			SINGLELetter,INLANG, MatchLength,Subsumed,SymbolDictMatchThreshold,LemmaDictMatchThreshold,PercentUnkInUnit,PercenUnkInUnitThreshold, Co_occurStats, CU2Bias};
 			float weights[]=new float[]{0.5f,0.5f,-0.05f,-0.5f,0.5f,1f,
-					-1f,-1.1f,0.01f,-0.5f,-0.9f,-0.9f,-2f,0.5f,0.5f};
+					-1f,-1.1f,0.01f,-0.05f,-0.9f,-0.9f,-2f,0.5f,0.5f,0.01f};
 	}
 	public static class Token implements HasWord {
 		String wrd;
@@ -586,18 +587,18 @@ public class CFGParser extends RuleBasedParser {
 		}
 	}
 	public List<EntryWithScore<Unit>> parseHeader(String hdr) {
-		return parseHeader(hdr, null);
+		return parseHeader(hdr, null, 0);
 	}
 	List<EntryWithScore<Unit> > bestUnits = new ReusableVector<EntryWithScore<Unit>>();
 	List<EntryWithScore<Unit> > bestUnits2 = new ReusableVector<EntryWithScore<Unit>>();
-	public List<EntryWithScore<Unit>> parseHeader(String hdr, short[][] forcedTags) {
+	public List<EntryWithScore<Unit>> parseHeader(String hdr, short[][] forcedTags, int debugLvl) {
 		//System.out.println(hdr);
 		if (isURL(hdr)) return null;
 		TIntArrayList brackets = new TIntArrayList();
 		List<String> hdrToks = quantityDict.getTokens(hdr,brackets);
 		if (hdrToks.size()==0) return null;
 
-		List<? extends HasWord> sentence = tokenScorer.cacheScores(hdrToks, brackets,forcedTags);
+		List<? extends HasWord> sentence = tokenScorer.cacheScores(hdrToks, brackets,forcedTags,debugLvl);
 		if (parser.parse(sentence)) {
 			TObjectFloatHashMap<Unit> units = new TObjectFloatHashMap<Unit>();
 			List<ScoredObject<Tree>> trees = parser.getBestParses();
@@ -607,7 +608,7 @@ public class CFGParser extends RuleBasedParser {
 				Vector<Tree> unitNodes = new Vector<Tree>();
 				tree.setSpans();
 				getUnitNodes(tree, unitNodes,StateIndex.States.U.name());
-				//System.out.println(tree + " " + tree.score()+ " "+parser.scoreBinarizedTree(tree, 0));
+				if (debugLvl > 0) System.out.println(tree + " " + tree.score()+ " "+parser.scoreBinarizedTree(tree, 0,debugLvl-1));
 
 				if (unitNodes.size() > 2) throw new NotImplementedException();
 				if (unitNodes.size()==0) continue;
@@ -760,7 +761,18 @@ public class CFGParser extends RuleBasedParser {
 		return parseHeader(hdr);
 	}
 	public static void main(String args[]) throws Exception {
-		List<EntryWithScore<Unit>> unitsR = new CFGParser(null).parseHeader("Size in sq m (Avg)");//, new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.SU_W.ordinal()},{(short) Tags.SU_W.ordinal()},{(short) Tags.W.ordinal()}});
+		// ,  
+		//Max. 10-min. average sustained wind Km/h
+		//
+		// All British competitions
+		// UK fl. oz (UK)
+		//  fl. oz (US)
+		//
+		
+		List<EntryWithScore<Unit>> unitsR = new CFGParser(null).parseHeader("Orbital period ( days )",
+				null
+				//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.IN.ordinal()},{(short) Tags.Mult.ordinal()},{(short) Tags.SU_W.ordinal()},{(short) Tags.SU_W.ordinal()}}
+				,2);
 		//"billions usd", new short[][]{{(short) Tags.Mult.ordinal()},{(short) Tags.SU.ordinal()}});
 		//Loading g / m ( gr / ft )"); 
 		// Max. 10-min. average sustained wind Km/h

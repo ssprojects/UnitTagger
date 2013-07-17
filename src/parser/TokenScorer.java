@@ -60,6 +60,7 @@ public class TokenScorer implements ConditionalLexicon {
 	QuantityCatalog matcher;
 	int altUnitCounts = 5;
 	int numStatesWithFeatures=2;
+	int lexScore = numStatesWithFeatures;
 	int multUnitState=0;
 	int unitState=1;
 	Params params;
@@ -84,13 +85,13 @@ public class TokenScorer implements ConditionalLexicon {
 		this.wordFreq = wordFreq;
 		this.coOcurStats = coOcurStats;
 	}
-	public List<? extends HasWord> cacheScores(List<String> hdrToks, TIntArrayList brackets, short[][] forcedTags) {
+	public List<? extends HasWord> cacheScores(List<String> hdrToks, TIntArrayList brackets, short[][] forcedTags, int debugLvl) {
 		this.hdrToks = hdrToks;
 		DocResult res = matcher.subSequenceMatch(hdrToks, 0.8f);
 		this.dictMatches = res;
 		this.brackets = brackets;
 		if (scores == null || scores.length < hdrToks.size()) {
-			scores = new float[hdrToks.size()][hdrToks.size()][numStatesWithFeatures]; 
+			scores = new float[hdrToks.size()][hdrToks.size()][numStatesWithFeatures*2]; 
 			bestUnit = new Unit[hdrToks.size()][hdrToks.size()][numStatesWithFeatures*altUnitCounts];
 		} 
 		this.forcedTags=forcedTags;
@@ -116,8 +117,8 @@ public class TokenScorer implements ConditionalLexicon {
 			Unit unit = matcher.idToUnitMap.get(id);
 			int start = res.hitPosition(h);
 			int end = res.hitEndPosition(h);
-			if (start==end && start==1) {
-				//System.out.println();
+			if (start==end && start==2) {
+				System.out.println();
 			}
 			if (matcher.idToUnitMap.getType(id) != matcher.idToUnitMap.ConceptMatch) {
 				maxMatchLen = Math.max(maxMatchLen, res.hitLength(h));
@@ -226,6 +227,33 @@ public class TokenScorer implements ConditionalLexicon {
 				}
 			}
 		}
+		// add features corresponding to subsumed matches...
+		for (int len = 1; len < maxMatchLen; len++) {
+			for (int start = 0; start < scores.length-len+1; start++) {
+				int end = start+len-1;
+				int state = -1;
+				if (bestUnit[start][end][unitState] != null)
+					state = unitState;
+				else if (bestUnit[start][end][multUnitState] != null)
+					state = multUnitState;
+				if (state==-1) continue;
+				float score = scores[start][end][state];
+				boolean subsumed=false;
+				for (int diff = 1; diff <= maxMatchLen-len && !subsumed; diff++) {
+					for (int s = start; s >= 0 && s >= start-diff; s--) {
+						int e = s + len+diff-1;
+						if (e >= scores[s].length) continue;
+						if (scores[s][e][state] > score - ScoreEps) {
+							scores[start][end][state] += params.weights[FTypes.Subsumed.ordinal()];
+							if (debugLvl > 0) printFeatureInfo(start,end,state,FTypes.Subsumed,1);
+							subsumed = true;
+							break;
+						}
+					}
+				}
+			}
+		}
+		
 		// if there are alternative units for a span, check if corpus-level stats can help differentiate 
 		//
 		if (coOcurStats!=null) {
@@ -250,8 +278,13 @@ public class TokenScorer implements ConditionalLexicon {
 					float minFreq = Float.POSITIVE_INFINITY;
 					for (int id = units.size()-1; id >= 0; id--) {
 						Unit unit = units.get(id);
-						int freq = coOcurStats.getOccurrenceFrequency(hdrToks.get(start), unit.getBaseName(), unit.getParentQuantity().getConcept(), total);
-						float f = freq + CoccurMixWeight*total[1];
+						float f = Float.POSITIVE_INFINITY;
+						for (int p = 0; unit.getBaseNamePart(p) != null; p++) {
+							Unit unitPart = unit.getBaseNamePart(p);
+							int freq = coOcurStats.getOccurrenceFrequency(hdrToks.get(start), unitPart.getBaseName(), unitPart.getParentQuantity().getConcept(), total);
+							float ff = freq + CoccurMixWeight*total[1];
+							f = Math.min(f, ff);
+						}
 						freqs[id] = f;
 						totalFreq += f;
 						maxFreq = Math.max(maxFreq, f);
@@ -284,7 +317,10 @@ public class TokenScorer implements ConditionalLexicon {
 									unitsT[uCtr++] = bestUnit[start][end][a*2+state];
 								}
 							}
-							if (unitsT[0] != null) scores[start][end][state] += maxFreq*params.weights[FTypes.Co_occurStats.ordinal()];
+							if (unitsT[0] != null) {
+								scores[start][end][state] += maxFreq*params.weights[FTypes.Co_occurStats.ordinal()];
+								if (debugLvl > 0) printFeatureInfo(start,end,state,FTypes.Co_occurStats,maxFreq);
+							}
 							for (int a = 0; a < unitsT.length && unitsT[a]!=null;a++) {
 								bestUnit[start][end][a*2+state] = unitsT[a];
 							}
@@ -332,31 +368,7 @@ public class TokenScorer implements ConditionalLexicon {
 				 */
 			}
 		}
-		// add features corresponding to subsumed matches...
-		for (int len = 1; len < maxMatchLen; len++) {
-			for (int start = 0; start < scores.length-len+1; start++) {
-				int end = start+len-1;
-				int state = -1;
-				if (bestUnit[start][end][unitState] != null)
-					state = unitState;
-				else if (bestUnit[start][end][multUnitState] != null)
-					state = multUnitState;
-				if (state==-1) continue;
-				float score = scores[start][end][state];
-				boolean subsumed=false;
-				for (int diff = 1; diff <= maxMatchLen-len && !subsumed; diff++) {
-					for (int s = start; s >= 0 && s >= start-diff; s--) {
-						int e = s + len+diff-1;
-						if (e >= scores[s].length) continue;
-						if (scores[s][e][state] > score - ScoreEps) {
-							scores[start][end][state] += params.weights[FTypes.Subsumed.ordinal()];
-							subsumed = true;
-							break;
-						}
-					}
-				}
-			}
-		}
+	
 		sentence = new Vector<Token>();
 		for (int i = 0; i < hdrToks.size(); i++) {
 			String w = hdrToks.get(i);
@@ -384,8 +396,16 @@ public class TokenScorer implements ConditionalLexicon {
 				if (ch == 's'|| Character.isDigit(ch))
 					continue;
 			}
-			if (someUnitInside(start,end,unitState)) scores[start][end][unitState] += bscore;
-			if (someUnitInside(start,end,multUnitState))  scores[start][end][multUnitState] += bscore;
+			for (int state = 0; state <=1; state++) {
+				if (someUnitInside(start,end,multUnitState) || someUnitInside(start,end,unitState)) {
+					if (sentence.get(start).tag==Tags.IN && end > start) {
+						scores[start+1][end][lexScore+state] += bscore;
+						if (debugLvl > 0) printFeatureInfo(start+1,end,state,FTypes.WithinBracket,bscore);
+					}
+					scores[start][end][lexScore+state] += bscore;
+					if (debugLvl > 0) printFeatureInfo(start,end,state,FTypes.WithinBracket,bscore);
+				}
+			}
 		}
 		/*
 		for (int istart = 0; istart < hdrToks.size(); istart++) {
@@ -403,6 +423,10 @@ public class TokenScorer implements ConditionalLexicon {
 		}
 		 */
 		return sentence;
+	}
+	private void printFeatureInfo(int start, int end, int unitState2,
+			FTypes fname, float bscore) {
+		System.out.println("Feature "+fname.name()+ " ("+start+" "+end+") "+unitState2+ " "+(bscore*params.weights[fname.ordinal()]));
 	}
 	private boolean someUnitInside(int start, int end, int state) {
 		for (int s = start; s <= end; s++) {
@@ -543,12 +567,20 @@ public class TokenScorer implements ConditionalLexicon {
 			// OP symbol at split
 			if (split+1 > end) return NegInfty;
 			Unit bestUnitR = bestUnit[split+1][end][unitState];
-			if (bestUnitL != null && bestUnitR != null && bestUnitL.getParentQuantity() == bestUnitR.getParentQuantity()) {
-				return NegInfty;
+			if (bestUnitL != null && bestUnitR != null) {
+				if (bestUnitL.getParentQuantity() == bestUnitR.getParentQuantity()) 
+					return NegInfty;
+				else {
+					// 16/7/2013: added so that units like MJ/l have a slight bias to be compound units instead of alternatives.
+					return params.weights[FTypes.CU2Bias.ordinal()] + getLexScore(start,end, unitState);
+					//return 0;
+				}
 			}
 		} else if (stateIndex.isIN_U(rule.parent)) {
 			float bscore = params.weights[FTypes.AfterIN.ordinal()];
-			if (bestUnit[split][end][unitState] != null) return bscore;
+			// 16/7/2013: added the second condition because IN_MULT is not allowed to stand on its own.
+			if (bestUnit[split][end][unitState] != null || bestUnit[split][end][multUnitState] != null) return bscore;
+
 		}else if (stateIndex.isState(StateIndex.States.IN_Mult, rule.parent)) {
 			float bscore = params.weights[FTypes.AfterIN.ordinal()];
 			if (bestUnit[split][end][multUnitState] != null) return bscore;
@@ -560,10 +592,12 @@ public class TokenScorer implements ConditionalLexicon {
 			if (!stateIndex.isUnit(rule.rightChild)) {
 				// right child is Op_U, so ignore the op
 				unitStart = split+1;
-			}
-			// Penalize multiplier unit-pair from appearing as a list of units.
-			if (someUnitInside(start,split, multUnitState) || someUnitInside(unitStart,end, multUnitState)) {
-				return Float.NEGATIVE_INFINITY;
+			} else {
+				// Penalize multiplier unit-pair from appearing as a list of units.
+				// when there is no / separating the two.
+				if (someUnitInside(start,split-1, multUnitState) || someUnitInside(unitStart,end, multUnitState)) {
+					return Float.NEGATIVE_INFINITY;
+				}
 			}
 			int numUnkToks = 0;
 			int numW = 0;
@@ -577,9 +611,6 @@ public class TokenScorer implements ConditionalLexicon {
 			float fractionUnk  = ((float)numUnkToks)/Math.max(numW, 1);
 			if (fractionUnk > params.weights[FTypes.PercenUnkInUnitThreshold.ordinal()])
 				score += fractionUnk*params.weights[FTypes.PercentUnkInUnit.ordinal()];
-
-
-
 			return score;
 		} else if (rule.parent == Tags.SU.ordinal() && (stateIndex.isState(States.SU_MW, rule.leftChild))) {
 			// 15 Jul 2013: should reward dictionary match only when a true compound unit otherwise things like "sq m" take double reward by
@@ -589,6 +620,9 @@ public class TokenScorer implements ConditionalLexicon {
 		return 0;
 	}
 
+	private float getLexScore(int start, int end, int unitState) {
+		return scores[start][end][lexScore+unitState];
+	}
 	@Override
 	public float score(UnaryRule rule, int start, int end) {
 		if (rule==null) return Float.NEGATIVE_INFINITY;
@@ -606,7 +640,7 @@ public class TokenScorer implements ConditionalLexicon {
 	}
 	private float scoreSpan(int start, int end, int state) {
 		if (state >=0)
-			return scores[start][end][state];
+			return scores[start][end][state]+getLexScore(start, end, state);
 		return 0;
 	}
 	@Override

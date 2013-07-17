@@ -268,9 +268,11 @@ public class ConditionalCFGParser implements Scorer, KBestViterbiParser {
     return op.tlpParams.subcategoryStripper().transformTree(new Debinarizer(op.forceCNF).transformTree(tree));
     //    return debinarizer.transformTree(t);
   }
-
-  //
   public double scoreBinarizedTree(Tree tree, int start) {
+	  return scoreBinarizedTree(tree, start,0);
+  }
+  //
+  public double scoreBinarizedTree(Tree tree, int start, int debugLvl) {
     if (tree.isLeaf()) {
       return 0.0;
     }
@@ -284,7 +286,7 @@ public class ConditionalCFGParser implements Scorer, KBestViterbiParser {
       // }
       float score = lex.score(iTW, start, wordStr, null);
       tree.setScore(score);
-      //System.out.println(score + " "+tree.getSpan());
+      if (debugLvl > 0) System.out.println(score + " "+tree.getSpan());
       return score;
     }
     int parent = stateIndex.indexOf(tree.label().value());
@@ -296,10 +298,10 @@ public class ConditionalCFGParser implements Scorer, KBestViterbiParser {
       //        System.out.println("Grammar doesn't have rule: " + ur);
       // }
       //      return SloppyMath.max(ug.scoreRule(ur), -10000.0) + scoreBinarizedTree(tree.children()[0], leftmost);
-      double score = ug.scoreRule(ur) + scoreBinarizedTree(tree.children()[0], start)
+      double score = ug.scoreRule(ur) + scoreBinarizedTree(tree.children()[0], start,debugLvl)
       				+ lex.score(ur,start,start+tree.children()[0].yield().size());
       tree.setScore(score);
-     // System.out.println(score + " "+tree.getSpan());
+     if (debugLvl > 0) System.out.println(score + " "+tree.getSpan());
       return score;
     }
     int secondChild = stateIndex.indexOf(tree.children()[1].label().value());
@@ -312,10 +314,10 @@ public class ConditionalCFGParser implements Scorer, KBestViterbiParser {
     //            scoreBinarizedTree(tree.children()[0], leftmost) +
     //            scoreBinarizedTree(tree.children()[1], false);
     int sz0 = tree.children()[0].yield().size();
-    double score = bg.scoreRule(br) + scoreBinarizedTree(tree.children()[0], start) + scoreBinarizedTree(tree.children()[1], start + sz0)
+    double score = bg.scoreRule(br) + scoreBinarizedTree(tree.children()[0], start, debugLvl) + scoreBinarizedTree(tree.children()[1], start + sz0, debugLvl)
     +lex.score(br,start,start+sz0+tree.children()[1].yield().size(),start + sz0);
     tree.setScore(score);
-   // System.out.println(score + " "+tree.getSpan());
+    if (debugLvl > 0) System.out.println(score + " "+tree.getSpan() + " "+(sz0+start));
     return score;
   }
 

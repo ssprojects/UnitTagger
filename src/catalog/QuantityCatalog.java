@@ -84,7 +84,8 @@ public class QuantityCatalog implements WordFrequency {
 	SignatureSetImpl<String> signSet;
 	Analyzer analyzer;
 	public static String impDelims = "£$#\\/%\\(\\)\\[\\]";
-	public static String delims =impDelims +  "!#&'\\*\\+,-\\.:;\\<=\\>\\?@\\^\\_\\`\\{\\|\\}~ \t";//NumberUnitParser.numberUnitDelims+"|\\p{Punct})";//)";
+	// 17/7/2013: remove - because words like year-end and ten-year were getting marked as year.
+	public static String delims =impDelims +  "!#&'\\*\\+,\\.:;\\<=\\>\\?@\\^\\_\\`\\{\\|\\}~ \t";//NumberUnitParser.numberUnitDelims+"|\\p{Punct})";//)";
 	public static List<String> getTokens(String name) {
 		return getTokens(name,null);
 	}
@@ -186,9 +187,30 @@ public class QuantityCatalog implements WordFrequency {
 				idToUnitMap.add(q.SIUnit,ctoks,idToUnitMap.ConceptMatch);
 			}
 		}
+		addCompoundUnitParts();
 		//System.out.println(Arrays.toString(stats));
 	}
 
+	private void addCompoundUnitParts() {
+		for (Quantity q : taxonomy) {
+			for (Unit u : q.getUnits()) {
+				String baseName = u.getBaseName();
+				int index = baseName.indexOf(" per ");
+				if (index > 1 && index + 5 < baseName.length()-1) {
+					String unit1Str = baseName.substring(0,index).trim();
+					String unit2Str = baseName.substring(index+5).trim();
+					
+					if (unit1Str.length() > 0 && unit2Str.length()>0) {
+						Unit unit1 = getUnitFromBaseName(unit1Str);
+						Unit unit2 = getUnitFromBaseName(unit2Str);
+						if (unit1 != null && unit2 != null) {
+							u.setCompoundUnitParts(unit1,unit2);
+						}
+					}
+				}
+			}
+		}
+	}
 	public Quantity bestConceptMatch(String str) {
 		str = str.trim().toLowerCase();
 		if (str.endsWith("."))

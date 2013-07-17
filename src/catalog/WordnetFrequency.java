@@ -36,10 +36,10 @@ public class WordnetFrequency implements WordFrequency {
 		// over-generalizes for words like last,span
 		// Quantity hypernym includes way too many units.
 		for  (int path = 0; nsyn != null; path++) {
-			NounSynset hypos[] = nsyn.getHypernyms();
-			nsyn = null;
-			for (int h = 0; h < hypos.length; h++) {
-				nsyn = hypos[0];
+				NounSynset hypos[] = nsyn.getHypernyms();
+				nsyn = null;
+				for (int h = 0; h < hypos.length; h++) {
+					nsyn = hypos[0];
 				if (hypos[h] == calenderMonthSyn) {
 					// ensures that names of months are not marked as units.
 					return false;
@@ -70,8 +70,9 @@ public class WordnetFrequency implements WordFrequency {
 						}
 						if (synsets[i] instanceof NounSynset) {
 							NounSynset nsyn = (NounSynset) synsets[i];
-
+							System.out.println("Descendant of Quantity " + isUnit(nsyn)+ " "+isUnitDefn(nsyn));
 						}
+						
 					}
 				}
 				else
@@ -92,7 +93,7 @@ public class WordnetFrequency implements WordFrequency {
 	 */
 	public static void main(String[] args) {
 		//args = HeaderSegmenter.WordSymbols;
-		args = new String[]{"t"};
+		args = new String[]{"million"};
 		WordnetFrequency wordFreq = new WordnetFrequency();
 		List<EntryWithScore<String[]>> matches = new Vector<EntryWithScore<String[]>>();
 		wordFreq.getRelativeFrequency(args[0], matches);
@@ -138,6 +139,19 @@ public class WordnetFrequency implements WordFrequency {
 	}
 	private boolean isUnitDefn(Synset synset) {
 		// was "period of time" earlier and did not capture words like week.
-		return (synset.getDefinition().contains("unit") || (synset.getDefinition().contains("period of")));
+		boolean retVal = (synset.getDefinition().contains("unit") 
+				|| synset.getDefinition().contains("period of")
+				|| synset.getDefinition().contains(" number ") // 17 Jul 2013: added for words like thousand, billion
+		);
+		if (!retVal) {
+			// adding this since terms like milligram do not have unit in their definition.
+			// so, if immediate parent has unit-of.
+			NounSynset hypos[] = ((NounSynset) synset).getHypernyms();
+			for (int h = 0; h < hypos.length; h++) {
+				NounSynset nsyn = hypos[0];
+				if (nsyn.getDefinition().contains("unit of")) return true;
+			}
+		}
+		return retVal;
 	}
 }

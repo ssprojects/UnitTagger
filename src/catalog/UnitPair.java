@@ -36,7 +36,7 @@ public class UnitPair extends Unit {
 	}
 	@Override
 	public String toString() {
-		return unit1.toString()  + OpString[op.ordinal()]+unit2.toString();
+		return getBaseName();//unit1.toString()  + OpString[op.ordinal()]+unit2.toString();
 	}
 	public String[] getBaseNames() {
 		throw new NotImplementedException();

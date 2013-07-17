@@ -17,6 +17,7 @@ import java.util.Vector;
 public class Unit {
 	private String name;
 	String baseNames[]; // separate out the synonyms, remove the paranthesis 
+	Unit firstBaseNameParts[];
 	private String symbol;
 	String baseSyms[]; // separate out the alternative symbols, remove the paranthesis 
 	private String conversionFactor;
@@ -95,9 +96,13 @@ public class Unit {
 	public void setName(String n){
 		name=n;
 		baseNames = setBaseNames(name);
-		
 	}
-
+	public Unit getBaseNamePart(int p) {
+		if (firstBaseNameParts != null && firstBaseNameParts.length > p)
+			return firstBaseNameParts[p];
+		if (p==0) return this;
+		return null;
+	}
 	public void setSymbol(String symb){
 		symbol=symb;
 		baseSyms = setBaseNames(symbol);
@@ -144,6 +149,8 @@ public class Unit {
 	}
 	public String toString()
 	{
+		return getBaseName();
+		/*
 		StringBuffer strBuff = new StringBuffer();
 		strBuff.append("Name:="+name + " Symbol:="+symbol+" Conversion Factor:="+conversionFactor);
 		if (lemmaSet!=null && lemmaSet.size() > 0) {
@@ -152,6 +159,7 @@ public class Unit {
 			strBuff.append(lemma).append(", ");
 		}
 		return strBuff.toString() ;
+		*/
 	}
 
 	public String[] getBaseNames() {
@@ -263,5 +271,9 @@ public class Unit {
 			doubleStr = doubleStr.substring(0,doubleStr.length()-1);
 		}
 		return doubleStr;
+	}
+
+	public void setCompoundUnitParts(Unit unit1, Unit unit2) {
+		firstBaseNameParts = new Unit[]{unit1,unit2};
 	}
 }

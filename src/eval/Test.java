@@ -72,11 +72,11 @@ public class Test {
 					}
 				}
 				if (!matched) {
+					System.out.println(hdr); //"Extracted from " + parser.getClass().getSimpleName() + " " + extractedUnits);
 					mistakes[p]++;
 					if (applicableRules.size()==1) {
 						criticalMistakes[p]++;
 					}
-					System.out.println(hdr); //"Extracted from " + parser.getClass().getSimpleName() + " " + extractedUnits);
 				}
 				matchedA[p] = matched;
 			} 
