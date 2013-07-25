@@ -23,7 +23,8 @@ public class WordnetFrequency implements WordFrequency {
 	WordNetDatabase database;
 	float stopWordFreq = 0.9f;
 	// p -- percent as against poise and poncelet.
-	static String stopWords[] = new String[]{"in","are","at","a","from","of","to","the","for","and","with","on","total","per","no","number","amp","apos","quot","hr"};
+	// s is often used as a pluralizer in headers.
+	static String stopWords[] = new String[]{"in","are","at","a","from","of","to","the","for","and","all","st","with","on","total","per","no","number","amp","apos","quot","hr","s"};
 	static HashSet<String> stopWordsHash=new HashSet<String>(Arrays.asList(stopWords));
 	public WordnetFrequency() {
 		System.setProperty("wordnet.database.dir", "/mnt/b100/d0/library/public_html/wordnet/WordNet-2.1/dict");
@@ -93,7 +94,7 @@ public class WordnetFrequency implements WordFrequency {
 	 */
 	public static void main(String[] args) {
 		//args = HeaderSegmenter.WordSymbols;
-		args = new String[]{"million"};
+		args = new String[]{"s"};
 		WordnetFrequency wordFreq = new WordnetFrequency();
 		List<EntryWithScore<String[]>> matches = new Vector<EntryWithScore<String[]>>();
 		wordFreq.getRelativeFrequency(args[0], matches);
@@ -140,7 +141,7 @@ public class WordnetFrequency implements WordFrequency {
 	private boolean isUnitDefn(Synset synset) {
 		// was "period of time" earlier and did not capture words like week.
 		boolean retVal = (synset.getDefinition().contains("unit") 
-				|| synset.getDefinition().contains("period of")
+				|| (synset.getDefinition().contains("period") && synset.getDefinition().contains("time"))
 				|| synset.getDefinition().contains(" number ") // 17 Jul 2013: added for words like thousand, billion
 		);
 		if (!retVal) {

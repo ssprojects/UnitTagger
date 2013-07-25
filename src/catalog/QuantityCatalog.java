@@ -454,7 +454,6 @@ public class QuantityCatalog implements WordFrequency {
 			}
 		}
 	}
-	@Override
 	public boolean getRelativeFrequency(String str, List<EntryWithScore<String[]>> matchesArg) {
 		Collection matches = lemmaDict.getCollection(str);
 		matchesArg.clear();
@@ -470,6 +469,16 @@ public class QuantityCatalog implements WordFrequency {
 			}
 		}
 		return matchesArg.size()>0;
+	}
+	public float getRelativeFrequency(Unit unit, String name) {
+		float freq = 0;
+		for (int l = unit.getLemmas().size()-1; l >= 0; l--) {
+			String lemma = unit.getLemmas().get(l);
+			if (lemma.equalsIgnoreCase(name)) {
+				return unit.getLemmaFrequency(l);
+			}
+		}
+		return freq;
 	}
 	public float getRelativeFrequency(int id) {
 		Unit u = idToUnitMap.get(id);

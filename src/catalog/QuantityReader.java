@@ -110,7 +110,7 @@ public class QuantityReader {
 									if (freqs==null) {
 										freqs = new TFloatArrayList();
 									}
-									for (int f = 0; f < lemmaset.size()-1; freqs.add(0),f++);
+									for (int f = freqs.size(); f < lemmaset.size()-1; freqs.add(0),f++);
 									freqs.add(freq);
 								}
 							}

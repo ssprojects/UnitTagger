@@ -114,8 +114,10 @@ public class CFGParser extends RuleBasedParser {
 		"BU ::- SU 1"+ "\n" +
 
 		"CU2 ::- SU Sep_SU 1 \n"+
+		"CU2 ::- SU PER_SU 1 \n"+
 
 		"Sep_SU ::- Op SU 1"+ "\n" +
+		"Sep_SU ::- PER SU 1"+ "\n" +
 
 		"SU ::- SU_MW SU_W 1f"+ "\n" +
 
@@ -126,7 +128,7 @@ public class CFGParser extends RuleBasedParser {
 
 	// TODO: allow a multiplier for simple units like in mg/thousand litres.
 	public static class EnumIndex implements Index<String> {
-		public enum Tags {SU, SU_W, W, Mult, IN, OF, Op,Boundary};
+		public enum Tags {SU, SU_W, W, Mult, IN, OF, Op,PER,Boundary};
 		public short allowedTags[][] = {
 				{(short) Tags.SU.ordinal(),(short) Tags.SU_W.ordinal(),(short) Tags.W.ordinal()},
 				{(short) Tags.SU.ordinal(),(short) Tags.SU_W.ordinal(),(short) Tags.W.ordinal()},
@@ -135,7 +137,8 @@ public class CFGParser extends RuleBasedParser {
 				{(short) Tags.SU.ordinal(),(short) Tags.SU_W.ordinal(),(short) Tags.W.ordinal(),(short) Tags.IN.ordinal()},
 				{(short) Tags.W.ordinal(),(short) Tags.OF.ordinal()},
 				{(short) Tags.W.ordinal(), (short) Tags.Op.ordinal()},
-				{(short) Tags.Boundary.ordinal()},
+				{(short) Tags.PER.ordinal(),(short) Tags.SU.ordinal(),(short)Tags.W.ordinal()},
+				{(short) Tags.Boundary.ordinal()}
 		};
 		@Override
 		public Iterator<String> iterator() {
@@ -247,7 +250,7 @@ public class CFGParser extends RuleBasedParser {
 		public StateIndex(EnumIndex tagIndex) {
 			this.tagIndex = tagIndex;
 		}
-		public enum States {ROOT,ROOT_,Junk,Junk_U,Sep_U,IN_U,U, UL,IN_Mult,Mult_OF,BU,CU2,Sep_SU,SU_MW};// W, Mult, IN, OF, Op,Boundary};
+		public enum States {ROOT,ROOT_,Junk,Junk_U,Sep_U,IN_U,U, UL,IN_Mult,Mult_OF,BU,CU2,Sep_SU,SU_MW, PER_SU};// W, Mult, IN, OF, Op,Boundary};
 		@Override
 		public Iterator<String> iterator() {
 			return null;
@@ -504,9 +507,11 @@ public class CFGParser extends RuleBasedParser {
 
 	public static class Params {
 		public enum FTypes {WithinBracket,ContextWord,UnitBias,UnitScoreBias,AfterIN,DictMatchWeight,
-			SINGLELetter,INLANG, MatchLength,Subsumed,SymbolDictMatchThreshold,LemmaDictMatchThreshold,PercentUnkInUnit,PercenUnkInUnitThreshold, Co_occurStats, CU2Bias};
+						SINGLELetter,INLANG, MatchLength,Subsumed,SymbolDictMatchThreshold,LemmaDictMatchThreshold,
+						PercentUnkInUnit,PercenUnkInUnitThreshold, Co_occurStats, CU2Bias, MultBias};
 			float weights[]=new float[]{0.5f,0.5f,-0.05f,-0.5f,0.5f,1f,
-					-1f,-1.1f,0.01f,-0.05f,-0.9f,-0.9f,-2f,0.5f,0.5f,0.01f};
+					-1f,-1.1f,0.01f,-0.05f,-0.9f,-0.9f,-2f,0.5f,0.5f,0.06f,0.05f};
+			// CU2bias should be more than unitbias to prefer compound units when one side is known e.g. people per sq km
 	}
 	public static class Token implements HasWord {
 		String wrd;
@@ -764,14 +769,15 @@ public class CFGParser extends RuleBasedParser {
 		// ,  
 		//Max. 10-min. average sustained wind Km/h
 		//
-		// All British competitions
-		// UK fl. oz (UK)
-		//  fl. oz (US)
+		//
+		// 
+		//  
 		//
 		
-		List<EntryWithScore<Unit>> unitsR = new CFGParser(null).parseHeader("Orbital period ( days )",
+		List<EntryWithScore<Unit>> unitsR = new CFGParser(null).parseHeader("duration (s)",
 				null
-				//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.IN.ordinal()},{(short) Tags.Mult.ordinal()},{(short) Tags.SU_W.ordinal()},{(short) Tags.SU_W.ordinal()}}
+				//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}
+				//,{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}}
 				,2);
 		//"billions usd", new short[][]{{(short) Tags.Mult.ordinal()},{(short) Tags.SU.ordinal()}});
 		//Loading g / m ( gr / ft )"); 
@@ -779,7 +785,7 @@ public class CFGParser extends RuleBasedParser {
 		// ("fl. oz (US)", new short[][]{{(short) Tags.SU_W.ordinal()},{(short) Tags.SU_W.ordinal()},{(short) Tags.SU_W.ordinal()}}); // getting wrongly matched to kg/L
 		if (unitsR != null) {
 			for (EntryWithScore<Unit> unit : unitsR) {
-				System.out.println(unit.getKey().getBaseName()+ " " +unit.getScore());
+				System.out.println(unit.getKey().getName()+ " " +unit.getScore());
 			}
 		}
 		

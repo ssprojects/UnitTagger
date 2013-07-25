@@ -64,7 +64,7 @@ public class Test {
 						matched=true;
 						for (EntryWithScore<Unit> unitScore : extractedUnits) {
 							Unit unit = unitScore.getKey();
-							if (!trueUnits.contains(unit.getBaseName().toLowerCase())) {
+							if (!trueUnits.contains(unit.getBaseName().toLowerCase()) && !trueUnits.contains(unit.getName())) {
 								matched=false;
 								break;
 							}

@@ -40,7 +40,6 @@ public class Unit {
 		lemmaSet=lemmas;
 	
 	}
-
 	/*
 	 * need to parse all of these..
 	 * 	kilocalorie; large calorie: 2 base names

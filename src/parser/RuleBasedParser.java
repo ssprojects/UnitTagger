@@ -448,7 +448,7 @@ public class RuleBasedParser extends SimpleParser {
 	}
 	public static void main(String args[])  throws Exception {
 		List<String> vec = new Vector<String>();
-		List<EntryWithScore<Unit>> unitsR = new RuleBasedParser(null,null).parseHeaderExplain("Ten-year % change", vec);
+		List<EntryWithScore<Unit>> unitsR = new RuleBasedParser(null,null).parseHeaderExplain("number(s)", vec);
 		//				"
 		System.out.println(unitsR);
 		System.out.println(Arrays.toString(vec.toArray()));
