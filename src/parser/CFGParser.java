@@ -41,6 +41,7 @@ import conditionalCFG.ConditionalCFGParser;
 
 import parser.CFGParser.EnumIndex.Tags;
 import parser.CFGParser.StateIndex.States;
+import parser.coOccurMethods.PrUnitGivenWord;
 
 import edu.stanford.nlp.ling.HasTag;
 import edu.stanford.nlp.ling.HasWord;
@@ -569,7 +570,7 @@ public class CFGParser extends RuleBasedParser {
 		}
 		ug.purgeRules();
 		Index<String> wordIndex = new WordIndex(this.quantityDict.tokenDict);
-		tokenScorer = new TokenScorer(index, tagIndex,quantityDict,wordIndex, new WordnetFrequency(),coOccurStats);
+		tokenScorer = new TokenScorer(index, tagIndex,quantityDict,wordIndex, new WordnetFrequency(),new PrUnitGivenWord(coOccurStats));
 		Options op = new Options();
 		op.dcTags=false;
 		//op.testOptions.verbose=true;

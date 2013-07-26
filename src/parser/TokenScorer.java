@@ -39,6 +39,8 @@ import parser.CFGParser.WordIndex;
 import parser.CFGParser.EnumIndex.Tags;
 import parser.CFGParser.Params.FTypes;
 import parser.CFGParser.StateIndex.States;
+import parser.coOccurMethods.Co_occurrenceScores;
+import parser.coOccurMethods.PrUnitGivenWord;
 import catalog.Co_occurrenceStatistics;
 import catalog.Quantity;
 import catalog.QuantityCatalog;
@@ -49,33 +51,32 @@ import conditionalCFG.ConditionalLexicon;
 public class TokenScorer implements ConditionalLexicon {
 	private static final float NegInfty = -100;
 	private static final float ScoreEps = 0.01f;
-	public static final float CoccurMixWeight=0.1f;
-	public static final float CoccurRatioSmooth=1f;
+	
 	private DocResult dictMatches;
 	private List<Token> sentence;
-	List<String> hdrToks;
+	protected List<String> hdrToks;
 	private TIntArrayList brackets;
 	EnumIndex tagIndex;
 	Index<String> wordIndex;
 	StateIndex stateIndex;
 	QuantityCatalog matcher;
-	int altUnitCounts = 5;
+	protected int altUnitCounts = 5;
 	int numStatesWithFeatures=2;
 	int lexScore = numStatesWithFeatures;
 	int multUnitState=0;
 	int unitState=1;
 	Params params;
 	float scores[][][];
-	Unit bestUnit[][][];
+	protected Unit bestUnit[][][];
 	int lastMatch[] = new int[1];
 	TaggedToken boundaryToken;
 	short forcedTags[][]=null;
 	WordFrequency wordFreq;
 	Vector<EntryWithScore<String[]> > freqVector = new Vector<EntryWithScore<String[]>>();
-	Co_occurrenceStatistics coOcurStats;
+	Co_occurrenceScores coOcurStats;
 	HashSet<String> unitWords = new HashSet<String>();
 	public TokenScorer(StateIndex stateIndex, EnumIndex tagIndex, QuantityCatalog matcher, 
-			Index<String> wordIndex, WordFrequency wordFreq, Co_occurrenceStatistics coOcurStats) {
+			Index<String> wordIndex, WordFrequency wordFreq, Co_occurrenceScores coOcurStats) {
 		this.tagIndex = tagIndex;
 		this.wordIndex = wordIndex;
 		this.matcher = matcher;
@@ -231,7 +232,6 @@ public class TokenScorer implements ConditionalLexicon {
 		// if there are alternative units for a span, check if corpus-level stats can help differentiate 
 		//
 		if (coOcurStats!=null) {
-			int total[] = new int[2];
 			StringMap<Unit> units = new StringMap<Unit>();
 			for (int start = 0; start < hdrToks.size(); start++) {
 				for (int end = start; end < hdrToks.size(); end++) {
@@ -242,74 +242,42 @@ public class TokenScorer implements ConditionalLexicon {
 					}
 				}
 			}
-			if (units.size() > 1) {
-				float totalScores[] = new float[units.size()];
-				for (int start = 0; start < hdrToks.size(); start++) {
-					if (!coOcurStats.tokenPresent(hdrToks.get(start))) continue;
-					float freqs[] = new float[units.size()];
-					float totalFreq = CoccurRatioSmooth;
-					float maxFreq = Float.NEGATIVE_INFINITY;
-					float minFreq = Float.POSITIVE_INFINITY;
-					for (int id = units.size()-1; id >= 0; id--) {
-						Unit unit = units.get(id);
-						float f = Float.POSITIVE_INFINITY;
-						for (int p = 0; unit.getBaseNamePart(p) != null; p++) {
-							Unit unitPart = unit.getBaseNamePart(p);
-							int freq = coOcurStats.getOccurrenceFrequency(hdrToks.get(start), unitPart.getBaseName(), unitPart.getParentQuantity().getConcept(), total);
-							float ff = freq + CoccurMixWeight*total[1];
-							f = Math.min(f, ff);
+			float totalScores[] = coOcurStats.getCo_occurScores(hdrToks, units);
+			// the total contribution from co-occurrence statistics is now available.
+			// now add the winning units in each slots.
+			for (int start = 0; start < hdrToks.size(); start++) {
+				for (int end = start; end < hdrToks.size(); end++) {
+					for (int state = 0; state < 2; state++) {
+						float maxFreq = Float.NEGATIVE_INFINITY;
+						float adjustedScores[] = new float[altUnitCounts];
+						for (int a = 0; a < altUnitCounts && bestUnit[start][end][a*2+state] != null; a++) {
+							Unit unit = bestUnit[start][end][a*2+state];
+							int id = units.get(unit);
+							float freq = (start==end && coOcurStats.adjustFrequency())?getFrequency(unit, hdrToks.get(start),-1):1;
+							adjustedScores[a] = coOcurStats.freqAdjustedScore(freq,totalScores[id]);
+							maxFreq = Math.max(maxFreq, adjustedScores[a]);
+							
 						}
-						freqs[id] = f;
-						totalFreq += f;
-						maxFreq = Math.max(maxFreq, f);
-						minFreq = Math.min(minFreq, f);
-					}
-					if (maxFreq-minFreq > Float.MIN_VALUE) {
-						for (int id = 0; id < freqs.length; id++) {
-							float f = freqs[id];	
-							totalScores[id] += f/totalFreq;
+						Unit unitsT[] = new Unit[altUnitCounts];
+						for (int a = 0, uCtr=0; a < altUnitCounts && bestUnit[start][end][a*2+state] != null; a++) {
+							float f = adjustedScores[a];
+							if (f < maxFreq*0.9) {
+								bestUnit[start][end][a*2+state] = null;
+							} else {
+								unitsT[uCtr++] = bestUnit[start][end][a*2+state];
+							}
 						}
-					}
-				}
-				for (int i = 0; i < totalScores.length; i++) {
-					Unit unit = units.get(i);
-					float freq = getFrequency(unit, unit.getBaseName(),-1);
-					totalScores[i] *= freq;
-				}
-				// the total contribution from co-occurrence statistics is now available.
-				// now add the winning units in each slots.
-				for (int start = 0; start < hdrToks.size(); start++) {
-					for (int end = start; end < hdrToks.size(); end++) {
-						for (int state = 0; state < 2; state++) {
-							float maxFreq = Float.NEGATIVE_INFINITY;
-							for (int a = 0; a < altUnitCounts && bestUnit[start][end][a*2+state] != null; a++) {
-								Unit unit = bestUnit[start][end][a*2+state];
-								int id = units.get(unit);
-								float freq = (start==end)?getFrequency(unit, hdrToks.get(start),-1):1;
-								maxFreq = Math.max(maxFreq, totalScores[id]*freq);
-							}
-							Unit unitsT[] = new Unit[altUnitCounts];
-							for (int a = 0, uCtr=0; a < altUnitCounts && bestUnit[start][end][a*2+state] != null; a++) {
-								Unit unit = bestUnit[start][end][a*2+state];
-								int id = units.get(unit);
-								float freq = (start==end)?getFrequency(unit, hdrToks.get(start),-1):1;
-								float f = totalScores[id]*freq;
-								if (f < maxFreq*0.9) {
-									bestUnit[start][end][a*2+state] = null;
-								} else {
-									unitsT[uCtr++] = bestUnit[start][end][a*2+state];
-								}
-							}
-							if (unitsT[0] != null) {
-								scores[start][end][state] += maxFreq*params.weights[FTypes.Co_occurStats.ordinal()];
-								if (debugLvl > 0) printFeatureInfo(start,end,state,FTypes.Co_occurStats,maxFreq,unitsT[0].getName());
-							}
-							for (int a = 0; a < unitsT.length && unitsT[a]!=null;a++) {
-								bestUnit[start][end][a*2+state] = unitsT[a];
-							}
+						if (unitsT[0] != null) {
+							scores[start][end][state] += maxFreq*params.weights[FTypes.Co_occurStats.ordinal()];
+							if (debugLvl > 0) printFeatureInfo(start,end,state,FTypes.Co_occurStats,maxFreq,unitsT[0].getName());
+						}
+						for (int a = 0; a < unitsT.length && unitsT[a]!=null;a++) {
+							bestUnit[start][end][a*2+state] = unitsT[a];
 						}
 					}
 				}
+			}
+		}
 
 				/*
 				int numM = 0;
@@ -349,8 +317,6 @@ public class TokenScorer implements ConditionalLexicon {
 					}
 				}
 				 */
-			}
-		}
 
 		sentence = new Vector<Token>();
 		for (int i = 0; i < hdrToks.size(); i++) {
