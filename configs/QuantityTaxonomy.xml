@@ -13,11 +13,22 @@
       <lemmaset>
 	<String>per</String>			  
 	<String frequency="0.99">p</String>			  
-	<String>percentage</String>			  
+	<String frequency="1">percentage</String>			  
       </lemmaset>
     </unit>
   </concept>		
-  <concept name="Number">
+  <concept name="Power Ratio">
+    <Synset>
+    </Synset>
+    <typicalUsage>
+    </typicalUsage>
+    <unit name="decibel" symbol="dB" conversionFactor="">
+      <lemmaset>
+	<String frequency="0.99">dB</String>			  
+      </lemmaset>
+    </unit>
+  </concept>		
+  <concept name="Multiples">
     <Synset>
     </Synset>
     <typicalUsage>
@@ -49,6 +60,7 @@
 	<String>bilion</String>			  
 	<String>bln</String>
 	<String>b</String>
+	<String>bn</String>
       </lemmaset>
     </unit>
   </concept>
@@ -104,11 +116,12 @@
     </unit>
     <unit name="Alderney pound" symbol="£" conversionFactor="">
       <lemmaset>
-	<String></String>
+	<String frequency="0.0001">£</String>
       </lemmaset>
     </unit>
     <unit name="Guernsey pound" symbol="£" conversionFactor="">
       <lemmaset>
+	<String frequency="0.0001">£</String>
 	<String>GGP</String>
       </lemmaset>
     </unit>
@@ -146,11 +159,12 @@
     </unit>
     <unit name="Ascension pound" symbol="£" conversionFactor="">
       <lemmaset>
-	<String></String>
+	<String frequency="0.0001">£</String>
       </lemmaset>
     </unit>
     <unit name="Saint Helena pound" symbol="£" conversionFactor="">
       <lemmaset>
+	<String frequency="0.0001">£</String>
 	<String>SHP</String>
       </lemmaset>
     </unit>
@@ -390,6 +404,7 @@
     </unit>
     <unit name="Egyptian pound" symbol="£; ج.م" conversionFactor="">
       <lemmaset>
+	<String frequency="0.0001">£</String>
 	<String>EGP</String>
       </lemmaset>
     </unit>
@@ -410,6 +425,7 @@
     </unit>
     <unit name="Falkland Islands pound" symbol="£" conversionFactor="">
       <lemmaset>
+	<String frequency="0.0001">£</String>
 	<String>FKP</String>
       </lemmaset>
     </unit>
@@ -446,6 +462,7 @@
     </unit>
     <unit name="Gibraltar pound" symbol="£" conversionFactor="">
       <lemmaset>
+	<String frequency="0.0001">£</String>
 	<String>GIP</String>
       </lemmaset>
     </unit>
@@ -508,6 +525,7 @@
     </unit>
     <unit name="Manx pound" symbol="£" conversionFactor="">
       <lemmaset>
+	<String frequency="0.0001">£</String>
 	<String>IMP</String>
       </lemmaset>
     </unit>
@@ -529,6 +547,7 @@
     </unit>
     <unit name="Jersey pound" symbol="£" conversionFactor="">
       <lemmaset>
+	<String frequency="0.0001">£</String>
 	<String>JEP</String>
       </lemmaset>
     </unit>
@@ -585,6 +604,7 @@
     </unit>
     <unit name="Lebanese pound" symbol="ل.ل" conversionFactor="">
       <lemmaset>
+	<String frequency="0.0001">£</String>
 	<String>LBP</String>
       </lemmaset>
     </unit>
@@ -819,6 +839,7 @@
     </unit>
     <unit name="São Tomé and Príncipe dobra" symbol="Db" conversionFactor="">
       <lemmaset>
+	<String frequency="0.0001">db</String>
 	<String>STD</String>
       </lemmaset>
     </unit>
@@ -860,11 +881,12 @@
     </unit>
     <unit name="South Georgia and the South Sandwich Islands pound" symbol="£" conversionFactor="">
       <lemmaset>
-	<String></String>
+	<String frequency="0.0001">£</String>
       </lemmaset>
     </unit>
     <unit name="South Sudanese pound" symbol="£" conversionFactor="">
       <lemmaset>
+	<String frequency="0.0001">£</String>
 	<String>SSP</String>
       </lemmaset>
     </unit>
@@ -875,6 +897,7 @@
     </unit>
     <unit name="Sudanese pound" symbol="£" conversionFactor="">
       <lemmaset>
+	<String frequency="0.0001">£</String>
 	<String>SDG</String>
       </lemmaset>
     </unit>
@@ -896,6 +919,7 @@
     </unit>
     <unit name="Syrian pound" symbol="£; ل.س" conversionFactor="">
       <lemmaset>
+	<String frequency="0.0001">£</String>
 	<String>SYP</String>
       </lemmaset>
     </unit>
@@ -938,6 +962,7 @@
     </unit>
     <unit name="Tristan da Cunha pound" symbol="£" conversionFactor="">
       <lemmaset>
+	<String frequency="0.0001">£</String>
 	<String></String>
       </lemmaset>
     </unit>
@@ -1164,8 +1189,6 @@
       </lemmaset>
     </unit>
     <unit name="link (Gunter's; Surveyor's)" symbol="lnk" conversionFactor="= 0.201168 m">
-      <lemmaset>
-      </lemmaset>
     </unit>
     <unit name="link (Ramsden's; Engineer's)" symbol="lnk" conversionFactor="= 0.3048 m">
       <lemmaset>
@@ -1544,11 +1567,13 @@
       <lemmaset>
       </lemmaset>
     </unit>
-    <unit name="barrel (imperial)" symbol="bl (imp)" conversionFactor="= 0.163 659 24 m3">
+    <unit name="barrel (petroleum)" symbol="bl; bbl" conversionFactor="= 0.158 987 294 928 m3">
       <lemmaset>
       </lemmaset>
     </unit>
-    <unit name="barrel (petroleum)" symbol="bl; bbl" conversionFactor="= 0.158 987 294 928 m3">
+
+<!--
+    <unit name="barrel (imperial)" symbol="bl (imp)" conversionFactor="= 0.163 659 24 m3">
       <lemmaset>
       </lemmaset>
     </unit>
@@ -1558,10 +1583,9 @@
     </unit>
     <unit name="barrel (US fluid)" symbol="fl bl (US)" conversionFactor="= 0.119 240 471 196 m3">
       <lemmaset>
-	<String>barrels</String>
-	<String>barrel</String>
       </lemmaset>
     </unit>
+-->
     <unit name="board-foot" symbol="fbm" conversionFactor="≡ 2.359 737 216×10−3 m3">
       <lemmaset>
       </lemmaset>
@@ -1615,6 +1639,10 @@
     <unit name="cubic metre (SI unit)" symbol="m3" conversionFactor="≡ 1 m3">
       <lemmaset>
 	<String>m 3</String>
+      </lemmaset>
+    </unit>
+    <unit name="cubic centimetre" symbol="cc" conversionFactor="≡ 1000000 m3">
+      <lemmaset>
       </lemmaset>
     </unit>
     <unit name="cubic mile" symbol="cu mi" conversionFactor="≡ 4 168 181 825.440 579 584 m3">
@@ -1712,20 +1740,24 @@
     </unit>
     <unit name="gallon (beer)" symbol="beer gal" conversionFactor="= 4.621 152 048×10−3 m3">
       <lemmaset>
+	<String frequency="0.001">gal</String>			  
 	<String>galllons</String>
       </lemmaset>
     </unit>
     <unit name="gallon (imperial)" symbol="gal (imp)" conversionFactor="≡ 4.546 09×10−3 m3">
       <lemmaset>
+		<String frequency="0.001">gal</String>			  
       </lemmaset>
     </unit>
     <unit name="gallon (US dry)" symbol="gal (US)" conversionFactor="= 4.404 883 770 86×10−3 m3">
       <lemmaset>
 	<String>gall</String>
+	<String frequency="0.001">gal</String>			  
       </lemmaset>
     </unit>
     <unit name="gallon (US fluid; Wine)" symbol="gal (US)" conversionFactor="≡ 3.785 411 784×10−3 m3">
       <lemmaset>
+	<String frequency="0.99">gal</String>			  
       </lemmaset>
     </unit>
     <unit name="gill (imperial); Noggin" symbol="gi (imp); nog" conversionFactor="= 142.065 3125×10−6 m3">
@@ -1760,7 +1792,6 @@
     <unit name="last" symbol=" " conversionFactor="= 2.909 4976 m3">
       <lemmaset>
 	<String>last</String>
-	<String>last yr</String>
       </lemmaset>
     </unit>
     <unit name="litre" symbol="L" conversionFactor="≡ 0.001 m3">
@@ -1791,7 +1822,7 @@
       <lemmaset>
 	<String>ounces</String>
 	<String>ounce</String>
-	<String>fl oz</String>
+	<String>UK fl oz</String>
       </lemmaset>
     </unit>
     <unit name="ounce (fluid US customary)" symbol="US fl oz" conversionFactor="≡ 29.573 529 5625×10−6 m3">
@@ -1800,12 +1831,14 @@
 	<String>ounce</String>
       </lemmaset>
     </unit>
+<!--
     <unit name="ounce (fluid US food nutrition labeling)" symbol="US fl oz" conversionFactor="≡ 3×10−5 m3">
       <lemmaset>
 	<String>ounces</String>
 	<String>ounce</String>
       </lemmaset>
     </unit>
+-->
     <unit name="peck (imperial)" symbol="pk" conversionFactor="= 9.092 18×10−3 m3">
       <lemmaset>
       </lemmaset>
@@ -2292,22 +2325,10 @@
     </unit>
     <unit name="quarter (imperial)" symbol=" " conversionFactor="= 12.700 586 36 kg">
       <lemmaset>
-	<String>quartal</String>
-	<String>quarte</String>
-	<String>quart</String>
-	<String>quarts</String>
-	<String>quartz</String>
-	<String>quarter</String>
       </lemmaset>
     </unit>
     <unit name="quarter (informal)" symbol=" " conversionFactor="= 226.796 185 kg">
       <lemmaset>
-	<String>quartal</String>
-	<String>quarte</String>
-	<String>quart</String>
-	<String>quarts</String>
-	<String>quartz</String>
-	<String>quarter</String>
       </lemmaset>
     </unit>
     <unit name="quarter, long (informal)" symbol=" " conversionFactor="= 254.011 7272 kg">
@@ -2316,26 +2337,14 @@
     </unit>
     <unit name="quintal (metric)" symbol="q" conversionFactor="= 100 kg">
       <lemmaset>
-	<String>quintal</String>
-	<String>q</String>
-	<String>quintals</String>
-	<String>quintals)</String>
       </lemmaset>
     </unit>
     <unit name="scruple (apothecary)" symbol="s ap" conversionFactor="= 1.295 9782 g">
       <lemmaset>
-	<String>scruple</String>
-	<String>scruples</String>
-	<String>scrupler</String>
       </lemmaset>
     </unit>
     <unit name="sheet" symbol=" " conversionFactor="= 647.9891 mg">
       <lemmaset>
-	<String>sheets</String>
-	<String>sheets ico</String>
-	<String>sheet/h</String>
-	<String>sheet</String>
-	<String>sheets bmp</String>
       </lemmaset>
     </unit>
     <unit name="slug; geepound; hyl" symbol="slug" conversionFactor="≈ 14.593 903 kg">
@@ -2344,15 +2353,6 @@
     </unit>
     <unit name="stone" symbol="st" conversionFactor="= 6.350 293 18 kg">
       <lemmaset>
-	<String>short ton</String>
-	<String>sostone</String>
-	<String>short tons</String>
-	<String>ton shorty</String>
-	<String>stoney</String>
-	<String>stone</String>
-	<String>st</String>
-	<String>stones</String>
-	<String>stoner</String>
       </lemmaset>
     </unit>
     <unit name="ton, assay (long)" symbol="AT" conversionFactor="≈ 32.666 667 g">
@@ -2374,6 +2374,11 @@
     <unit name="tonne (mts unit)" symbol="t" conversionFactor="= 1 000 kg">
       <lemmaset>
 	<String>tones</String>
+      </lemmaset>
+    </unit>
+    <unit name="kiloton" symbol="kt" conversionFactor="= 1 000 000 kg">
+      <lemmaset>
+	<String>kilotonne</String>
       </lemmaset>
     </unit>
     <unit name="wey" symbol=" " conversionFactor="= 114.305 277 24 kg (variants exist)">
@@ -2524,6 +2529,7 @@
     </unit>
     <unit name="day" symbol="d" conversionFactor="= 1440 min = 86400 s">
       <lemmaset>
+	<String>days</String>
       </lemmaset>
     </unit>
     <!--
@@ -2550,6 +2556,7 @@
     </unit>
     <unit name="hour" symbol="h" conversionFactor="= 3 600 s">
       <lemmaset>
+	<String frequency="0.7">H</String>
 	<String>hours</String>
 	<String>hourss</String>
 	<String>hour</String>
@@ -2805,7 +2812,7 @@
 	<String>kmph</String>
       </lemmaset>
     </unit>
-    <unit name="knot" symbol="kn, kt" conversionFactor="≈ 0.514 444 m/s">
+    <unit name="knot" symbol="kn; kt" conversionFactor="≈ 0.514 444 m/s">
       <lemmaset>
 	<String>knots</String>
 	<String>knott</String>
@@ -3481,12 +3488,14 @@
     </unit>
     <unit name="watt (SI unit)" symbol="W" conversionFactor="= 1 W = 1 J/s = 1 N·m/s = 1 kg·m2/s3">
       <lemmaset>
-	<String>watts dc</String>
-	<String>watts</String>
-	<String>wattts</String>
-	<String>watt</String>
-	<String>watts cw</String>
-	<String>wats</String>
+      </lemmaset>
+    </unit>
+    <unit name="kilowatt" symbol="KW" conversionFactor="= 1000 W">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="megawatt" symbol="MW" conversionFactor="= 1000000 W">
+      <lemmaset>
       </lemmaset>
     </unit>
     </concept><concept name="Action">
@@ -3511,6 +3520,11 @@
       <lemmaset>
 	<String>poise</String>
 	<String frequency="0.001">p</String>			  
+      </lemmaset>
+    </unit>
+    <unit name="centipoise (cgs unit)" symbol="cP" conversionFactor="= 0.1 Pa·s">
+      <lemmaset>
+	<String frequency="0.1">cp</String>			  
       </lemmaset>
     </unit>
     <unit name="pound per foot hour" symbol="lb/(ft·h)" conversionFactor="≈ 4.133 789×10−4 Pa·s">
@@ -3685,6 +3699,7 @@
     </typicalUsage>
     <unit name="henry (SI unit)" symbol="H" conversionFactor="= 1 H = 1 Wb/A = 1 kg·m2/(A·s)2">
       <lemmaset>
+	<String frequency="0.0001">H</String>
       </lemmaset>
     </unit>
     </concept><concept name="Temperature">
@@ -3811,7 +3826,7 @@
     </unit>
     <unit name="candlepower (new)" symbol="cp" conversionFactor="= 1 cd">
       <lemmaset>
-	<String>cp</String>
+	<String frequency="0.001">cp</String>
 	<String>contact point</String>
       </lemmaset>
     </unit>
