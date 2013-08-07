@@ -44,14 +44,13 @@ public class SimpleParser implements HeaderUnitParser{
 	static HashSet<String> wordSymbolsHash=new HashSet<String>(Arrays.asList(WordSymbols));
 	boolean debug;
 	Element options;
-	QuantityCatalog quantityDict;
-	protected Co_occurrenceStatistics coOccurStats;
+	protected QuantityCatalog quantityDict;
 	public SimpleParser(Element elem, QuantityCatalog dict) throws IOException, ParserConfigurationException, SAXException {
 		this.options = elem;
 		if (dict==null) 
 			dict = new QuantityCatalog(elem);
 		quantityDict = dict;
-		coOccurStats = new Co_occurrenceStatistics(elem, dict);
+		
 	}
 	
 	/* (non-Javadoc)

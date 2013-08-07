@@ -497,4 +497,8 @@ public class QuantityCatalog implements WordFrequency {
 			return units.iterator().next();
 		return null;
 	}
+	public boolean isUnit(String str) {
+		List<EntryWithScore<Unit>> matches = getTopK(str, "", 0.9);
+		return (matches != null && matches.size()>0);
+	}
 }

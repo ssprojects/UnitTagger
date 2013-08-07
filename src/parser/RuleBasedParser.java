@@ -83,7 +83,7 @@ public class RuleBasedParser extends SimpleParser {
 						maxScore = score;
 						matchId = h;
 						singleUnit = unit;
-					} else if (maxScore < score + Double.MIN_VALUE) {
+					} else if (maxScore < score + Float.MIN_VALUE) {
 					}
 				}
 			}
@@ -96,7 +96,7 @@ public class RuleBasedParser extends SimpleParser {
 					if (quantityDict.idToUnitMap.getType(id)!=quantityDict.idToUnitMap.ConceptMatch) {
 						float score = res.hitMatch(h);
 						if (res.hitPosition(h)==res.hitPosition(matchId) && res.hitLength(h)==res.hitLength(matchId)) {
-							 if (score > maxScore-Double.MIN_VALUE && h != matchId) {
+							 if (score > maxScore-1e-6f && h != matchId) {
 								altUnitMatches.add(h); 
 							 }
 							continue;
@@ -204,7 +204,7 @@ public class RuleBasedParser extends SimpleParser {
 				if (brackets.get(pos) < 0) continue; // mismatched brackets
 				int start = brackets.get(pos) >> 16;
 				int end = brackets.get(pos) & ((1<<16)-1);
-				for (int p = start; p <= end; p++) {
+				for (int p = start; p <= end && p < pHdr.tokens.size(); p++) {
 					String tok = pHdr.tokens.get(p);
 					if (Character.isLetter(tok.charAt(0))) return false;
 				}
@@ -343,7 +343,8 @@ public class RuleBasedParser extends SimpleParser {
 		public List<EntryWithScore<Unit>> apply(String hdr, State pHdr, List<String> applicableRules) {
 			pHdr.setDictMatch();
 			int bestUnitMatch = pHdr.setSingleSpanMatchesUnit();
-			if (bestUnitMatch < 0) return null;
+			// added the second condition because otherwise major axis (AU) is getting wrongly labeled since AU is ambiguous.
+			if (bestUnitMatch < 0 || pHdr.altUnitMatches.size()>0) return null;
 			if (pHdr.dictMatch.hitLength(bestUnitMatch)==1 && pHdr.tokens.get(pHdr.dictMatch.hitPosition(bestUnitMatch)).length() <= 1) return null;
 			TIntArrayList brackets = pHdr.brackets;
 			for (int pos = 0; pos < brackets.size(); pos++) {
@@ -448,7 +449,7 @@ public class RuleBasedParser extends SimpleParser {
 	}
 	public static void main(String args[])  throws Exception {
 		List<String> vec = new Vector<String>();
-		List<EntryWithScore<Unit>> unitsR = new RuleBasedParser(null,null).parseHeaderExplain("number(s)", vec);
+		List<EntryWithScore<Unit>> unitsR = new RuleBasedParser(null,null).parseHeaderExplain("Production (t)", vec);
 		//				"
 		System.out.println(unitsR);
 		System.out.println(Arrays.toString(vec.toArray()));
