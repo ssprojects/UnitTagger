@@ -22,6 +22,7 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -40,7 +41,6 @@ import parser.CFGParser.EnumIndex.Tags;
 import parser.CFGParser.Params.FTypes;
 import parser.CFGParser.StateIndex.States;
 import parser.RuleBasedParser.State;
-import parser.TokenScorer.UnitObject;
 import parser.cfgTrainer.FeatureVector;
 import parser.coOccurMethods.Co_occurrenceScores;
 import parser.coOccurMethods.PrUnitGivenWord;
@@ -73,42 +73,6 @@ public class TokenScorer implements ConditionalLexicon {
 	float scores[][][];
 	protected Unit bestUnit[][][];
 	int lastMatch[] = new int[1];
-	public static class UnitObject extends EntryWithScore<Unit> {
-		FeatureVector fvals;
-		public UnitObject(Unit key, double score) {
-			super(key, score);
-		}
-		public UnitObject(Unit unit, double d,UnitObject unit1, UnitObject unit2) {
-			this(unit,d);
-			if (unit1 != null && unit1.fvals != null) {
-				if (fvals==null) setFvals();
-				fvals.add(unit1.fvals);
-			}
-			if (unit2 != null && unit2.fvals != null) {
-				if (fvals==null) setFvals();
-				fvals.add(unit2.fvals);
-			}
-		}
-		private void setFvals() {
-			fvals = new FeatureVector(FTypes.WithinBracket.ordinal()); // this is the largest set of unit-specific features.
-		}
-		public void addFeature(FTypes ftype, float fwt) {
-			if (fvals==null) setFvals();
-			fvals.add(ftype.ordinal(), fwt);
-		}
-		
-		public void addFeatures(FeatureVector treeFeatureVector) {
-			if (fvals == null || treeFeatureVector.size()>fvals.size()) {
-				setFvals(treeFeatureVector.size());
-			}
-			fvals.add(treeFeatureVector);
-		}
-		private void setFvals(int size) {
-			FeatureVector oldFVals = fvals;
-			fvals = new FeatureVector(size);
-			fvals.add(oldFVals);
-		}
-	}
 	public UnitObject newUnit(Unit newUnit) {
 		UnitObject unitObj = new UnitObject(newUnit, params.weights[FTypes.UnitBias.ordinal()]);
 		if (trainMode) {
@@ -158,7 +122,7 @@ public class TokenScorer implements ConditionalLexicon {
 		if (scores == null || scores.length < hdrToks.size()) {
 			scores = new float[hdrToks.size()][hdrToks.size()][numStatesWithFeatures*2]; 
 			bestUnit = new Unit[hdrToks.size()][hdrToks.size()][numStatesWithFeatures*altUnitCounts];
-			sortedUnits = null;//new Vector[hdrToks.size()][hdrToks.size()][2];
+			sortedUnits = new Vector[hdrToks.size()][hdrToks.size()][2];
 		} 
 		float unitBias = params.weights[FTypes.UnitBias.ordinal()];
 		
@@ -169,7 +133,9 @@ public class TokenScorer implements ConditionalLexicon {
 				//  eg. density people per sq km should not include word density in unit.
 				scores[i][j][unitState] = scores[i][j][multUnitState] = unitBias - (j-i)*params.weights[FTypes.MatchLength.ordinal()];
 				Arrays.fill(bestUnit[i][j],null);
+				for (int s = 0; s < sortedUnits[i][j].length; s++) if (sortedUnits[i][j][s] != null) sortedUnits[i][j][s].clear();
 			}
+			
 			//Arrays.fill(scores[i][i], unitBias);
 		}
 
@@ -193,12 +159,12 @@ public class TokenScorer implements ConditionalLexicon {
 			int start = res.hitPosition(h);
 			int end = res.hitEndPosition(h);
 			if (matcher.idToUnitMap.getType(id) != matcher.idToUnitMap.ConceptMatch) {
-				float fvals[] = trainMode?new float[FTypes.values().length]:null;
 				maxMatchLen = Math.max(maxMatchLen, res.hitLength(h));
 				//Quantity concept = matcher.idToUnitMap.getConcept(id);
 				score = score*params.weights[FTypes.DictMatchWeight.ordinal()];
 				 registerFeatureInfo(start, end, state, FTypes.DictMatchWeight, res.hitMatch(h), unit.getName(), unitObject);
 				score += unitBias;
+				registerFeatureInfo(start, end, state, FTypes.UnitBias, 1, unit.getName(), unitObject);
 				score += (res.hitLength(h)-1)*params.weights[FTypes.MatchLength.ordinal()];
 				 registerFeatureInfo(start, end, state, FTypes.MatchLength, res.hitLength(h)-1, unit.getName(), unitObject);
 				List<String> unitToks = matcher.idToUnitMap.getTokens(id);
@@ -246,9 +212,10 @@ public class TokenScorer implements ConditionalLexicon {
 				}
 				if (sortedUnits!=null) {
 					if (sortedUnits[start][end][state]==null) {
-						sortedUnits[start][end][state] = new Vector<TokenScorer.UnitObject>();
+						sortedUnits[start][end][state] = new Vector<UnitObject>();
 					}
-					sortedUnits[start][end][state].add(new UnitObject(unit, score));
+					if (unitObject != null) unitObject.setScore(score);
+					sortedUnits[start][end][state].add(unitObject);
 				}
 			}
 		}
@@ -326,11 +293,13 @@ public class TokenScorer implements ConditionalLexicon {
 						}
 						if (sortedUnits!=null && sortedUnits[start][end][state] != null) {
 							for (int a = sortedUnits[start][end][state].size()-1; a >= 0; a--) {
-								Unit unit  = sortedUnits[start][end][state].get(a).getKey();
-								int id = units.get(unit);
+								UnitObject unit  = sortedUnits[start][end][state].get(a);
+								int id = units.get(unit.getKey());
 								if (id <= 0) continue;
-								float freq = (start==end && coOcurStats.adjustFrequency())?getFrequency(unit, hdrToks.get(start),-1):1;
-								sortedUnits[start][end][state].get(a).addFeature(FTypes.Co_occurStats, coOcurStats.freqAdjustedScore(freq,totalScores[id]));
+								float freq = (start==end && coOcurStats.adjustFrequency())?getFrequency(unit.getKey(), hdrToks.get(start),-1):1;
+								float cooccurScore = coOcurStats.freqAdjustedScore(freq,totalScores[id]);
+								unit.setScore(unit.getScore()+cooccurScore*params.weights[FTypes.Co_occurStats.ordinal()]);
+								unit.addFeature(FTypes.Co_occurStats, cooccurScore);
 							}
 						}
 					}
@@ -432,6 +401,15 @@ public class TokenScorer implements ConditionalLexicon {
 			}
 		}
 		 */
+		if (sortedUnits!=null) {
+		for (int start = 0; start < hdrToks.size(); start++) {
+			for (int end = start; end < hdrToks.size(); end++) {
+				for (int state = 0; state < 2; state++) {
+					if (sortedUnits[start][end][state] != null) Collections.sort(sortedUnits[start][end][state]);
+				}
+			}
+		}
+		}
 		return sentence;
 	}
 	
@@ -723,10 +701,10 @@ public class TokenScorer implements ConditionalLexicon {
 		return 0;
 	}
 
-	private void addLexFeatures(FeatureVector fvec, int start, int end,
-			int unitState2) {
-		// TODO Auto-generated method stub
-		
+	private void addLexFeatures(FeatureVector fvec, int start, int end,	int unitState) {
+		if (fvec != null && scores[start][end][lexScore+unitState] > 0) {
+			fvec.add(Params.FTypes.WithinBracket.ordinal(), 1);
+		}
 	}
 	private float getLexScore(int start, int end, int unitState) {
 		return scores[start][end][lexScore+unitState];

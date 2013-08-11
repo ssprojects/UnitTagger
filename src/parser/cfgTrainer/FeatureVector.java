@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Vector;
 
 import parser.CFGParser.Params.FTypes;
-import parser.TokenScorer.UnitObject;
 
 public class FeatureVector {
 	float fvals[];
@@ -19,12 +18,12 @@ public class FeatureVector {
 		return this;
 	}
 	public void add(FeatureVector fvals2) {
-		// TODO Auto-generated method stub
-		
+		for (int i = 0; i < fvals.length && i < fvals2.size(); i++) {
+			fvals[i] += fvals2.get(i);
+		}
 	}
 	public int size() {
-		// TODO Auto-generated method stub
-		return 0;
+		return fvals.length;
 	}
 	public void print(FTypes[] values) {
 		for (int i = 0; i < fvals.length; i++) {
@@ -33,6 +32,9 @@ public class FeatureVector {
 			}
 		}
 		return;
+	}
+	public float get(int i) {
+		return fvals[i];
 	}
 
 }

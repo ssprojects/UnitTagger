@@ -11,6 +11,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.Character.Subset;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -41,7 +42,9 @@ import conditionalCFG.ConditionalCFGParser;
 
 import parser.CFGParser.EnumIndex.Tags;
 import parser.CFGParser.StateIndex.States;
-import parser.cfgTrainer.CFGParser4Training.TaggedToken;
+import parser.CFGParser4Training.StateIndex;
+import parser.CFGParser4Training.TaggedToken;
+import parser.cfgTrainer.FeatureVector;
 import parser.coOccurMethods.PrUnitGivenWord;
 
 import edu.stanford.nlp.ling.HasTag;
@@ -120,7 +123,7 @@ public class CFGParser extends RuleBasedParser {
 		"CU2 ::- SU PER_SU 1 \n"+
 
 		"Sep_SU ::- Op SU 1"+ "\n" +
-		"Sep_SU ::- PER SU 1"+ "\n" +
+		"PER_SU ::- PER SU 1"+ "\n" +
 
 		"SU ::- SU_MW SU_W 1f"+ "\n" +
 
@@ -131,7 +134,7 @@ public class CFGParser extends RuleBasedParser {
 
 	// TODO: allow a multiplier for simple units like in mg/thousand litres.
 	public static class EnumIndex implements Index<String> {
-		public enum Tags {SU, SU_W, W, Mult, IN, OF, Op,PER,Boundary};
+		public enum Tags {SU, SU_W, W, Mult, IN, OF, Op,PER,Number,Boundary};
 		public short allowedTags[][] = {
 				{(short) Tags.SU.ordinal(),(short) Tags.SU_W.ordinal(),(short) Tags.W.ordinal()},
 				{(short) Tags.SU.ordinal(),(short) Tags.SU_W.ordinal(),(short) Tags.W.ordinal()},
@@ -141,6 +144,7 @@ public class CFGParser extends RuleBasedParser {
 				{(short) Tags.W.ordinal(),(short) Tags.OF.ordinal()},
 				{(short) Tags.W.ordinal(), (short) Tags.Op.ordinal()},
 				{(short) Tags.PER.ordinal(),(short) Tags.SU.ordinal(),(short)Tags.W.ordinal()},
+				{(short) Tags.Number.ordinal()},
 				{(short) Tags.Boundary.ordinal()}
 		};
 		TaggedToken boundaryToken;
@@ -479,7 +483,7 @@ public class CFGParser extends RuleBasedParser {
 	ConditionalCFGParser parser;
 	TokenScorer tokenScorer;
 	Index<String> wordIndex;
-
+	Params params;
 
 	public static class TagArrayIterator implements Iterator<IntTaggedWord> {
 		short tagArray[];
@@ -513,13 +517,21 @@ public class CFGParser extends RuleBasedParser {
 	}
 
 	public static class Params {
-		public enum FTypes {WithinBracket,ContextWord,UnitBias,UnitScoreBias,AfterIN,DictMatchWeight,
-						SINGLELetter,INLANG, MatchLength,Subsumed,SymbolDictMatchThreshold,LemmaDictMatchThreshold,
-						PercentUnkInUnit,PercenUnkInUnitThreshold, Co_occurStats, CU2Bias, MultBias};
-			float weights[]=new float[]{0.5f,0.5f,-0.05f,-0.5f,0.5f,1f,
-					0f,-1.1f,0.01f,-0.05f,-0.9f,-0.9f,-2f,0.5f,0.5f,0.06f,0.05f};
+		public enum FTypes {ContextWord,UnitBias,DictMatchWeight,
+			SINGLELetter,INLANG, MatchLength, Co_occurStats,Subsumed,
+			WithinBracket,AfterIN,
+			SymbolDictMatchThreshold,LemmaDictMatchThreshold,
+			PercentUnkInUnit,PercenUnkInUnitThreshold, CU2Bias, MultBias};
+			float weights[]=new float[]{0.5f,-0.05f,1f,
+					0f,-1.1f,0.01f,0.5f,-0.05f,
+					0.5f,0.5f,
+					-0.9f,-0.9f,-2f,0.5f,0.06f,0.05f};
 			// CU2bias should be more than unitbias to prefer compound units when one side is known e.g. people per sq km
+			public int numFeatures() {
+				return FTypes.values().length;
+			}
 	}
+	
 	public static class Token implements HasWord {
 		String wrd;
 		Tags tag;
@@ -579,6 +591,8 @@ public class CFGParser extends RuleBasedParser {
 		coOccurStats = new Co_occurrenceStatistics(options, quantityDict);
 		tokenScorer = new TokenScorer(index, tagIndex,quantityDict,wordIndex, new WordnetFrequency(),new PrUnitGivenWord(coOccurStats));
 		Options op = new Options();
+		params = new Params();
+		tmpFVec = new FeatureVector(params.numFeatures());
 		op.dcTags=false;
 		//op.testOptions.verbose=true;
 		parser = new ConditionalCFGParser(bg, ug, tokenScorer, op, index, wordIndex, tagIndex);
@@ -586,7 +600,7 @@ public class CFGParser extends RuleBasedParser {
 
 	private void initIndex(Index<String> index, Vector<BinaryRule> brules, Vector<UnaryRule> urules) throws IOException {
 		String line;
-		BufferedReader br  = new BufferedReader(new StringReader(grammar));
+		BufferedReader br  = new BufferedReader(new StringReader(getGrammar()));
 		while ((line = br.readLine())!=null) {
 			if (line.split(" ").length >= 5) {
 				BinaryRule brule = new BinaryRule(line, index);
@@ -599,30 +613,44 @@ public class CFGParser extends RuleBasedParser {
 			}
 		}
 	}
+	protected String getGrammar() {
+		return grammar;
+	}
 	public List<EntryWithScore<Unit>> parseHeader(String hdr) {
 		return parseHeader(hdr, null, 0);
 	}
-	List<EntryWithScore<Unit> > bestUnits = new ReusableVector<EntryWithScore<Unit>>();
-	List<EntryWithScore<Unit> > bestUnits2 = new ReusableVector<EntryWithScore<Unit>>();
+	
+
+	List<UnitObject > bestUnits = new Vector<UnitObject>();
+	List<UnitObject> bestUnits2 = new Vector<UnitObject>();
+	FeatureVector tmpFVec;
+
+	public List<EntryWithScore<Unit>> getTopKUnits(String hdr, int k, Vector<UnitObject> featureList, int debugLvl) {
+		return parseHeader(hdr, null, debugLvl, k, featureList);
+	}
 	public List<EntryWithScore<Unit>> parseHeader(String hdr, short[][] forcedTags, int debugLvl) {
-		//System.out.println(hdr);
+		return parseHeader(hdr, forcedTags, debugLvl, 1, null);
+	}
+	public List<EntryWithScore<Unit>> parseHeader(String hdr, short[][] forcedTags, int debugLvl, int k, Vector<UnitObject> featureList) {
+		if (debugLvl > 0) System.out.println(hdr);
 		if (isURL(hdr)) return null;
 		TIntArrayList brackets = new TIntArrayList();
 		List<String> hdrToks = quantityDict.getTokens(hdr,brackets);
 		if (hdrToks.size()==0) return null;
-
-		List<? extends HasWord> sentence = tokenScorer.cacheScores(hdrToks, brackets,forcedTags,debugLvl,false);
+		if (featureList!=null) featureList.clear();
+		List<? extends HasWord> sentence = tokenScorer.cacheScores(hdrToks, brackets,forcedTags,debugLvl,featureList!=null);
 		if (parser.parse(sentence)) {
 			TObjectFloatHashMap<Unit> units = new TObjectFloatHashMap<Unit>();
-			List<ScoredObject<Tree>> trees = parser.getBestParses();
-
+			List<ScoredObject<Tree>> trees = (k==1?parser.getBestParses():parser.getKBestParses(k));
 			for (ScoredObject<Tree> stree : trees) {
 				Tree tree = stree.object();
 				Vector<Tree> unitNodes = new Vector<Tree>();
 				tree.setSpans();
 				getUnitNodes(tree, unitNodes,StateIndex.States.U.name());
-				if (debugLvl > 0) System.out.println(tree + " " + tree.score()+ " "+parser.scoreBinarizedTree(tree, 0,debugLvl-1));
-
+				float treeScore = (float) parser.scoreBinarizedTree(tree, 0,debugLvl-1);
+				if (debugLvl > 0) System.out.println(tree + " " + tree.score()+ " "+treeScore);
+				FeatureVector treeFeatureVector=null;
+				if (featureList!=null) {treeFeatureVector = extractTreeFeatureVector(tree, 0,tmpFVec.clear());}
 				if (unitNodes.size() > 2) throw new NotImplementedException();
 				if (unitNodes.size()==0) continue;
 				Tree unitTree = unitNodes.get(0);
@@ -630,16 +658,21 @@ public class CFGParser extends RuleBasedParser {
 				if (unitNodes.size() > 1) getUnit(unitNodes.get(1),hdrToks,bestUnits2);
 				int numUnits = unitNodes.size();
 				if (bestUnits != null && bestUnits.size()>0) {
+					float baseScore = (float) bestUnits.get(0).getScore();
 					for (int a = 0; a < bestUnits.size(); a++) {
 						Unit bestUnit = bestUnits.get(a).getKey();
-						float val = (float) bestUnits.get(a).getScore();
-						if (numUnits==1 || bestUnits2.size()==0)
+						float val = (float) ((float) bestUnits.get(a).getScore()+treeScore-baseScore);
+						if (numUnits==1 || bestUnits2.size()==0) {
 							units.adjustOrPutValue(bestUnit, val,val);
-						else {
+							if (treeFeatureVector != null) addFeatureVector(featureList, bestUnits.get(a),null,treeFeatureVector,val,bestUnit);
+						} else {
+							float baseScore2 = (float) bestUnits2.get(0).getScore();
 							for (int a2 = 0; a2 < bestUnits2.size(); a2++) {
 								Unit bestUnit2 = bestUnits2.get(a2).getKey();
-								float val2 = (float) bestUnits2.get(a2).getScore();
-								units.adjustOrPutValue(new UnitPair(bestUnit, bestUnit2, UnitPair.OpType.Alt), val*val2,val*val2);
+								float val2 = (float) bestUnits2.get(a2).getScore() - baseScore2 + val;
+								Unit newUnit = new UnitPair(bestUnit, bestUnit2, UnitPair.OpType.Alt);
+								units.adjustOrPutValue(newUnit, val2, val2);
+								if (treeFeatureVector != null) addFeatureVector(featureList, bestUnits.get(a),bestUnits2.get(a2),treeFeatureVector,val2, newUnit);
 							}
 						}
 					}
@@ -651,31 +684,79 @@ public class CFGParser extends RuleBasedParser {
 					iter.advance();
 					possibleUnits.add(new EntryWithScore<Unit>(iter.key(), iter.value()));
 				}
+				Collections.sort(possibleUnits);
+				if (possibleUnits.size()>k) {
+					while (possibleUnits.size() > k) {
+						possibleUnits.remove(possibleUnits.size()-1);
+					}
+				}
+				if (featureList!=null) {
+					for (UnitObject obj : featureList) {
+						obj.checkCorrectness(params.weights);
+					}
+					Collections.sort(featureList);
+					while (featureList.size()>k) {
+						featureList.remove(featureList.size()-1);
+					}
+					if (debugLvl > 0) {
+						for (UnitObject unitObj : featureList) {
+							System.out.println(unitObj.getKey().getBaseName()+ " "+unitObj.getScore()); 
+							unitObj.fvals.print(Params.FTypes.values());
+						}
+					}
+				}
 				return possibleUnits;
 			} 
 		} else {
-		//	System.out.println("No unit");
+			//	System.out.println("No unit");
 		}
+		
 		return null;
 	}
 
-	List<EntryWithScore<Unit> > bestUnitsBase = new ReusableVector<EntryWithScore<Unit>>();
-	List<EntryWithScore<Unit> > bestUnitsMult = new ReusableVector<EntryWithScore<Unit>>();
-	EntryWithScore<Unit> tmpEntry = new EntryWithScore<Unit>(null, 0);
-	private void getUnit(Tree unitTree, List<String> hdrToks,List<EntryWithScore<Unit>> bestUnitsVec) {
-		// TODO Auto-generated method stub
-		IntPair pair  = unitTree.getSpan();
-		int start = pair.getSource();
-		int end = pair.getTarget();
+	private FeatureVector extractTreeFeatureVector(Tree tree, int start, FeatureVector fvec) {
+		if (tree.isLeaf()) {
+			return fvec;
+		}
+		if (tree.isPreTerminal()) {
+			String wordStr = tree.children()[0].label().value();
+			int tag = tokenScorer.tagIndex.indexOf(tree.label().value());
+			int word = tokenScorer.wordIndex.indexOf(wordStr);
+			IntTaggedWord iTW = new IntTaggedWord(word, tag);
+			float score = tokenScorer.score(fvec,iTW, start, wordStr, null);
+			return fvec;
+		}
+		int parent = tokenScorer.stateIndex.indexOf(tree.label().value());
+		int firstChild = tokenScorer.stateIndex.indexOf(tree.children()[0].label().value());
+		if (tree.numChildren() == 1) {
+			extractTreeFeatureVector(tree.children()[0], start, fvec);
+			return fvec;
+		}
+		int secondChild = tokenScorer.stateIndex.indexOf(tree.children()[1].label().value());
+		BinaryRule br = new BinaryRule(parent, firstChild, secondChild);
+		int sz0 = tree.children()[0].yield().size();
+		extractTreeFeatureVector(tree.children()[0], start, fvec);
+		extractTreeFeatureVector(tree.children()[1], start + sz0, fvec);
+		tokenScorer.score(br,start,start+sz0+tree.children()[1].yield().size(),start + sz0,fvec);
+		return fvec;
+	}
+	private void addFeatureVector(Vector<UnitObject> featureList, UnitObject unitObject1,UnitObject unitObject2, FeatureVector treeFeatureVector, float val2, Unit newUnit) {
+		UnitObject unitObject = new UnitObject(newUnit, val2, unitObject1, unitObject2);
+		unitObject.addFeatures(treeFeatureVector);
+		featureList.add(unitObject);
+	}
+	List<UnitObject> bestUnitsBase = new Vector<UnitObject>();
+	List<UnitObject> bestUnitsMult = new Vector<UnitObject>();
+	UnitObject tmpEntry = new UnitObject(null, 0);
+	private void getUnit(Tree unitTree, List<String> hdrToks,List<UnitObject> bestUnitsVec) {
 		bestUnitsVec.clear();
-
 		Tree bestUTree = getSubTree(unitTree,new String[]{"BU","SU"});
 		Tree multTree = getSubTree(unitTree,new String[]{"Mult"});
 
 		if (bestUTree != null) {
-			Unit bestUnits[] = tokenScorer.bestUnit[bestUTree.getSpan().getSource()][bestUTree.getSpan().getTarget()];
-			float scoreArr[] = tokenScorer.scores[bestUTree.getSpan().getSource()][bestUTree.getSpan().getTarget()];
-			
+			Vector<UnitObject> bestUnits[] = tokenScorer.sortedUnits[bestUTree.getSpan().getSource()][bestUTree.getSpan().getTarget()];
+			//float scoreArr[] = tokenScorer.scores[bestUTree.getSpan().getSource()][bestUTree.getSpan().getTarget()];
+
 			// a new compound unit.
 			if (bestUTree.numChildren()==1 && bestUTree.getChild(0).label().value().equals("CU2")&&tokenScorer.dictionaryMatch(bestUTree.getSpan().getSource(),bestUTree.getSpan().getTarget()) < 0.9) {
 				Vector<Tree> simpleUnits = new Vector<Tree>();
@@ -690,48 +771,48 @@ public class CFGParser extends RuleBasedParser {
 					Unit unit1 = bestUnitsBase.get(a1).getKey();
 					for (int a2 = 0; a2 < bestUnitsMult.size(); a2++) {
 						Unit unit2 = bestUnitsMult.get(a2).getKey();
-						bestUnitsVec.add(tmpEntry.init(quantityDict.newUnit(unit1,unit2,UnitPair.OpType.Ratio),newCompundScore(bestUnitsBase.get(a1).getScore(),bestUnitsMult.get(a2).getScore())));
+						bestUnitsVec.add(new UnitObject(quantityDict.newUnit(unit1,unit2,UnitPair.OpType.Ratio),newCompundScore(bestUnitsBase.get(a1).getScore(),bestUnitsMult.get(a2).getScore()), bestUnitsBase.get(a1), bestUnitsMult.get(a2)));
 						a++;
 					}
 				}
-			} else if (bestUnits[tokenScorer.unitState] == null) {
+			} else if (bestUnits[tokenScorer.unitState] == null || bestUnits[tokenScorer.unitState].size()==0) {
 				// a new base unit.
-				bestUnits[tokenScorer.unitState] = quantityDict.newUnit(hdrToks.subList(bestUTree.getSpan().getSource(), bestUTree.getSpan().getTarget()+1));
-				if (tokenScorer.altUnitCounts > 1) bestUnits[tokenScorer.unitState+2] = null;
+				bestUnits[tokenScorer.unitState] = new Vector<UnitObject>();
+				bestUnits[tokenScorer.unitState].add(tokenScorer.newUnit(quantityDict.newUnit(hdrToks.subList(bestUTree.getSpan().getSource(), bestUTree.getSpan().getTarget()+1))));
+				//if (tokenScorer.altUnitCounts > 1) bestUnits[tokenScorer.unitState+2] = null;
 				System.out.println("Created new unit "+bestUnits[tokenScorer.unitState]);
-				bestUnitsVec.add(tmpEntry.init(bestUnits[tokenScorer.unitState],scoreArr[tokenScorer.unitState]));
+				bestUnitsVec.add(bestUnits[tokenScorer.unitState].get(0));
 			} else {
-				for (int a1 = 0; a1 < tokenScorer.altUnitCounts; a1++) {
-					Unit unit1 = bestUnits[a1*2+tokenScorer.unitState];
-					if (unit1==null) break;
-					bestUnitsVec.add(tmpEntry.init(unit1,scoreArr[tokenScorer.unitState]));
+				for (int a1 = 0; a1 < bestUnits[tokenScorer.unitState].size(); a1++) {
+					bestUnitsVec.add(bestUnits[tokenScorer.unitState].get(a1));
 				}
 			}
 		}
-		Unit multUnit = null;
+		UnitObject multUnit = null;
 		float multScore = 0;
 		if (multTree != null) {
-			multUnit = tokenScorer.bestUnit[multTree.getSpan().getSource()][multTree.getSpan().getTarget()][tokenScorer.multUnitState];
-			multScore = tokenScorer.scores[multTree.getSpan().getSource()][multTree.getSpan().getTarget()][tokenScorer.multUnitState];
+			int start = multTree.getSpan().getSource();
+			int end = multTree.getSpan().getTarget();
+			multUnit = tokenScorer.sortedUnits[start][end][tokenScorer.multUnitState].get(0);
 		}
 		if (bestUnitsVec != null && bestUnitsVec.size()>0) {
 			if (multUnit != null) {
 				for (int a = 0; a < bestUnitsVec.size(); a++) {
 					Unit bestUnit = bestUnitsVec.get(a).getKey();
 					double score = bestUnitsVec.get(a).getScore();
-					bestUnitsVec.set(a,tmpEntry.init(new UnitMultPair(bestUnit, multUnit), (float)score*multScore));
+					bestUnitsVec.set(a,new UnitObject(new UnitMultPair(bestUnit, multUnit.getKey()), score+multScore, multUnit, bestUnitsVec.get(a)));
 				} 
 			}
 		} else if (multUnit!=null) {
-			bestUnitsVec.add(tmpEntry.init(multUnit, multScore));
+			bestUnitsVec.add(multUnit);
 		} else {
 			throw new NotImplementedException("Unknown state ");
 		}
 	}
 
-	private double newCompundScore(double score, double score2) {
-		// TODO Auto-generated method stub
-		return score*score2;
+	protected double newCompundScore(double score, double score2) {
+		// Jul 29, changing to sum to allow for training via a linear classifier.
+		return score + score2;
 	}
 
 	private Tree getSubTree(Tree tree, String[] strings) {
@@ -740,14 +821,6 @@ public class CFGParser extends RuleBasedParser {
 				return tree;
 			}
 		}
-		/*for (Tree kid : tree.children()) {
-			for (String label : strings) {
-				if (kid.label().value().equals(label)) {
-					return kid;
-				}
-			}
-		}
-		 */
 		for (Tree kid : tree.children()) {
 			Tree subTree = getSubTree(kid, strings);
 			if (subTree != null)
@@ -782,7 +855,7 @@ public class CFGParser extends RuleBasedParser {
 		//  
 		//
 		
-		List<EntryWithScore<Unit>> unitsR = new CFGParser(null).parseHeader("duration (s)",
+		List<EntryWithScore<Unit>> unitsR = new CFGParser(null).parseHeader("production (t)",
 				null
 				//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}
 				//,{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}}

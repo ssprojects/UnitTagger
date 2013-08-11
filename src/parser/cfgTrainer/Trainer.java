@@ -19,7 +19,7 @@ import org.xml.sax.SAXException;
 import parser.CFGParser;
 import parser.HeaderUnitParser;
 import parser.RuleBasedParser;
-import parser.TokenScorer.UnitObject;
+import parser.UnitObject;
 import catalog.QuantityCatalog;
 import catalog.Unit;
 import eval.Test;

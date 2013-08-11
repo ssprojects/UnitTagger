@@ -5,7 +5,7 @@ import iitb.shared.EntryWithScore;
 import java.util.BitSet;
 import java.util.List;
 
-import parser.TokenScorer.UnitObject;
+import parser.UnitObject;
 
 import catalog.Unit;
 
