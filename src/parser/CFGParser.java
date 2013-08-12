@@ -523,7 +523,7 @@ public class CFGParser extends RuleBasedParser {
 			SymbolDictMatchThreshold,LemmaDictMatchThreshold,
 			PercentUnkInUnit,PercenUnkInUnitThreshold, CU2Bias, MultBias};
 			float weights[]=new float[]{0.5f,-0.05f,1f,
-					0f,-1.1f,0.01f,0.5f,-0.05f,
+					0f,-1f,0.01f,0.5f,-0.07f,
 					0.5f,0.5f,
 					-0.9f,-0.9f,-2f,0.5f,0.06f,0.05f};
 			// CU2bias should be more than unitbias to prefer compound units when one side is known e.g. people per sq km
@@ -778,7 +778,9 @@ public class CFGParser extends RuleBasedParser {
 			} else if (bestUnits[tokenScorer.unitState] == null || bestUnits[tokenScorer.unitState].size()==0) {
 				// a new base unit.
 				bestUnits[tokenScorer.unitState] = new Vector<UnitObject>();
-				bestUnits[tokenScorer.unitState].add(tokenScorer.newUnit(quantityDict.newUnit(hdrToks.subList(bestUTree.getSpan().getSource(), bestUTree.getSpan().getTarget()+1))));
+				int start = bestUTree.getSpan().getSource();
+				int endP = bestUTree.getSpan().getTarget();
+				bestUnits[tokenScorer.unitState].add(tokenScorer.newUnit(quantityDict.newUnit(hdrToks.subList(start, endP+1)), start, endP));
 				//if (tokenScorer.altUnitCounts > 1) bestUnits[tokenScorer.unitState+2] = null;
 				System.out.println("Created new unit "+bestUnits[tokenScorer.unitState]);
 				bestUnitsVec.add(bestUnits[tokenScorer.unitState].get(0));
@@ -854,12 +856,12 @@ public class CFGParser extends RuleBasedParser {
 		// 
 		//  
 		//
-		
-		List<EntryWithScore<Unit>> unitsR = new CFGParser(null).parseHeader("production (t)",
-				null
+		Vector<UnitObject> featureList = new Vector();
+		List<EntryWithScore<Unit>> unitsR = new CFGParser(null).getTopKUnits("MV ( ft/s )", 1, featureList,1);
+	//	List<EntryWithScore<Unit>> unitsR = new CFGParser(null).parseHeader("production (t)",	null
 				//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}
 				//,{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}}
-				,2);
+		//		,2);
 		//"billions usd", new short[][]{{(short) Tags.Mult.ordinal()},{(short) Tags.SU.ordinal()}});
 		//Loading g / m ( gr / ft )"); 
 		// Max. 10-min. average sustained wind Km/h
