@@ -30,16 +30,16 @@ import java.util.Vector;
 
 import org.apache.commons.lang.NotImplementedException;
 
-import parser.CFGParser.EnumIndex;
-import parser.CFGParser.Params;
-import parser.CFGParser.StateIndex;
-import parser.CFGParser.TagArrayIterator;
-import parser.CFGParser.TaggedToken;
-import parser.CFGParser.Token;
-import parser.CFGParser.WordIndex;
-import parser.CFGParser.EnumIndex.Tags;
-import parser.CFGParser.Params.FTypes;
-import parser.CFGParser.StateIndex.States;
+import parser.CFGParser4Header.EnumIndex;
+import parser.CFGParser4Header.Params;
+import parser.CFGParser4Header.StateIndex;
+import parser.CFGParser4Header.TagArrayIterator;
+import parser.CFGParser4Header.TaggedToken;
+import parser.CFGParser4Header.Token;
+import parser.CFGParser4Header.WordIndex;
+import parser.CFGParser4Header.EnumIndex.Tags;
+import parser.CFGParser4Header.Params.FTypes;
+import parser.CFGParser4Header.StateIndex.States;
 import parser.RuleBasedParser.State;
 import parser.cfgTrainer.FeatureVector;
 import parser.coOccurMethods.Co_occurrenceScores;
@@ -159,19 +159,18 @@ public class TokenScorer implements ConditionalLexicon {
 			if (Quantity.isUnitLess(unit.getParentQuantity())) {
 				state = multUnitState;
 			}
-			UnitObject unitObject = null;
-			if (trainMode) unitObject = new UnitObject(unit, 0);
+			UnitObject unitObject  = new UnitObject(unit, 0);
 			int start = res.hitPosition(h);
 			int end = res.hitEndPosition(h);
 			if (matcher.idToUnitMap.getType(id) != matcher.idToUnitMap.ConceptMatch) {
 				maxMatchLen = Math.max(maxMatchLen, res.hitLength(h));
 				//Quantity concept = matcher.idToUnitMap.getConcept(id);
 				score = score*params.weights[FTypes.DictMatchWeight.ordinal()];
-				 registerFeatureInfo(start, end, state, FTypes.DictMatchWeight, res.hitMatch(h), unit.getName(), unitObject);
+				 registerFeatureInfo(start, end, state, FTypes.DictMatchWeight, res.hitMatch(h), unit.getName(), trainMode?unitObject:null);
 				score += unitBias;
-				registerFeatureInfo(start, end, state, FTypes.UnitBias, 1, unit.getName(), unitObject);
+				registerFeatureInfo(start, end, state, FTypes.UnitBias, 1, unit.getName(), trainMode?unitObject:null);
 				score += (res.hitLength(h)-1)*params.weights[FTypes.MatchLength.ordinal()];
-				 registerFeatureInfo(start, end, state, FTypes.MatchLength, res.hitLength(h)-1, unit.getName(), unitObject);
+				 registerFeatureInfo(start, end, state, FTypes.MatchLength, res.hitLength(h)-1, unit.getName(), trainMode?unitObject:null);
 				List<String> unitToks = matcher.idToUnitMap.getTokens(id);
 
 				int startM = getMaximalTokens(res.hitMatch(h), unitToks,hdrToks,start,end,lastMatch);
@@ -185,7 +184,7 @@ public class TokenScorer implements ConditionalLexicon {
 				if (startM==endM) {
 					float freq = getFrequency(unit, hdrToks.get(startM), id);
 					score += (1-freq)*params.weights[FTypes.INLANG.ordinal()];
-					 registerFeatureInfo(start, end, state, FTypes.INLANG, (1-freq), unit.getName(), unitObject);
+					 registerFeatureInfo(start, end, state, FTypes.INLANG, (1-freq), unit.getName(), trainMode?unitObject:null);
 				}
 
 				float bestScore = 0;
@@ -199,7 +198,7 @@ public class TokenScorer implements ConditionalLexicon {
 					}
 				}
 				score += params.weights[FTypes.ContextWord.ordinal()]*bestScore;
-				 registerFeatureInfo(start, end, state, FTypes.ContextWord, bestScore, unit.getName(), unitObject);
+				 registerFeatureInfo(start, end, state, FTypes.ContextWord, bestScore, unit.getName(), trainMode?unitObject:null);
 
 				if (bestUnit[start][end][state] ==null || scores[start][end][state] < score-Float.MIN_VALUE) {
 					scores[start][end][state] = score;
@@ -371,6 +370,8 @@ public class TokenScorer implements ConditionalLexicon {
 				sentence.add(new Token(EnumIndex.Tags.Op, w));
 			} else if (w.equalsIgnoreCase("of")) {
 				sentence.add(new Token(EnumIndex.Tags.OF, w));
+			} else if (w.equals(CFGParser4Text.QuantityToken)) {
+				sentence.add(new Token(EnumIndex.Tags.Q,w));
 			} else if (bestUnit[i][i][multUnitState] != null) {
 				sentence.add(new Token(EnumIndex.Tags.Mult, w));
 			} else {

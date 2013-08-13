@@ -24,7 +24,7 @@ import catalog.QuantityReader;
 import catalog.Unit;
 import catalog.UnitMultPair;
 
-import parser.CFGParser;
+import parser.CFGParser4Header;
 
 import edu.stanford.nlp.util.IntPair;
 
@@ -40,7 +40,7 @@ public class SimpleParser implements HeaderUnitParser{
 	public static String[] WordSymbols = {"in","sl","no","are","Ch","per","point", "at","line","league","sheet","weber","shed","last","french","a","hand","mark","number","length","time","us","standard","from","natural","mass"};
 	public static float ThresholdWithConcept=0.7f;
 	public static float Threshold=0.9f;
-	CFGParser parser;
+	CFGParser4Header parser;
 	static HashSet<String> wordSymbolsHash=new HashSet<String>(Arrays.asList(WordSymbols));
 	boolean debug;
 	Element options;

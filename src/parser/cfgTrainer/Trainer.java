@@ -16,7 +16,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import parser.CFGParser;
+import parser.CFGParser4Header;
 import parser.HeaderUnitParser;
 import parser.RuleBasedParser;
 import parser.UnitObject;
@@ -32,7 +32,7 @@ public class Trainer {
 		int total = 0;
 		Vector<String> applicableRules = new Vector<String>();
 		QuantityCatalog quantDict = new QuantityCatalog((Element)null);
-		CFGParser parser = new CFGParser(null, quantDict);
+		CFGParser4Header parser = new CFGParser4Header(null, quantDict);
 		RuleBasedParser ruleParser = new RuleBasedParser(null,quantDict);
 		int k = 1;
 		Vector<TrainingInstance> trainSet = new Vector<TrainingInstance>();

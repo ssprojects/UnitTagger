@@ -3,7 +3,7 @@ package parser.cfgTrainer;
 import java.util.Arrays;
 import java.util.Vector;
 
-import parser.CFGParser.Params.FTypes;
+import parser.CFGParser4Header.Params.FTypes;
 
 public class FeatureVector {
 	float fvals[];

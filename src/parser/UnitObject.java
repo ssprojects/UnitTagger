@@ -1,7 +1,7 @@
 package parser;
 
 import iitb.shared.EntryWithScore;
-import parser.CFGParser.Params.FTypes;
+import parser.CFGParser4Header.Params.FTypes;
 import parser.cfgTrainer.FeatureVector;
 import catalog.Unit;
 

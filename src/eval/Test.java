@@ -20,7 +20,7 @@ import org.xml.sax.SAXException;
 import catalog.QuantityCatalog;
 import catalog.Unit;
 
-import parser.CFGParser;
+import parser.CFGParser4Header;
 import parser.HeaderUnitParser;
 import parser.RuleBasedParser;
 
@@ -92,7 +92,7 @@ public class Test {
 	}
 	public static void main(String args[]) throws IOException, ParserConfigurationException, SAXException {
 		QuantityCatalog dict = new QuantityCatalog((Element)null);
-		HeaderUnitParser[] parsers = new HeaderUnitParser[]{new CFGParser(null,dict)};
+		HeaderUnitParser[] parsers = new HeaderUnitParser[]{new CFGParser4Header(null,dict)};
 		new Test(parsers,GroundTruthFile);
 	}
 }

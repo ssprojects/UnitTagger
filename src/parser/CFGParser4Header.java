@@ -40,10 +40,7 @@ import catalog.WordnetFrequency;
 
 import conditionalCFG.ConditionalCFGParser;
 
-import parser.CFGParser.EnumIndex.Tags;
-import parser.CFGParser.StateIndex.States;
-import parser.CFGParser4Training.StateIndex;
-import parser.CFGParser4Training.TaggedToken;
+import parser.CFGParser4Header.EnumIndex.Tags;
 import parser.cfgTrainer.FeatureVector;
 import parser.coOccurMethods.PrUnitGivenWord;
 
@@ -65,7 +62,7 @@ import edu.stanford.nlp.util.IntPair;
 import edu.stanford.nlp.util.ScoredObject;
 import edu.stanford.nlp.util.StringUtils;
 
-public class CFGParser extends RuleBasedParser {
+public class CFGParser4Header extends RuleBasedParser {
 	protected Co_occurrenceStatistics coOccurStats;
 	/*
 	 * 
@@ -113,9 +110,10 @@ public class CFGParser extends RuleBasedParser {
 		"U ::- Mult 1" + "\n" +
 
 		"IN_Mult ::- IN Mult 1f" + "\n" +
-		"Mult_OF ::- Mult OF 1f" + "\n" +
-
-		"BU ::- CU2 Sep_SU 1\n"+
+		"Mult_OF ::- Mult OF 1f" + "\n";
+		;
+		String basicUnitGrammar = 
+			"BU ::- CU2 Sep_SU 1\n"+
 		"BU ::- CU2 1\n"+
 		"BU ::- SU 1"+ "\n" +
 
@@ -129,12 +127,10 @@ public class CFGParser extends RuleBasedParser {
 
 		"SU_MW ::- SU_W 1f"+ "\n" + 
 		"SU_MW ::- SU_W Op 1f"+ "\n" + 
-		"SU_MW ::- SU_MW SU_W 1f"+ "\n"
-		;
-
+		"SU_MW ::- SU_MW SU_W 1f"+ "\n";
 	// TODO: allow a multiplier for simple units like in mg/thousand litres.
 	public static class EnumIndex implements Index<String> {
-		public enum Tags {SU, SU_W, W, Mult, IN, OF, Op,PER,Number,Boundary};
+		public enum Tags {SU, SU_W, W, Mult, IN, OF, Op,PER,Q,Boundary};
 		public short allowedTags[][] = {
 				{(short) Tags.SU.ordinal(),(short) Tags.SU_W.ordinal(),(short) Tags.W.ordinal()},
 				{(short) Tags.SU.ordinal(),(short) Tags.SU_W.ordinal(),(short) Tags.W.ordinal()},
@@ -144,7 +140,7 @@ public class CFGParser extends RuleBasedParser {
 				{(short) Tags.W.ordinal(),(short) Tags.OF.ordinal()},
 				{(short) Tags.W.ordinal(), (short) Tags.Op.ordinal()},
 				{(short) Tags.PER.ordinal(),(short) Tags.SU.ordinal(),(short)Tags.W.ordinal()},
-				{(short) Tags.Number.ordinal()},
+				{(short) Tags.Q.ordinal()},
 				{(short) Tags.Boundary.ordinal()}
 		};
 		TaggedToken boundaryToken;
@@ -261,7 +257,7 @@ public class CFGParser extends RuleBasedParser {
 		public StateIndex(EnumIndex tagIndex) {
 			this.tagIndex = tagIndex;
 		}
-		public enum States {ROOT,ROOT_,Junk,Junk_U,Sep_U,IN_U,U, UL,IN_Mult,Mult_OF,BU,CU2,Sep_SU,SU_MW, PER_SU};// W, Mult, IN, OF, Op,Boundary};
+		public enum States {ROOT,ROOT_,Junk,Junk_U,Sep_U,IN_U,U, UL,IN_Mult,Mult_OF,BU,CU2,Sep_SU,SU_MW, PER_SU,Junk_QU,Q_U};// W, Mult, IN, OF, Op,Boundary};
 		@Override
 		public Iterator<String> iterator() {
 			return null;
@@ -566,10 +562,10 @@ public class CFGParser extends RuleBasedParser {
 			this.tg = tag;
 		}
 	}
-	public CFGParser(Element options) throws IOException, ParserConfigurationException, SAXException {
+	public CFGParser4Header(Element options) throws IOException, ParserConfigurationException, SAXException {
 		this(options,null);
 	}
-	public CFGParser(Element options, QuantityCatalog quantMatcher) throws IOException, ParserConfigurationException, SAXException {
+	public CFGParser4Header(Element options, QuantityCatalog quantMatcher) throws IOException, ParserConfigurationException, SAXException {
 		super(options,quantMatcher);
 		//index.add(Lexicon.BOUNDARY_TAG);
 		EnumIndex tagIndex = new EnumIndex();
@@ -614,7 +610,7 @@ public class CFGParser extends RuleBasedParser {
 		}
 	}
 	protected String getGrammar() {
-		return grammar;
+		return grammar+basicUnitGrammar;
 	}
 	public List<EntryWithScore<Unit>> parseHeader(String hdr) {
 		return parseHeader(hdr, null, 0);
@@ -857,8 +853,8 @@ public class CFGParser extends RuleBasedParser {
 		//  
 		//
 		Vector<UnitObject> featureList = new Vector();
-		List<EntryWithScore<Unit>> unitsR = new CFGParser(null).getTopKUnits("MV ( ft/s )", 1, featureList,1);
-	//	List<EntryWithScore<Unit>> unitsR = new CFGParser(null).parseHeader("production (t)",	null
+		List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).getTopKUnits("MV ( ft/s )", 1, featureList,1);
+	//	List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).parseHeader("production (t)",	null
 				//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}
 				//,{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}}
 		//		,2);

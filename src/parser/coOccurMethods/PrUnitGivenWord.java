@@ -8,10 +8,10 @@ import catalog.QuantityCatalog;
 import catalog.Unit;
 import catalog.WordFrequency;
 import edu.stanford.nlp.util.Index;
-import parser.CFGParser.EnumIndex;
-import parser.CFGParser.StateIndex;
+import parser.CFGParser4Header.EnumIndex;
+import parser.CFGParser4Header.StateIndex;
 import parser.TokenScorer;
-import parser.CFGParser.Params.FTypes;
+import parser.CFGParser4Header.Params.FTypes;
 
 public class PrUnitGivenWord implements Co_occurrenceScores  {
 	public static final float CoccurMixWeight=0.1f;
