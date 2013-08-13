@@ -257,7 +257,7 @@ public class CFGParser4Header extends RuleBasedParser {
 		public StateIndex(EnumIndex tagIndex) {
 			this.tagIndex = tagIndex;
 		}
-		public enum States {ROOT,ROOT_,Junk,Junk_U,Sep_U,IN_U,U, UL,IN_Mult,Mult_OF,BU,CU2,Sep_SU,SU_MW, PER_SU,Junk_QU,Q_U};// W, Mult, IN, OF, Op,Boundary};
+		public enum States {ROOT,ROOT_,Junk,Junk_U,Sep_U,IN_U,U, UL,IN_Mult,Mult_OF,BU,CU2,Sep_SU,SU_MW, PER_SU,Junk_QU,Q_U,BU_Q};// W, Mult, IN, OF, Op,Boundary};
 		@Override
 		public Iterator<String> iterator() {
 			return null;
@@ -642,7 +642,7 @@ public class CFGParser4Header extends RuleBasedParser {
 				Tree tree = stree.object();
 				Vector<Tree> unitNodes = new Vector<Tree>();
 				tree.setSpans();
-				getUnitNodes(tree, unitNodes,StateIndex.States.U.name());
+				getTopUnitNodes(tree, unitNodes);
 				float treeScore = (float) parser.scoreBinarizedTree(tree, 0,debugLvl-1);
 				if (debugLvl > 0) System.out.println(tree + " " + tree.score()+ " "+treeScore);
 				FeatureVector treeFeatureVector=null;
@@ -710,6 +710,9 @@ public class CFGParser4Header extends RuleBasedParser {
 		return null;
 	}
 
+	protected void getTopUnitNodes(Tree tree, Vector<Tree> unitNodes) {
+		getUnitNodes(tree,unitNodes,StateIndex.States.U.name());
+	}
 	private FeatureVector extractTreeFeatureVector(Tree tree, int start, FeatureVector fvec) {
 		if (tree.isLeaf()) {
 			return fvec;
@@ -804,7 +807,8 @@ public class CFGParser4Header extends RuleBasedParser {
 		} else if (multUnit!=null) {
 			bestUnitsVec.add(multUnit);
 		} else {
-			throw new NotImplementedException("Unknown state ");
+			//throw new NotImplementedException("Unknown state ");
+			return;
 		}
 	}
 

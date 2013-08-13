@@ -11,9 +11,12 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+import parser.CFGParser4Header.StateIndex;
+
 import catalog.QuantityCatalog;
 import catalog.Unit;
 import edu.stanford.nlp.parser.lexparser.Lexicon;
+import edu.stanford.nlp.trees.Tree;
 
 public class CFGParser4Text extends CFGParser4Header {
 	public CFGParser4Text(Element options) throws IOException,
@@ -40,18 +43,40 @@ public class CFGParser4Text extends CFGParser4Header {
         "Junk ::= W 1f"+ "\n" +
         
         "Q_U ::- Q U 1f" +    "\n" + //Quantity followed by a unit.
-        "Q_U ::- U Q 1f" +    "\n" +                // a units followed by a quantity e.g. "$500"
+        "Q_U ::- BU_Q 1f" +    "\n" +                // a units followed by a quantity e.g. "$500"
         "Q_U ::- Q 1f" + "\n" +                    // unitless and multiplier-less quantity e.g. Population of India is 1,200,000
+        "Q_U ::- BU_Q Mult 1" + "\n"+
         //Assuming Q is tag standing for a quantity, expressed either in words or numbers, which has been recognized and normalized
-        "U ::= BU 1f"+ "\n";
+        "U ::= BU 1f"+ "\n" +
+        "U ::- BU Mult 1" + "\n" +
+		"U ::- Mult BU 1" + "\n" +
+		"U ::- Mult 1" + "\n" + 
+		"BU_Q ::- BU Q 1f" +    "\n" 
+        ;
        
 	@Override
 	protected String getGrammar() {
 		return textGrammar + basicUnitGrammar;
 	}
+	
+	protected void getUnitNodes(Tree tree, Vector<Tree> unitNodes, String unitLabel) {
+		if (tree.label().value().equals(unitLabel)) {
+			unitNodes.add(tree);
+			return;
+		}
+		for (Tree kid : tree.children()) {
+			getUnitNodes(kid, unitNodes, unitLabel);
+		}
+	}
+	protected void getTopUnitNodes(Tree tree, Vector<Tree> unitNodes) {
+		getUnitNodes(tree,unitNodes,StateIndex.States.U.name());
+		if (unitNodes.size()==0) {
+			getUnitNodes(tree,unitNodes,StateIndex.States.Q_U.name());
+		}
+	}
 	public static void main(String args[]) throws Exception {
 		Vector<UnitObject> featureList = new Vector();
-		List<EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeader("$" + QuantityToken + " million",	null
+		List<EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeader(QuantityToken,	null
 				//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}
 				//,{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}}
 				,1);
