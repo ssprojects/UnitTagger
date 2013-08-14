@@ -3,6 +3,7 @@ package parser;
 import iitb.shared.EntryWithScore;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
@@ -11,6 +12,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+import parser.CFGParser4Header.EnumIndex.Tags;
 import parser.CFGParser4Header.StateIndex;
 
 import catalog.QuantityCatalog;
@@ -76,14 +78,18 @@ public class CFGParser4Text extends CFGParser4Header {
 	}
 	public static void main(String args[]) throws Exception {
 		Vector<UnitObject> featureList = new Vector();
-		List<EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeader(QuantityToken,	null
-				//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}
-				//,{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}}
+		Vector<String> explanation = new Vector<String>();
+		List<EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeaderExplain("by qqqq paise per litre", explanation,1); 
+		/*List<EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeader("year qqqq billion kilowatt hour",	null
+				//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.Q.ordinal()},{(short) Tags.Mult.ordinal()},{(short) Tags.SU.ordinal()}
+				//,{(short) Tags.SU.ordinal()}}
 				,1);
+		*/
 		if (unitsR != null) {
 			for (EntryWithScore<Unit> unit : unitsR) {
 				System.out.println(unit.getKey().getName()+ " " +unit.getScore());
 			}
+			if (explanation.size() > 0) System.out.println(explanation.get(0));
 		}
 		
 	}

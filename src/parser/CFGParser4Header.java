@@ -841,12 +841,12 @@ public class CFGParser4Header extends RuleBasedParser {
 	}
 	@Override
 	public List<EntryWithScore<Unit>> parseHeaderExplain(String hdr,
-			List<String> explanation) throws IOException {
-		List<EntryWithScore<Unit>> units = super.parseHeaderExplain(hdr, explanation);
+			List<String> explanation, int debugLvl) throws IOException {
+		List<EntryWithScore<Unit>> units = super.parseHeaderExplain(hdr, explanation, debugLvl);
 		if (explanation != null && explanation.size()==1) {
 			return units;
 		}
-		return parseHeader(hdr);
+		return parseHeader(hdr,null,debugLvl);
 	}
 	public static void main(String args[]) throws Exception {
 		// ,  

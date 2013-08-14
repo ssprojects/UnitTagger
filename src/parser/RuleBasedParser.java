@@ -385,7 +385,7 @@ public class RuleBasedParser extends SimpleParser {
 		}
 	}
 	List<Rule> rules;
-	public List<EntryWithScore<Unit> > parseHeaderExplain(String hdr, List<String> applicableRules) throws IOException {
+	public List<EntryWithScore<Unit> > parseHeaderExplain(String hdr, List<String> applicableRules, int debugLvl) throws IOException {
 		applicableRules.clear();
 		State hdrToks = new State(hdr);
 		List<EntryWithScore<Unit> > unitsToRet = null;
