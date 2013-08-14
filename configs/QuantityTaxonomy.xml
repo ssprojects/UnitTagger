@@ -233,6 +233,12 @@
 	<String>INR</String>
       </lemmaset>
     </unit>
+    <unit name="Indian paisa" symbol="" conversionFactor="">
+      <lemmaset>
+	<String>paisa</String>
+	<String>paise</String>
+      </lemmaset>
+    </unit>
     <unit name="Bolivian boliviano" symbol="Bs." conversionFactor="">
       <lemmaset>
 	<String>BOB</String>
@@ -1211,6 +1217,13 @@
 	<String>centimeter</String>
 	<String>centimeters</String>
 	<String>cms</String>
+      </lemmaset>
+    </unit>
+    <unit name="millimetre" symbol="mm" conversionFactor="≡ 0.01 m">
+      <lemmaset>
+	<String>millimeter</String>
+	<String>millimeters</String>
+	<String>mms</String>
       </lemmaset>
     </unit>
     <unit name="mickey" symbol=" " conversionFactor="= 1.27×10−4 m">
@@ -3312,6 +3325,7 @@
     </unit>
     <unit name="kilowatt-hour; Board of Trade Unit" symbol="kW·h; B.O.T.U." conversionFactor="= 3.6×106 J">
       <lemmaset>
+	<String>kilowatt hour</String>
       </lemmaset>
     </unit>
     <unit name="litre-atmosphere" symbol="l atm; sl" conversionFactor="= 101.325 J">
