@@ -257,7 +257,7 @@ public class CFGParser4Header extends RuleBasedParser {
 		public StateIndex(EnumIndex tagIndex) {
 			this.tagIndex = tagIndex;
 		}
-		public enum States {ROOT,ROOT_,Junk,Junk_U,Sep_U,IN_U,U, UL,IN_Mult,Mult_OF,BU,CU2,Sep_SU,SU_MW, PER_SU,Junk_QU,Q_U,BU_Q};// W, Mult, IN, OF, Op,Boundary};
+		public enum States {ROOT,ROOT_,Junk,Junk_U,Sep_U,IN_U,U, UL,IN_Mult,Mult_OF,BU,CU2,Sep_SU,SU_MW, PER_SU,Junk_QU,Q_U,SU_Q,BU_Q,CU2_Q};// W, Mult, IN, OF, Op,Boundary};
 		@Override
 		public Iterator<String> iterator() {
 			return null;
@@ -367,7 +367,7 @@ public class CFGParser4Header extends RuleBasedParser {
 			return (isCU2(state) || tagIndex.isSimpleUnit(state)) || isUnit(state);
 		}
 		public boolean isCU2(int state) {
-			return isState(States.CU2,state);
+			return isState(States.CU2,state) || isState(States.CU2_Q,state);
 		}
 		public boolean isIN_U(int state) {
 			return isState(States.IN_U,state);
@@ -749,7 +749,7 @@ public class CFGParser4Header extends RuleBasedParser {
 	UnitObject tmpEntry = new UnitObject(null, 0);
 	private void getUnit(Tree unitTree, List<String> hdrToks,List<UnitObject> bestUnitsVec) {
 		bestUnitsVec.clear();
-		Tree bestUTree = getSubTree(unitTree,new String[]{"BU","SU"});
+		Tree bestUTree = getSubTree(unitTree,new String[]{"BU_Q", "BU","SU"});
 		Tree multTree = getSubTree(unitTree,new String[]{"Mult"});
 
 		if (bestUTree != null) {
@@ -757,7 +757,7 @@ public class CFGParser4Header extends RuleBasedParser {
 			//float scoreArr[] = tokenScorer.scores[bestUTree.getSpan().getSource()][bestUTree.getSpan().getTarget()];
 
 			// a new compound unit.
-			if (bestUTree.numChildren()==1 && bestUTree.getChild(0).label().value().equals("CU2")&&tokenScorer.dictionaryMatch(bestUTree.getSpan().getSource(),bestUTree.getSpan().getTarget()) < 0.9) {
+			if (bestUTree.numChildren()==1 && bestUTree.getChild(0).label().value().startsWith("CU2")&&tokenScorer.dictionaryMatch(bestUTree.getSpan().getSource(),bestUTree.getSpan().getTarget()) < 0.9) {
 				Vector<Tree> simpleUnits = new Vector<Tree>();
 				getUnitNodes(bestUTree, simpleUnits, Tags.SU.name());
 				if (simpleUnits.size()!=2) {
