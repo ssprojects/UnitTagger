@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Vector;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -19,12 +20,22 @@ import org.xml.sax.SAXException;
 import parser.CFGParser4Header;
 import parser.HeaderUnitParser;
 import parser.RuleBasedParser;
-import parser.UnitObject;
+import parser.UnitFeatures;
+import parser.UnitSpan;
+import structlearner.ConstraintsGenerator;
+import iitb.CRF.DataSequence;
+import structlearner.StructTrainer;
+import structlearner.StructTrainer.Constraint;
+import structlearner.StructTrainer.LossScaler;
 import catalog.QuantityCatalog;
 import catalog.Unit;
 import eval.Test;
 
-public class Trainer {
+public class Trainer implements ConstraintsGenerator {
+	Vector<TrainingInstance> trainSet;
+	CFGParser4Header parser;
+	public static int k = 3;
+	Properties options = new Properties();
 	public Trainer(String labeledDataFile) throws Exception {
 		Element elem = XMLConfigs.load(new FileReader(labeledDataFile));
 		NodeList nodeList = elem.getElementsByTagName("r");
@@ -34,17 +45,13 @@ public class Trainer {
 		QuantityCatalog quantDict = new QuantityCatalog((Element)null);
 		CFGParser4Header parser = new CFGParser4Header(null, quantDict);
 		RuleBasedParser ruleParser = new RuleBasedParser(null,quantDict);
-		int k = 1;
-		Vector<TrainingInstance> trainSet = new Vector<TrainingInstance>();
+		trainSet = new Vector<TrainingInstance>();
 		for (int r = 0; r < len; r++) {
 			total++;
 			Element rec = (Element) nodeList.item(r);
 			String hdr = XMLConfigs.getElement(rec, "h").getTextContent();
 			NodeList unitList = rec.getElementsByTagName("u");
 			String trueUnits = "";
-			if (r==0) {
-				//System.out.println();
-			}
 			if (unitList != null && unitList.getLength()>0) {
 				for (int u = 0; u < unitList.getLength();u++) {
 					if (u > 0) trueUnits.concat("|");
@@ -52,17 +59,23 @@ public class Trainer {
 					trueUnits += unitList.item(u).getTextContent().toLowerCase();
 				}
 			}
+			
 			List<EntryWithScore<Unit>> extractedUnits = ruleParser.parseHeaderExplain(hdr, applicableRules);
 			if (applicableRules.size()==1) {
 				if (unitsMatchedIndex(trueUnits,extractedUnits)>=0) continue;
 				throw new Exception("Mistake in rule-based extractor for "+hdr+trueUnits.toString()+ " "+extractedUnits.toString());
 			} else {
-				Vector<UnitObject> featureList = new Vector();
-				extractedUnits = parser.getTopKUnits(hdr, k, featureList,1 );
-				trainSet.add(new TrainingInstance(featureList, unitsMatchedIndex(trueUnits, featureList)));
+				Vector<UnitFeatures> featureList = new Vector();//
+				extractedUnits = parser.parseHeader(hdr, null, new UnitSpan(trueUnits), 1, 1, featureList);
+				int index = unitsMatchedIndex(trueUnits, extractedUnits);
+				if (!(index == 0 && trueUnits.length()==0 || index == 1)) {
+					System.out.println("True unit not found");
+				}
+				trainSet.add(new TrainingInstance(hdr,trueUnits));
 			}
 		}
-		// now train the parameters using the training set.
+		StructTrainer structTrainer = new StructTrainer(this);
+		structTrainer.train(parser.getParamsArray(), options);
 	}
 	private int unitsMatchedIndex(String trueUnits,
 			List<? extends EntryWithScore<Unit>> extractedUnits) {
@@ -85,5 +98,42 @@ public class Trainer {
 	}
 	public static void main(String args[]) throws Exception {
 		new Trainer(Test.GroundTruthFile);
+	}
+	@Override
+	public Vector<Constraint> getViolatedConstraints(double[] lambda,int iterNum, LossScaler lossScaler) throws Exception {
+		return null;
+	}
+	@Override
+	public Vector<Constraint> getViolatedConstraints(double[] lambda, DataSequence dataSeq, int iterNum, int numRecord, LossScaler lossScaler) {
+		String hdr = trainSet.get(numRecord).hdr;
+		String trueUnits= trainSet.get(numRecord).trueUnits;
+		Vector<UnitFeatures> featureList = new Vector();
+		parser.getTopKUnits(hdr, k, featureList,1);
+//		trainSet.add(new TrainingInstance(featureList, unitsMatchedIndex(trueUnits, featureList)));
+		int matchIndex = unitsMatchedIndex(trueUnits, featureList);
+		int returnedCons=-1;
+		if (matchIndex < 0) {
+			// no match.
+			if (trueUnits != null && trueUnits.length() > 0) returnedCons = 0;
+		} else {
+			
+		}
+		return null;
+	}
+	@Override
+	public double maxLoss(DataSequence dataSeq, int numRecord) {
+		return 1;
+	}
+	@Override
+	public double minNonZeroLoss(DataSequence dataSeq, int numRecord) {
+		return 1;
+	}
+	@Override
+	public double dataDiameter() {
+		return 0;
+	}
+	@Override
+	public int instanceCount() {
+		return trainSet.size();
 	}
 }

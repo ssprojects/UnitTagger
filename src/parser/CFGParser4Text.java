@@ -81,7 +81,7 @@ public class CFGParser4Text extends CFGParser4Header {
 		}
 	}
 	public static void main(String args[]) throws Exception {
-		Vector<UnitObject> featureList = new Vector();
+		Vector<UnitFeatures> featureList = new Vector();
 		Vector<String> explanation = new Vector<String>();
 		List<EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeaderExplain("by $qqqq per litre", explanation,1); 
 		/*List<EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeader("year qqqq billion kilowatt hour",	null

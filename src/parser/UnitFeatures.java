@@ -5,12 +5,12 @@ import parser.CFGParser4Header.Params.FTypes;
 import parser.cfgTrainer.FeatureVector;
 import catalog.Unit;
 
-public class UnitObject extends EntryWithScore<Unit> {
+public class UnitFeatures extends EntryWithScore<Unit> {
 	FeatureVector fvals;
-	public UnitObject(Unit key, double score) {
+	public UnitFeatures(Unit key, double score) {
 		super(key, score);
 	}
-	public UnitObject(Unit unit, double d,UnitObject unit1, UnitObject unit2) {
+	public UnitFeatures(Unit unit, double d,UnitFeatures unit1, UnitFeatures unit2) {
 		this(unit,d);
 		if (unit1 != null && unit1.fvals != null) {
 			if (fvals==null) setFvals();
@@ -40,10 +40,10 @@ public class UnitObject extends EntryWithScore<Unit> {
 		fvals = new FeatureVector(size);
 		if (oldFVals != null) fvals.add(oldFVals);
 	}
-	public void checkCorrectness(float wts[]) {
+	public void checkCorrectness(double[] weights) {
 		float fw=0;
 		for (int i = 0; i < fvals.size(); i++) {
-			fw += wts[i]*fvals.get(i);
+			fw += weights[i]*fvals.get(i);
 		}
 		assert(Math.abs(fw-getScore()) < 1e-6);
 	}

@@ -34,6 +34,8 @@ import org.apache.lucene.util.Version;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+import parser.UnitSpan;
+
 /* sunita: Sep 8, 2012 */
 public class QuantityCatalog implements WordFrequency {
 	private static final double MinContextOverlap = 0.5;
@@ -56,7 +58,6 @@ public class QuantityCatalog implements WordFrequency {
 	MultiValueMap conceptDict = new MultiValueMap();
 	public static String QuantTaxonomyPath = "configs/QuantityTaxonomy.xml";
 	ArrayList<Quantity> taxonomy;
-	Quantity numberQuantity;
 	public static class IdToUnitMap extends Vector<Unit> {
 		public static final byte ConceptMatch = (byte)'c';
 		public static final byte SymbolMatch = (byte)'s';
@@ -83,13 +84,17 @@ public class QuantityCatalog implements WordFrequency {
 	
 	SignatureSetImpl<String> signSet;
 	Analyzer analyzer;
-	public static String impDelims = "£$#\\/%\\(\\)\\[\\]";
+	public static String impDelims = "£$#\\/%\\(\\)\\[";
 	// 17/7/2013: remove - because words like year-end and ten-year were getting marked as year.
-	public static String delims =impDelims +  "!#&'\\*\\+,\\.:;\\<=\\>\\?@\\^\\_\\`\\{\\|\\}~ \t";//NumberUnitParser.numberUnitDelims+"|\\p{Punct})";//)";
+	public static String delims =impDelims +  "!#&'\\*\\+,\\.:;\\<=\\>\\?@\\^\\_\\`\\|~ \t\\]\\{\\}";//NumberUnitParser.numberUnitDelims+"|\\p{Punct})";//)";
 	public static List<String> getTokens(String name) {
 		return getTokens(name,null);
 	}
 	public static List<String> getTokens(String name, TIntArrayList brackets) {
+		return getTokens(name,brackets,null,null);
+	}
+		
+	public static List<String> getTokens(String name, TIntArrayList brackets, String specialTokens[], TIntArrayList specialTokenPosition) {
 		/*
 		if (name.indexOf(' ') < 0) {
 			List<String> toks = new Vector<String>();
@@ -104,6 +109,13 @@ public class QuantityCatalog implements WordFrequency {
 		StringTokenizer textTok = new StringTokenizer(name, delims, true);
 		while (textTok.hasMoreTokens()) {
 			String tokStr=textTok.nextToken();
+			int tpos;
+			if (specialTokens != null && (tpos = ArrayUtils.find(specialTokens, tokStr)) >= 0) {
+				if (specialTokenPosition !=null) {
+					specialTokenPosition.add((tpos << 16) + toks.size());
+				}
+				continue;
+			}
 			if (delims.indexOf(tokStr)==-1 || impDelims.indexOf(tokStr)!=-1) {	 
 				char ch = tokStr.charAt(0);
 				if (ch=='(' || ch == ')' || ch=='[' || ch == ']') {
@@ -176,8 +188,6 @@ public class QuantityCatalog implements WordFrequency {
 					idToUnitMap.add(u,lemmaToks,idToUnitMap.LemmaMatch);
 				}
 			}
-			if (q.getConcept().equals("Number"))
-				numberQuantity=	q;
 			conceptDict.put(q.getConcept().toLowerCase().trim(), q);
 			List<String> ctoks = getTokens(q.getConcept());
 			tokenDict.put(signSet.toSignSet(ctoks), idToUnitMap.size());
@@ -308,7 +318,7 @@ public class QuantityCatalog implements WordFrequency {
 			if (!(multUnits==null || multUnits.size()==0 || candUnitName.length() == 0)) { 
 				Unit multiplier = null;
 				for (EntryWithScore<Unit> multUnit : multUnits) {
-					if (multUnit.getKey().getParentQuantity()==numberQuantity) {
+					if (Quantity.isUnitLess(multUnit.getKey().getParentQuantity())) {
 						multiplier=multUnit.getKey();
 						break;
 					}
@@ -320,7 +330,7 @@ public class QuantityCatalog implements WordFrequency {
 					List<EntryWithScore<Unit>> multUnits2 = (candUnitName.length() > 0?getTopK(candUnitName, null, matchThreshold):null);
 					if (!(multUnits2==null || multUnits2.size()==0 || candUnitName.length() == 0)) { 
 						for (EntryWithScore<Unit> multUnit : multUnits2) {
-							if (multUnit.getKey().getParentQuantity()==numberQuantity) {
+							if (Quantity.isUnitLess(multUnit.getKey().getParentQuantity())) {
 								multiplier=multUnit.getKey();
 								candUnitName=candMult; // interchanged...
 								break;
@@ -418,23 +428,23 @@ public class QuantityCatalog implements WordFrequency {
 	}
 	public static void main(String args[]) throws Exception {
 		String tests[][] = {
-				{"$mil", "net worth", "usd [million]"},
-				{"millions of Miles", "Distance from earth in millions miles", "million mile"},
-				{"FY 2006, USD billion", "", "billion $"},
-				{"million Miles", "", "million mile"},
 				{"sq.km.","Area","square kilometre"},
+				{"million Km", "", "kilometre [million]"},
+				{"$mil", "net worth", "united states dollar [million]"},
+				{"millions of Miles", "Distance from earth in millions miles", "mile [million]"},
+				{"FY 2006, USD billion", "", "united states dollar [billion]"},
 				{"cm", "Diameter", "centimetre"},
 				{"in", "length", "inch"},
 				{"\"", "length", "inch"},
 				{"Miles", "", "mile"},
 				{"Miles(approx)", "", "mile"},
-				{"mil $", "", "million $"}, 
-				{"$", "net worth", "$"},
+				{"mil $", "", "united states dollar [million]"}, 
+				{"$", "net worth", "united states dollar"},
 				{"ft./s", "Average Length","foot"},
 				{"m", "value", "metre"},
 				{"y", "decay, half-life", "year"}, // the spurious a needs to be removed.
 				{"h", "decay, half-life", "hour"},
-				{"km²","","square kilometer"}
+				{"km²","","square kilometre"}
 		};
 		QuantityCatalog matcher = new QuantityCatalog(QuantityReader.loadQuantityTaxonomy(QuantTaxonomyPath));
 		
@@ -450,7 +460,7 @@ public class QuantityCatalog implements WordFrequency {
 			//System.out.println(tests[i][0]+"--->"+toks);
 			List<EntryWithScore<Unit>> matches = matcher.getTopK(tests[i][0], tests[i][1], MinMatchThreshold);
 			if (!(matches != null && matches.size()>0 && matches.get(0).getKey().getBaseName().equalsIgnoreCase(tests[i][2]))) {
-				throw new Exception("Mistake for "+tests[i][0]+ " predicted "+matches.get(0).getKey().getBaseName());
+				System.out.println("Mistake for "+tests[i][0]+ " predicted "+ (matches != null?matches.get(0).getKey().getBaseName():""));
 			}
 		}
 	}

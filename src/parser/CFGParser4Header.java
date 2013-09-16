@@ -273,7 +273,9 @@ public class CFGParser4Header extends RuleBasedParser {
 		public String get(int i) {
 			return (i < tagIndex.size())?tagIndex.get(i):States.values()[i-tagIndex.size()].name();
 		}
-
+		public int indexOf(States state) {
+			return state.ordinal()+tagIndex.size();
+		}
 		@Override
 		public int indexOf(String o) {
 			try {
@@ -365,6 +367,9 @@ public class CFGParser4Header extends RuleBasedParser {
 		}
 		public boolean isBaseUnit(int state) {
 			return (isCU2(state) || tagIndex.isSimpleUnit(state)) || isUnit(state);
+		}
+		public boolean hasUnit(int state) {
+			return isBaseUnit(state) || isState(States.UL, state);
 		}
 		public boolean isCU2(int state) {
 			return isState(States.CU2,state) || isState(States.CU2_Q,state);
@@ -518,7 +523,7 @@ public class CFGParser4Header extends RuleBasedParser {
 			WithinBracket,AfterIN,
 			SymbolDictMatchThreshold,LemmaDictMatchThreshold,
 			PercentUnkInUnit,PercenUnkInUnitThreshold, CU2Bias, MultBias};
-			float weights[]=new float[]{0.5f,-0.05f,1f,
+			double[] weights=new double[]{0.5f,-0.05f,1f,
 					0f,-1f,0.01f,0.5f,-0.07f,
 					0.5f,0.5f,
 					-0.9f,-0.9f,-2f,0.5f,0.06f,0.05f};
@@ -585,7 +590,7 @@ public class CFGParser4Header extends RuleBasedParser {
 		ug.purgeRules();
 		Index<String> wordIndex = new WordIndex(this.quantityDict.tokenDict);
 		coOccurStats = new Co_occurrenceStatistics(options, quantityDict);
-		tokenScorer = new TokenScorer(index, tagIndex,quantityDict,wordIndex, new WordnetFrequency(),new PrUnitGivenWord(coOccurStats));
+		tokenScorer = new TokenScorer(index, tagIndex,quantityDict,wordIndex, wordFreq,new PrUnitGivenWord(coOccurStats));
 		Options op = new Options();
 		params = new Params();
 		tmpFVec = new FeatureVector(params.numFeatures());
@@ -617,27 +622,55 @@ public class CFGParser4Header extends RuleBasedParser {
 	}
 	
 
-	List<UnitObject > bestUnits = new Vector<UnitObject>();
-	List<UnitObject> bestUnits2 = new Vector<UnitObject>();
+	List<UnitFeatures > bestUnits = new Vector<UnitFeatures>();
+	List<UnitFeatures> bestUnits2 = new Vector<UnitFeatures>();
 	FeatureVector tmpFVec;
 
-	public List<EntryWithScore<Unit>> getTopKUnits(String hdr, int k, Vector<UnitObject> featureList, int debugLvl) {
+	public List<EntryWithScore<Unit>> getTopKUnits(String hdr, int k, Vector<UnitFeatures> featureList, int debugLvl) {
 		return parseHeader(hdr, null, debugLvl, k, featureList);
 	}
 	public List<EntryWithScore<Unit>> parseHeader(String hdr, short[][] forcedTags, int debugLvl) {
 		return parseHeader(hdr, forcedTags, debugLvl, 1, null);
 	}
-	public List<EntryWithScore<Unit>> parseHeader(String hdr, short[][] forcedTags, int debugLvl, int k, Vector<UnitObject> featureList) {
+	public List<EntryWithScore<Unit>> parseHeader(String hdr, short[][] forcedTags, int debugLvl, int k, Vector<UnitFeatures> featureList) {
+		return parseHeader(hdr, null, debugLvl,forcedTags, null, k, featureList);
+	}
+	ParseState getTokensWithSpan(String hdr, UnitSpan forcedUnit, ParseState hdrMatches) {
+		if (hdrMatches != null && forcedUnit == null && hdrMatches.hdr.equalsIgnoreCase(hdr)) return hdrMatches;
+		hdr = hdr.replace(UnitSpan.StartXML, UnitSpan.StartString);
+		hdr = hdr.replace(UnitSpan.EndXML, UnitSpan.EndString);
+		TIntArrayList unitSpanPos = null;
+		TIntArrayList brackets = new TIntArrayList();
+		if (forcedUnit != null) {
+			unitSpanPos = new TIntArrayList();
+		}
+		List<String> hdrToks = quantityDict.getTokens(hdr,brackets,UnitSpan.SpecialTokens,unitSpanPos);
+		if (forcedUnit != null) {
+			for (int i = 0; i < unitSpanPos.size(); i++) {
+				if (i %2==0) {
+					forcedUnit.start = (unitSpanPos.get(i) & ((1<<16)-1));
+				} else {
+					forcedUnit.end = (unitSpanPos.get(i) & ((1<<16)-1))-1;
+				}
+			}
+		}
+		hdrMatches = new ParseState(hdr);
+		hdrMatches.tokens = hdrToks;
+		hdrMatches.brackets=brackets;
+		return hdrMatches;
+	}
+	public List<EntryWithScore<Unit>> parseHeader(String hdr, ParseState hdrMatches, int debugLvl, short[][] forcedTags, UnitSpan forcedUnit, int k, Vector<UnitFeatures> featureList) {			
 		if (debugLvl > 0) System.out.println(hdr);
 		if (isURL(hdr)) return null;
-		TIntArrayList brackets = new TIntArrayList();
-		List<String> hdrToks = quantityDict.getTokens(hdr,brackets);
-		if (hdrToks.size()==0) return null;
+		
+		hdrMatches = getTokensWithSpan(hdr,forcedUnit,hdrMatches);
+		if (hdrMatches.tokens.size()==0) return null;
 		if (featureList!=null) featureList.clear();
-		List<? extends HasWord> sentence = tokenScorer.cacheScores(hdrToks, brackets,forcedTags,debugLvl,featureList!=null);
+		List<String> hdrToks = hdrMatches.tokens;
+		List<? extends HasWord> sentence = tokenScorer.cacheScores(hdrMatches,forcedTags,debugLvl,featureList!=null,forcedUnit);
 		if (parser.parse(sentence)) {
 			TObjectFloatHashMap<Unit> units = new TObjectFloatHashMap<Unit>();
-			List<ScoredObject<Tree>> trees = (k==1?parser.getBestParses():parser.getKBestParses(k));
+			List<ScoredObject<Tree>> trees = (k>=1?parser.getBestParses():parser.getKBestParses(k));
 			for (ScoredObject<Tree> stree : trees) {
 				Tree tree = stree.object();
 				Vector<Tree> unitNodes = new Vector<Tree>();
@@ -687,7 +720,7 @@ public class CFGParser4Header extends RuleBasedParser {
 					}
 				}
 				if (featureList!=null) {
-					for (UnitObject obj : featureList) {
+					for (UnitFeatures obj : featureList) {
 						obj.checkCorrectness(params.weights);
 					}
 					Collections.sort(featureList);
@@ -695,7 +728,7 @@ public class CFGParser4Header extends RuleBasedParser {
 						featureList.remove(featureList.size()-1);
 					}
 					if (debugLvl > 0) {
-						for (UnitObject unitObj : featureList) {
+						for (UnitFeatures unitObj : featureList) {
 							System.out.println(unitObj.getKey().getBaseName()+ " "+unitObj.getScore()); 
 							unitObj.fvals.print(Params.FTypes.values());
 						}
@@ -739,21 +772,21 @@ public class CFGParser4Header extends RuleBasedParser {
 		tokenScorer.score(br,start,start+sz0+tree.children()[1].yield().size(),start + sz0,fvec);
 		return fvec;
 	}
-	private void addFeatureVector(Vector<UnitObject> featureList, UnitObject unitObject1,UnitObject unitObject2, FeatureVector treeFeatureVector, float val2, Unit newUnit) {
-		UnitObject unitObject = new UnitObject(newUnit, val2, unitObject1, unitObject2);
+	private void addFeatureVector(Vector<UnitFeatures> featureList, UnitFeatures unitObject1,UnitFeatures unitObject2, FeatureVector treeFeatureVector, float val2, Unit newUnit) {
+		UnitFeatures unitObject = new UnitFeatures(newUnit, val2, unitObject1, unitObject2);
 		unitObject.addFeatures(treeFeatureVector);
 		featureList.add(unitObject);
 	}
-	List<UnitObject> bestUnitsBase = new Vector<UnitObject>();
-	List<UnitObject> bestUnitsMult = new Vector<UnitObject>();
-	UnitObject tmpEntry = new UnitObject(null, 0);
-	private void getUnit(Tree unitTree, List<String> hdrToks,List<UnitObject> bestUnitsVec) {
+	List<UnitFeatures> bestUnitsBase = new Vector<UnitFeatures>();
+	List<UnitFeatures> bestUnitsMult = new Vector<UnitFeatures>();
+	UnitFeatures tmpEntry = new UnitFeatures(null, 0);
+	private void getUnit(Tree unitTree, List<String> hdrToks,List<UnitFeatures> bestUnitsVec) {
 		bestUnitsVec.clear();
 		Tree bestUTree = getSubTree(unitTree,new String[]{"BU_Q", "BU","SU"});
 		Tree multTree = getSubTree(unitTree,new String[]{"Mult"});
 
 		if (bestUTree != null) {
-			Vector<UnitObject> bestUnits[] = tokenScorer.sortedUnits[bestUTree.getSpan().getSource()][bestUTree.getSpan().getTarget()];
+			Vector<UnitFeatures> bestUnits[] = tokenScorer.sortedUnits[bestUTree.getSpan().getSource()][bestUTree.getSpan().getTarget()];
 			//float scoreArr[] = tokenScorer.scores[bestUTree.getSpan().getSource()][bestUTree.getSpan().getTarget()];
 
 			// a new compound unit.
@@ -770,13 +803,13 @@ public class CFGParser4Header extends RuleBasedParser {
 					Unit unit1 = bestUnitsBase.get(a1).getKey();
 					for (int a2 = 0; a2 < bestUnitsMult.size(); a2++) {
 						Unit unit2 = bestUnitsMult.get(a2).getKey();
-						bestUnitsVec.add(new UnitObject(quantityDict.newUnit(unit1,unit2,UnitPair.OpType.Ratio),newCompundScore(bestUnitsBase.get(a1).getScore(),bestUnitsMult.get(a2).getScore()), bestUnitsBase.get(a1), bestUnitsMult.get(a2)));
+						bestUnitsVec.add(new UnitFeatures(quantityDict.newUnit(unit1,unit2,UnitPair.OpType.Ratio),newCompundScore(bestUnitsBase.get(a1).getScore(),bestUnitsMult.get(a2).getScore()), bestUnitsBase.get(a1), bestUnitsMult.get(a2)));
 						a++;
 					}
 				}
 			} else if (bestUnits[tokenScorer.unitState] == null || bestUnits[tokenScorer.unitState].size()==0) {
 				// a new base unit.
-				bestUnits[tokenScorer.unitState] = new Vector<UnitObject>();
+				bestUnits[tokenScorer.unitState] = new Vector<UnitFeatures>();
 				int start = bestUTree.getSpan().getSource();
 				int endP = bestUTree.getSpan().getTarget();
 				bestUnits[tokenScorer.unitState].add(tokenScorer.newUnit(quantityDict.newUnit(hdrToks.subList(start, endP+1)), start, endP));
@@ -789,7 +822,7 @@ public class CFGParser4Header extends RuleBasedParser {
 				}
 			}
 		}
-		UnitObject multUnit = null;
+		UnitFeatures multUnit = null;
 		float multScore = 0;
 		if (multTree != null) {
 			int start = multTree.getSpan().getSource();
@@ -801,7 +834,7 @@ public class CFGParser4Header extends RuleBasedParser {
 				for (int a = 0; a < bestUnitsVec.size(); a++) {
 					Unit bestUnit = bestUnitsVec.get(a).getKey();
 					double score = bestUnitsVec.get(a).getScore();
-					bestUnitsVec.set(a,new UnitObject(new UnitMultPair(bestUnit, multUnit.getKey()), score+multScore, multUnit, bestUnitsVec.get(a)));
+					bestUnitsVec.set(a,new UnitFeatures(new UnitMultPair(bestUnit, multUnit.getKey()), score+multScore, multUnit, bestUnitsVec.get(a)));
 				} 
 			}
 		} else if (multUnit!=null) {
@@ -841,12 +874,18 @@ public class CFGParser4Header extends RuleBasedParser {
 	}
 	@Override
 	public List<EntryWithScore<Unit>> parseHeaderExplain(String hdr,
-			List<String> explanation, int debugLvl) throws IOException {
-		List<EntryWithScore<Unit>> units = super.parseHeaderExplain(hdr, explanation, debugLvl);
+			List<String> explanation, int debugLvl, ParseState hdrMatches[]) throws IOException {
+		if (hdrMatches==null) {
+			hdrMatches = new ParseState[1];
+		}
+		if (explanation==null) {
+			explanation = new Vector<String>();
+		}
+		List<EntryWithScore<Unit>> units = super.parseHeaderExplain(hdr, explanation, debugLvl,hdrMatches);
 		if (explanation != null && explanation.size()==1) {
 			return units;
 		}
-		return parseHeader(hdr,null,debugLvl);
+		return parseHeader(hdrMatches[0].hdr, hdrMatches[0],debugLvl,null,null,1, null);
 	}
 	public static void main(String args[]) throws Exception {
 		// ,  
@@ -856,12 +895,14 @@ public class CFGParser4Header extends RuleBasedParser {
 		// 
 		//  
 		//
-		Vector<UnitObject> featureList = new Vector();
-		List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).getTopKUnits("MV ( ft/s )", 1, featureList,1);
-	//	List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).parseHeader("production (t)",	null
+		Vector<UnitFeatures> featureList = new Vector();
+		List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).getTopKUnits("Wealth (in $mil)",  1, featureList,1);
+		/*List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).parseHeader("Wealth (in " + UnitSpan.StartXML + " $mil "+UnitSpan.EndXML+")",null, 2,null, 
 				//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}
 				//,{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}}
-		//		,2);
+			new UnitSpan("united states dollar [million]"),
+			1,featureList);
+			*/
 		//"billions usd", new short[][]{{(short) Tags.Mult.ordinal()},{(short) Tags.SU.ordinal()}});
 		//Loading g / m ( gr / ft )"); 
 		// Max. 10-min. average sustained wind Km/h
@@ -872,5 +913,8 @@ public class CFGParser4Header extends RuleBasedParser {
 			}
 		}
 		
+	}
+	public double[] getParamsArray() {
+		return params.weights;
 	}
 }

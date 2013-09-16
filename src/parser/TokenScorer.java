@@ -40,7 +40,6 @@ import parser.CFGParser4Header.WordIndex;
 import parser.CFGParser4Header.EnumIndex.Tags;
 import parser.CFGParser4Header.Params.FTypes;
 import parser.CFGParser4Header.StateIndex.States;
-import parser.RuleBasedParser.State;
 import parser.cfgTrainer.FeatureVector;
 import parser.coOccurMethods.Co_occurrenceScores;
 import parser.coOccurMethods.PrUnitGivenWord;
@@ -49,6 +48,7 @@ import catalog.Quantity;
 import catalog.QuantityCatalog;
 import catalog.Unit;
 import catalog.UnitMultPair;
+import catalog.UnitPair;
 import catalog.WordFrequency;
 import conditionalCFG.ConditionalLexicon;
 
@@ -73,19 +73,19 @@ public class TokenScorer implements ConditionalLexicon {
 	private float scores[][][];
 	protected Unit bestUnit[][][];
 	int lastMatch[] = new int[1];
-	public UnitObject newUnit(Unit newUnit, int start, int end) {
-		UnitObject unitObj = new UnitObject(newUnit, 0);
+	public UnitFeatures newUnit(Unit newUnit, int start, int end) {
+		UnitFeatures unitObj = new UnitFeatures(newUnit, 0);
 		unitObj.setScore(defaultFeatureScore(start, end, trainMode?unitObj:null));
 		return unitObj;
 	}
-	private float defaultFeatureScore(int start, int end, UnitObject unitObj) {
+	private float defaultFeatureScore(int start, int end, UnitFeatures unitObj) {
 		if (unitObj != null) {
 			unitObj.addFeature(FTypes.UnitBias,1);
 			unitObj.addFeature(Params.FTypes.MatchLength, -(end-start));
 		}
-		return params.weights[FTypes.UnitBias.ordinal()] + params.weights[Params.FTypes.MatchLength.ordinal()]*(-(end-start));
+		return (float) (params.weights[FTypes.UnitBias.ordinal()] + params.weights[Params.FTypes.MatchLength.ordinal()]*(-(end-start)));
 	}
-	Vector<UnitObject> sortedUnits[][][];
+	Vector<UnitFeatures> sortedUnits[][][];
 	short forcedTags[][]=null;
 	WordFrequency wordFreq;
 	Vector<EntryWithScore<String[]> > freqVector = new Vector<EntryWithScore<String[]>>();
@@ -93,6 +93,7 @@ public class TokenScorer implements ConditionalLexicon {
 	HashSet<String> unitWords = new HashSet<String>();
 	int debugLvl;
 	private boolean trainMode;
+	UnitSpan forcedUnit;
 	public TokenScorer(StateIndex stateIndex, EnumIndex tagIndex, QuantityCatalog matcher, 
 			Index<String> wordIndex, WordFrequency wordFreq, Co_occurrenceScores coOcurStats) {
 		this.tagIndex = tagIndex;
@@ -105,20 +106,41 @@ public class TokenScorer implements ConditionalLexicon {
 		this.wordFreq = wordFreq;
 		this.coOcurStats = coOcurStats;
 	}
-	public List<? extends HasWord> cacheScores(State hdrState, short[][] forcedTags, int debugLvl, boolean trainMode) {
+	public List<? extends HasWord> cacheScores(ParseState hdrState, short[][] forcedTags, int debugLvl, boolean trainMode, UnitSpan forcedUnit) {
 		this.hdrToks = hdrState.tokens;
-		this.dictMatches=hdrState.dictMatch;
+		this.dictMatches=hdrState.setDictMatch(matcher);
 		this.brackets = hdrState.brackets;
 		this.forcedTags=forcedTags;
+		this.forcedUnit = forcedUnit;
+		hdrState.setConceptsFound(matcher);
+		if (forcedUnit != null) {
+			initForcedUnitState(forcedUnit);
+		}
 		return fillScoreArrays(debugLvl,trainMode);
 	}
-	public List<? extends HasWord> cacheScores(List<String> hdrToks, TIntArrayList brackets, short[][] forcedTags, int debugLvl, boolean trainMode) {
+	public List<? extends HasWord> cacheScores(List<String> hdrToks, TIntArrayList brackets, short[][] forcedTags, int debugLvl, boolean trainMode, UnitSpan forcedUnit) {
 		this.hdrToks = hdrToks;
 		DocResult res = matcher.subSequenceMatch(hdrToks, 0.8f);
 		this.dictMatches = res;
 		this.brackets = brackets;
 		this.forcedTags=forcedTags;
+		this.forcedUnit = forcedUnit;
+		if (forcedUnit != null) {
+			initForcedUnitState(forcedUnit);
+		}
 		return fillScoreArrays(debugLvl,trainMode);
+	}
+	private void initForcedUnitState(UnitSpan forcedUnit) {
+			if (forcedUnit.isOpType(UnitPair.OpType.Ratio)) {
+				forcedUnit.rootState=stateIndex.indexOf(States.CU2); // or States.CU2_Q;
+			} else if (forcedUnit.isOpType(UnitPair.OpType.Alt)) {
+				forcedUnit.rootState = stateIndex.indexOf(States.UL);
+			} else if (forcedUnit.isOpType(UnitPair.OpType.Mult)) {
+				forcedUnit.rootState = stateIndex.indexOf(States.U);
+			} else {
+			forcedUnit.rootState=stateIndex.indexOf(Tags.SU.name());
+			forcedUnit.rootState=Tags.SU.ordinal();
+		}
 	}
 	public List<? extends HasWord> fillScoreArrays(int debugLvl, boolean trainMode) {
 		DocResult res = dictMatches;
@@ -129,14 +151,14 @@ public class TokenScorer implements ConditionalLexicon {
 			bestUnit = new Unit[hdrToks.size()][hdrToks.size()][numStatesWithFeatures*altUnitCounts];
 			sortedUnits = new Vector[hdrToks.size()][hdrToks.size()][2];
 		} 
-		float unitBias = params.weights[FTypes.UnitBias.ordinal()];
+		float unitBias = (float) params.weights[FTypes.UnitBias.ordinal()];
 		
 		for (int i = 0; i < hdrToks.size(); i++) {
 			for (int j = i; j < hdrToks.size(); j++) {
 				Arrays.fill(scores[i][j],0);
 				// need the negative length bias here to ensure that new units are short as much as possible. 
 				//  eg. density people per sq km should not include word density in unit.
-				scores[i][j][unitState] = scores[i][j][multUnitState] = unitBias - (j-i)*params.weights[FTypes.MatchLength.ordinal()];
+				scores[i][j][unitState] = scores[i][j][multUnitState] = (float) (unitBias - (j-i)*params.weights[FTypes.MatchLength.ordinal()]);
 				Arrays.fill(bestUnit[i][j],null);
 				for (int s = 0; s < sortedUnits[i][j].length; s++) if (sortedUnits[i][j][s] != null) sortedUnits[i][j][s].clear();
 			}
@@ -159,13 +181,13 @@ public class TokenScorer implements ConditionalLexicon {
 			if (Quantity.isUnitLess(unit.getParentQuantity())) {
 				state = multUnitState;
 			}
-			UnitObject unitObject  = new UnitObject(unit, 0);
+			UnitFeatures unitObject  = new UnitFeatures(unit, 0);
 			int start = res.hitPosition(h);
 			int end = res.hitEndPosition(h);
 			if (matcher.idToUnitMap.getType(id) != matcher.idToUnitMap.ConceptMatch) {
 				maxMatchLen = Math.max(maxMatchLen, res.hitLength(h));
 				//Quantity concept = matcher.idToUnitMap.getConcept(id);
-				score = score*params.weights[FTypes.DictMatchWeight.ordinal()];
+				score = (float) (score*params.weights[FTypes.DictMatchWeight.ordinal()]);
 				 registerFeatureInfo(start, end, state, FTypes.DictMatchWeight, res.hitMatch(h), unit.getName(), trainMode?unitObject:null);
 				score += unitBias;
 				registerFeatureInfo(start, end, state, FTypes.UnitBias, 1, unit.getName(), trainMode?unitObject:null);
@@ -216,7 +238,7 @@ public class TokenScorer implements ConditionalLexicon {
 				}
 				if (sortedUnits!=null) {
 					if (sortedUnits[start][end][state]==null) {
-						sortedUnits[start][end][state] = new Vector<UnitObject>();
+						sortedUnits[start][end][state] = new Vector<UnitFeatures>();
 					}
 					if (unitObject != null) unitObject.setScore(score);
 					sortedUnits[start][end][state].add(unitObject);
@@ -241,9 +263,9 @@ public class TokenScorer implements ConditionalLexicon {
 						if (e >= scores[s].length) continue;
 						if (scores[s][e][state] > score - ScoreEps) {
 							scores[start][end][state] += params.weights[FTypes.Subsumed.ordinal()];
-							Vector<UnitObject> unitVec = sortedUnits[start][end][state];
+							Vector<UnitFeatures> unitVec = sortedUnits[start][end][state];
 							if (unitVec != null) {
-								for (UnitObject unitObj : unitVec) {
+								for (UnitFeatures unitObj : unitVec) {
 									unitObj.setScore(unitObj.getScore()+params.weights[FTypes.Subsumed.ordinal()]);
 								}
 							}
@@ -306,7 +328,7 @@ public class TokenScorer implements ConditionalLexicon {
 						}
 						if (sortedUnits!=null && sortedUnits[start][end][state] != null) {
 							for (int a = sortedUnits[start][end][state].size()-1; a >= 0; a--) {
-								UnitObject unit  = sortedUnits[start][end][state].get(a);
+								UnitFeatures unit  = sortedUnits[start][end][state].get(a);
 								int id = units.get(unit.getKey());
 								if (id < 0) continue;
 								float freq = (start==end && coOcurStats.adjustFrequency())?getFrequency(unit.getKey(), hdrToks.get(start),-1):1;
@@ -383,7 +405,7 @@ public class TokenScorer implements ConditionalLexicon {
 			if (brackets.get(pos) < 0) continue; // mismatched brackets
 			int start = brackets.get(pos) >> 16;
 			int end = brackets.get(pos) & ((1<<16)-1);
-			float bscore = params.weights[FTypes.WithinBracket.ordinal()];
+			float bscore = (float) params.weights[FTypes.WithinBracket.ordinal()];
 			if (start==end  && hdrToks.get(start).length()==1)  {
 				// do not give bracket advantage to (s) and [number]
 				char ch = hdrToks.get(start).charAt(0);
@@ -394,10 +416,13 @@ public class TokenScorer implements ConditionalLexicon {
 				if (someUnitInside(start,end,multUnitState) || someUnitInside(start,end,unitState)) {
 					if (sentence.get(start).tag==Tags.IN && end > start) {
 						scores[start+1][end][lexScore+state] += bscore;
-						registerFeatureInfo(start+1,end,state,FTypes.WithinBracket,1,null, (UnitObject)null);
+						registerFeatureInfo(start+1,end,state,FTypes.WithinBracket,1,null, (UnitFeatures)null);
+					} else {
+						// 13/09/2013: Added the else because otherwise the within-bracket score was 
+						// getting added twice when IN is wrongly mapped to unit "Inch". 
+						scores[start][end][lexScore+state] += bscore;
+						registerFeatureInfo(start,end,state,FTypes.WithinBracket,1,null, (UnitFeatures)null);
 					}
-					scores[start][end][lexScore+state] += bscore;
-					registerFeatureInfo(start,end,state,FTypes.WithinBracket,1,null, (UnitObject)null);
 				}
 			}
 		}
@@ -420,7 +445,22 @@ public class TokenScorer implements ConditionalLexicon {
 		for (int start = 0; start < hdrToks.size(); start++) {
 			for (int end = start; end < hdrToks.size(); end++) {
 				for (int state = 0; state < 2; state++) {
-					if (sortedUnits[start][end][state] != null) Collections.sort(sortedUnits[start][end][state]);
+					if (sortedUnits[start][end][state] != null && sortedUnits[start][end][state].size()>0) {
+						Vector<UnitFeatures> unitVec = sortedUnits[start][end][state];
+						if (forcedUnit != null && start >= forcedUnit.start && end <= forcedUnit.end) {
+							for(int i = unitVec.size()-1; i >= 0; i--) {
+								if (!forcedUnit.allowed(unitVec.get(i).getKey())) {
+									unitVec.get(i).setScore(Double.NEGATIVE_INFINITY);
+								}
+							}
+						}
+						Collections.sort(sortedUnits[start][end][state]);
+						for(int i = unitVec.size()-1; i >= 0; i--) {
+							if (Double.isInfinite(unitVec.get(i).getScore())) {
+								unitVec.remove(i);
+							}
+						}
+					}
 				}
 			}
 		}
@@ -478,16 +518,16 @@ public class TokenScorer implements ConditionalLexicon {
 		return freq;
 	}
 	private void registerFeatureInfo(int start, int end, int unitState2,
-			FTypes fname, float bscore, String unitName, UnitObject unitObject) {
+			FTypes fname, float bscore, String unitName, UnitFeatures unitObject) {
 		if (debugLvl > 0) System.out.println("Feature "+fname.name()+ " ("+start+" "+end+") "+unitState2+ " "+(bscore*params.weights[fname.ordinal()])+" "+unitName);
 		if (unitObject!=null) unitObject.addFeature(fname, bscore);
 	}
 	private void registerFeatureInfo(int start, int end, int unitState2,
 			FTypes fname, int bscore, Object unitName,
-			Vector<UnitObject> unitObjectVec) {
+			Vector<UnitFeatures> unitObjectVec) {
 		if (debugLvl > 0) System.out.println("Feature "+fname.name()+ " ("+start+" "+end+") "+unitState2+ " "+(bscore*params.weights[fname.ordinal()])+" "+unitName);
 		if (unitObjectVec!=null) {
-			for (UnitObject unitObject : unitObjectVec) {
+			for (UnitFeatures unitObject : unitObjectVec) {
 				unitObject.addFeature(fname, bscore);
 			}
 		}
@@ -620,6 +660,9 @@ public class TokenScorer implements ConditionalLexicon {
 		if (forcedTags != null && forcedTags.length > loc && forcedTags[loc][0] != iTW.tag) {
 			System.out.println("Disallowed tags tried");
 		}
+		if (forcedUnit != null && forcedUnit.start==loc && forcedUnit.end==loc && (forcedUnit.rootState != iTW.tag)) {
+			return Float.NEGATIVE_INFINITY;
+		}
 		float score = scoreSpan(fvec,loc,loc,tagIndex.isMultUnit(iTW.tag())?multUnitState:(tagIndex.isSimpleUnit(iTW.tag())?unitState:-1));
 		//System.out.println(iTW.toString(wordIndex, tagIndex) + " "+ loc + " " + word + "  " + score);
 		return score;
@@ -634,6 +677,17 @@ public class TokenScorer implements ConditionalLexicon {
 		//System.out.println(rule.toString(stateIndex));
 		if (start+1==end || start == end) return 0; // since score already accounted for at the word-level
 		end = end-1;
+		if (start==1 && end==1) {
+			System.out.print("");
+		}
+		if (forcedUnit != null) {
+			if ((forcedUnit.start==start && forcedUnit.end==end && forcedUnit.rootState != rule.parent)
+					||  ((forcedUnit.start > end || forcedUnit.end < start)) && stateIndex.hasUnit(rule.parent)
+					|| (forcedUnit.start > start  && stateIndex.hasUnit(rule.parent)) // || forcedUnit.end < end-1
+					) {
+				return Float.NEGATIVE_INFINITY;
+			}
+		}
 		if (stateIndex.isCU2(rule.parent)) {
 			// ensure that the two children are from different parts of the unit taxonomy.
 			if (start > split-1) 
@@ -649,18 +703,21 @@ public class TokenScorer implements ConditionalLexicon {
 			}
 			// 16/7/2013: added so that units like MJ/l have a slight bias to be compound units instead of alternatives.
 			if (fvec!=null) {fvec.add(FTypes.CU2Bias.ordinal(),1f); addLexFeatures(fvec,start,end,unitState);}
-			return params.weights[FTypes.CU2Bias.ordinal()] + getLexScore(start,end, unitState);
+			return (float) (params.weights[FTypes.CU2Bias.ordinal()] + getLexScore(start,end, unitState));
 			//return 0
 		} else if (stateIndex.isIN_U(rule.parent)) {
-			float bscore = params.weights[FTypes.AfterIN.ordinal()];
+			float bscore = (float) params.weights[FTypes.AfterIN.ordinal()];
 			// 16/7/2013: added the second condition because IN_MULT is not allowed to stand on its own.
-			if (bestUnit[split][end][unitState] != null || bestUnit[split][end][multUnitState] != null) {
+			//if (bestUnit[split][end][unitState] != null || bestUnit[split][end][multUnitState] != null) {
+			// 13/9/2013: even the above did not work because for compound units e.g. IN billion US$ the bestUnit field is empty.
+			//            so, changed to the one below.
+			if (someUnitInside(split,end,unitState) || someUnitInside(split,end,multUnitState)) {
 				if (fvec!=null) fvec.add(FTypes.AfterIN.ordinal(), 1);
 				return bscore;
 			}
 
 		}else if (stateIndex.isState(StateIndex.States.IN_Mult, rule.parent)) {
-			float bscore = params.weights[FTypes.AfterIN.ordinal()];
+			float bscore = (float) params.weights[FTypes.AfterIN.ordinal()];
 			if (bestUnit[split][end][multUnitState] != null) {
 				if (fvec!=null) fvec.add(FTypes.AfterIN.ordinal(), 1);
 				return bscore;
@@ -670,7 +727,7 @@ public class TokenScorer implements ConditionalLexicon {
 			// adding this to prevent million metre being marked as a list of two units.
 			if (stateIndex.isMultUnit(rule.leftChild) || stateIndex.isMultUnit(rule.rightChild)) {
 				if (fvec!=null) fvec.add(FTypes.MultBias.ordinal(), 1);
-				multBias = params.weights[FTypes.MultBias.ordinal()];
+				multBias = (float) params.weights[FTypes.MultBias.ordinal()];
 			}
 			if (fvec!=null) addLexFeatures(fvec, start, end, unitState);
 			return multBias + getLexScore(start, end, unitState);
@@ -745,8 +802,10 @@ public class TokenScorer implements ConditionalLexicon {
 				addLexFeatures(fvec, start, end, state);
 			}
 			//return scores[start][end][state]+getLexScore(start, end, state);
-			Vector<UnitObject> unitVec = sortedUnits[start][end][state];
-			return ((unitVec != null && unitVec.size()>0)?(float)unitVec.get(0).getScore():defaultFeatureScore(start,end,null)) +getLexScore(start, end, state);
+			int index = 0;
+			Vector<UnitFeatures> unitVec = sortedUnits[start][end][state];
+			
+			return ((unitVec != null && unitVec.size()>0 && index >= 0)?(float)unitVec.get(index).getScore():defaultFeatureScore(start,end,null)) +getLexScore(start, end, state);
 		}
 		return 0;
 	}

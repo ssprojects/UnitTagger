@@ -152,7 +152,7 @@ public class SimpleParser implements HeaderUnitParser{
 
 	@Override
 	public List<EntryWithScore<Unit>> parseHeaderExplain(String hdr,
-			List<String> explanation) throws IOException {
+			List<String> explanation, int debugLvl, ParseState hdrMatches[]) throws IOException {
 		if (explanation != null) explanation.clear();
 		return parseHeader(hdr);
 	}

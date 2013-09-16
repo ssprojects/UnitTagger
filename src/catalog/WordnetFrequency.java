@@ -1,6 +1,7 @@
 package catalog;
 
 import iitb.shared.EntryWithScore;
+import iitb.shared.XMLConfigs;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.w3c.dom.Element;
 
 import edu.smu.tspell.wordnet.NounSynset;
 import edu.smu.tspell.wordnet.Synset;
@@ -16,6 +18,7 @@ import edu.smu.tspell.wordnet.SynsetType;
 import edu.smu.tspell.wordnet.WordNetDatabase;
 
 public class WordnetFrequency implements WordFrequency {
+	public static String WordNetDictPath="/mnt/b100/d0/library/public_html/wordnet/WordNet-2.1/dict";
 	public static String quantityTypeString = "how much there is of something that you can quantify";
 	public static String quantitySearchString = "quantity";
 	public static String calendarMonth = "calendar month";
@@ -26,12 +29,22 @@ public class WordnetFrequency implements WordFrequency {
 	// s is often used as a pluralizer in headers.
 	static String stopWords[] = new String[]{"in","are","at","a","from","of","to","the","for","and","all","st","with","on","total","per","no","number","amp","apos","quot","hr","s"};
 	static HashSet<String> stopWordsHash=new HashSet<String>(Arrays.asList(stopWords));
-	public WordnetFrequency() {
-		System.setProperty("wordnet.database.dir", "/mnt/b100/d0/library/public_html/wordnet/WordNet-2.1/dict");
+	public WordnetFrequency(Element options) {
+		System.out.println("Using "+extractLoadFile(options));
+		System.setProperty("wordnet.database.dir", extractLoadFile(options));
 		database = WordNetDatabase.getFileInstance();
 		Synset syns[] = database.getSynsets(quantitySearchString, SynsetType.NOUN);
 		quantSyn = (NounSynset) syns[0];
 		calenderMonthSyn = (NounSynset) database.getSynsets(calendarMonth, SynsetType.NOUN)[0];
+	}
+	private static String extractLoadFile(Element elem) {
+		if (elem != null) {
+			Element coOccurElem = XMLConfigs.getElement(elem, "WordNet");
+			if (coOccurElem!=null && coOccurElem.hasAttribute("path")) {
+				return coOccurElem.getAttribute("path");
+			}
+		}
+		return WordNetDictPath;
 	}
 	public boolean isUnit(NounSynset nsyn) {
 		// over-generalizes for words like last,span
@@ -94,8 +107,8 @@ public class WordnetFrequency implements WordFrequency {
 	 */
 	public static void main(String[] args) {
 		//args = HeaderSegmenter.WordSymbols;
-		args = new String[]{"s"};
-		WordnetFrequency wordFreq = new WordnetFrequency();
+		args = new String[]{"mil"};
+		WordnetFrequency wordFreq = new WordnetFrequency(null);
 		List<EntryWithScore<String[]>> matches = new Vector<EntryWithScore<String[]>>();
 		wordFreq.getRelativeFrequency(args[0], matches);
 		System.out.println(Arrays.toString(matches.toArray()));

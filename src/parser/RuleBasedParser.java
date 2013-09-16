@@ -3,7 +3,6 @@ package parser;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
-import gnu.trove.TObjectIntHashMap;
 import iitb.shared.EntryWithScore;
 import iitb.shared.SignatureSetIndex.DocResult;
 
@@ -21,7 +20,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-import catalog.Quantity;
 import catalog.QuantityCatalog;
 import catalog.Unit;
 import catalog.WordnetFrequency;
@@ -31,124 +29,8 @@ public class RuleBasedParser extends SimpleParser {
 	static final float UnitFrequencyThreshold = 0.75f;
 	static final char[] SingleLetterUnits = {'d', 'r'}; // WARNING: keep this sorted at all times.
 	WordnetFrequency wordFreq;
-	public class State {
-		String hdr;
-		DocResult dictMatch;
-		TIntArrayList brackets;
-		List<String> tokens;
-		TObjectIntHashMap<String> conceptsFound;
-		int singleUnitMatch = -2;
-		Vector<EntryWithScore<String[]> > freqVector;
-		float freq=Float.NEGATIVE_INFINITY;
-		TIntArrayList altUnitMatches;
-		public State(String hdr) {
-			this.hdr= hdr;
-		}
-		public void setTokens() {
-			if (tokens==null) {
-				brackets = new TIntArrayList();
-				tokens = QuantityCatalog.getTokens(hdr,brackets);
-			}
-		}
-		public void setDictMatch() {
-			if (dictMatch==null) {
-				setTokens();
-				dictMatch = quantityDict.subSequenceMatch(tokens, 0.7f,true);
-			}
-		}
-		public void setConceptsFound() {
-			conceptsFound = new TObjectIntHashMap<String>();
-			for (int h = dictMatch.numHits()-1; h >= 0; h--) {
-				int id = dictMatch.hitDocId(h);
-				if (quantityDict.idToUnitMap.getType(id)==quantityDict.idToUnitMap.ConceptMatch) {
-					Quantity concept = quantityDict.idToUnitMap.getConcept(id);
-					conceptsFound.put(concept.getConcept(),h);
-				}
-			}
-		}
-		public int setSingleSpanMatchesUnit() {
-			if (singleUnitMatch != -2) return singleUnitMatch;
-			DocResult res = dictMatch;
-			int matchId = -1;
-			Unit singleUnit = null;
-			float maxScore = Float.NEGATIVE_INFINITY;
-			for (int h = res.numHits()-1; h >= 0; h--) {
-				int id = res.hitDocId(h);
-				byte type = quantityDict.idToUnitMap.getType(id);
-				if (quantityDict.idToUnitMap.getType(id)!=quantityDict.idToUnitMap.ConceptMatch) {
-					Unit unit =  quantityDict.idToUnitMap.get(res.hitDocId(h));
-					float score = res.hitMatch(h);
-					if (score < ThresholdTight) continue;
-					if (maxScore < score) {
-						maxScore = score;
-						matchId = h;
-						singleUnit = unit;
-					} else if (maxScore < score + Float.MIN_VALUE) {
-					}
-				}
-			}
-			if (matchId >= 0) {
-				altUnitMatches = new TIntArrayList();
-				// now make sure that for no other span we have a unit that is different.
-				for (int h = res.numHits()-1; h >= 0; h--) {
-					int id = res.hitDocId(h);
-					byte type = quantityDict.idToUnitMap.getType(id);
-					if (quantityDict.idToUnitMap.getType(id)!=quantityDict.idToUnitMap.ConceptMatch) {
-						float score = res.hitMatch(h);
-						if (res.hitPosition(h)==res.hitPosition(matchId) && res.hitLength(h)==res.hitLength(matchId)) {
-							 if (score > maxScore-1e-6f && h != matchId) {
-								altUnitMatches.add(h); 
-							 }
-							continue;
-						}
-						Unit unit =  quantityDict.idToUnitMap.get(res.hitDocId(h));
-						if (unit != singleUnit) {
-							matchId=-1;
-							break;
-						}
-					}
-				}
-			}
-			singleUnitMatch = matchId;
-			return matchId;
-		}
-		public float setWordFrequency() {
-			if (!Float.isInfinite(freq)) return freq;
-			freqVector = new Vector<EntryWithScore<String[]>>();
-			Unit unit = quantityDict.idToUnitMap.get(dictMatch.hitDocId(singleUnitMatch));
-			freq = 0.01f;
-			float relativeFreqInCatalog = 0;
-			int startM = dictMatch.hitPosition(singleUnitMatch);
-			boolean inWordNet = wordFreq.getRelativeFrequency(tokens.get(startM),freqVector);
-			if (!inWordNet) {
-				relativeFreqInCatalog = quantityDict.getRelativeFrequency(dictMatch.hitDocId(singleUnitMatch));
-				if (relativeFreqInCatalog > Float.MIN_VALUE) {
-					freq = relativeFreqInCatalog;
-				}
-			}
-			int numMatches = 0;
-			for (EntryWithScore<String[]> entry : freqVector) {
-				String[] wordForms = entry.getKey();
-				boolean isUnit=false;
-				for (String wf : wordForms) {
-					if (unit.getBaseName().equalsIgnoreCase(wf)) {
-						isUnit=true;
-						break;
-					}
-				}
-				if (isUnit) {
-					numMatches++;
-					if (numMatches>1) {
-						System.out.println("Violated uniqueness assumption of base unit");
-					}
-					freq += (float) entry.getScore();
-				}
-			}
-			return freq;
-		}
-	}
 	public interface Rule {
-		List<EntryWithScore<Unit>> apply(String hdr, State pHdr, List<String> applicableRules);
+		List<EntryWithScore<Unit>> apply(String hdr, ParseState pHdr, List<String> applicableRules);
 		String name();
 		boolean terminal();
 	}
@@ -157,7 +39,7 @@ public class RuleBasedParser extends SimpleParser {
 	public static class IsUrl implements Rule {
 		@Override
 		public
-		List<EntryWithScore<Unit>> apply(String hdr,  State processedHdr, List<String> applicableRules) {
+		List<EntryWithScore<Unit>> apply(String hdr,  ParseState processedHdr, List<String> applicableRules) {
 			if (isURL(hdr)) applicableRules.add(name());
 			return null;
 		}
@@ -173,8 +55,8 @@ public class RuleBasedParser extends SimpleParser {
 	public class NoUnit extends IsUrl {
 		@Override
 		public
-		List<EntryWithScore<Unit>> apply(String hdr,  State pHdr, List<String> applicableRules) {
-			pHdr.setDictMatch();
+		List<EntryWithScore<Unit>> apply(String hdr,  ParseState pHdr, List<String> applicableRules) {
+			pHdr.setDictMatch(quantityDict);
 			if (!pHdr.tokens.contains("in") && (pHdr.brackets.size()==0 || onlyNumbersWithinBracket(pHdr)) && !pHdr.tokens.contains("/")) {
 				if (pHdr.dictMatch==null || pHdr.dictMatch.numHits()==0) {
 					applicableRules.add(name());
@@ -198,7 +80,7 @@ public class RuleBasedParser extends SimpleParser {
 			}
 			return null;
 		}
-		private boolean onlyNumbersWithinBracket(State pHdr) {
+		private boolean onlyNumbersWithinBracket(ParseState pHdr) {
 			TIntArrayList brackets = pHdr.brackets;
 			for (int pos = 0; pos < brackets.size(); pos++) {
 				if (brackets.get(pos) < 0) continue; // mismatched brackets
@@ -221,7 +103,7 @@ public class RuleBasedParser extends SimpleParser {
 		public static String Patterns[][] = {{"s","#"}, {"sl", "no"}, {"w", "/", "l"}, {"u", "s"}, {"*","in","last","*"}};
 		@Override
 		public
-		List<EntryWithScore<Unit>> apply(String hdr,  State pHdr, List<String> applicableRules) {
+		List<EntryWithScore<Unit>> apply(String hdr,  ParseState pHdr, List<String> applicableRules) {
 			pHdr.setTokens();
 			for (String[] pat : Patterns) {
 				if (pat.length==pHdr.tokens.size()) {
@@ -244,12 +126,12 @@ public class RuleBasedParser extends SimpleParser {
 	public class DictConceptMatch1Unit extends IsUrl {
 		@Override
 		public
-		List<EntryWithScore<Unit>> apply(String hdr, State pHdr, List<String> applicableRules) {
-			pHdr.setDictMatch();
-			pHdr.setConceptsFound();
+		List<EntryWithScore<Unit>> apply(String hdr, ParseState pHdr, List<String> applicableRules) {
+			pHdr.setDictMatch(quantityDict);
+			pHdr.setConceptsFound(quantityDict);
 
 			DocResult res = pHdr.dictMatch;
-			int matchId = pHdr.setSingleSpanMatchesUnit();
+			int matchId = pHdr.setSingleSpanMatchesUnit(quantityDict);
 			if (matchId >= 0) {
 				matchId = -1;
 				Unit singleUnit = null;
@@ -285,9 +167,9 @@ public class RuleBasedParser extends SimpleParser {
 		}
 	}
 	public class PercentSymbolMatch extends IsUrl {
-		public List<EntryWithScore<Unit>> apply(String hdr, State pHdr, List<String> applicableRules) {
-			pHdr.setDictMatch();
-			int bestUnitMatch = pHdr.setSingleSpanMatchesUnit();
+		public List<EntryWithScore<Unit>> apply(String hdr, ParseState pHdr, List<String> applicableRules) {
+			pHdr.setDictMatch(quantityDict);
+			int bestUnitMatch = pHdr.setSingleSpanMatchesUnit(quantityDict);
 			if (bestUnitMatch < 0 || pHdr.altUnitMatches.size()>0) return null;
 			Unit unit = quantityDict.idToUnitMap.get(pHdr.dictMatch.hitDocId(bestUnitMatch));
 			if (unit.getBaseSymbols()[0].equals("%") && hdr.indexOf('/') < 0) {
@@ -300,9 +182,9 @@ public class RuleBasedParser extends SimpleParser {
 		}
 	}
 	public class YearUnit extends IsUrl {
-		public List<EntryWithScore<Unit>> apply(String hdr, State pHdr, List<String> applicableRules) {
-			pHdr.setDictMatch();
-			int bestUnitMatch = pHdr.setSingleSpanMatchesUnit();
+		public List<EntryWithScore<Unit>> apply(String hdr, ParseState pHdr, List<String> applicableRules) {
+			pHdr.setDictMatch(quantityDict);
+			int bestUnitMatch = pHdr.setSingleSpanMatchesUnit(quantityDict);
 			if (bestUnitMatch < 0 || pHdr.altUnitMatches.size()>0) return null;
 			Unit unit = quantityDict.idToUnitMap.get(pHdr.dictMatch.hitDocId(bestUnitMatch));
 			if (unit.getBaseName().equalsIgnoreCase("year") && !hdr.toLowerCase().contains("year-")) {
@@ -316,9 +198,9 @@ public class RuleBasedParser extends SimpleParser {
 	}
 
 	public class SingleLetterNotUnit extends IsUrl {
-		public List<EntryWithScore<Unit>> apply(String hdr, State pHdr, List<String> applicableRules) {
-			pHdr.setDictMatch();
-			int bestUnitMatch = pHdr.setSingleSpanMatchesUnit();
+		public List<EntryWithScore<Unit>> apply(String hdr, ParseState pHdr, List<String> applicableRules) {
+			pHdr.setDictMatch(quantityDict);
+			int bestUnitMatch = pHdr.setSingleSpanMatchesUnit(quantityDict);
 			if (bestUnitMatch < 0) return null;
 			int matchStart = pHdr.dictMatch.hitPosition(bestUnitMatch);
 			char letter = pHdr.tokens.get(matchStart).charAt(0);
@@ -340,9 +222,9 @@ public class RuleBasedParser extends SimpleParser {
 
 	public class SingleUnitWithinBrackets extends IsUrl {
 		// unless it is m.
-		public List<EntryWithScore<Unit>> apply(String hdr, State pHdr, List<String> applicableRules) {
-			pHdr.setDictMatch();
-			int bestUnitMatch = pHdr.setSingleSpanMatchesUnit();
+		public List<EntryWithScore<Unit>> apply(String hdr, ParseState pHdr, List<String> applicableRules) {
+			pHdr.setDictMatch(quantityDict);
+			int bestUnitMatch = pHdr.setSingleSpanMatchesUnit(quantityDict);
 			// added the second condition because otherwise major axis (AU) is getting wrongly labeled since AU is ambiguous.
 			if (bestUnitMatch < 0 || pHdr.altUnitMatches.size()>0) return null;
 			if (pHdr.dictMatch.hitLength(bestUnitMatch)==1 && pHdr.tokens.get(pHdr.dictMatch.hitPosition(bestUnitMatch)).length() <= 1) return null;
@@ -367,14 +249,14 @@ public class RuleBasedParser extends SimpleParser {
 		public OnlyFreqUnitWords() {
 		}
 		@Override
-		public List<EntryWithScore<Unit>> apply(String hdr, State pHdr,
+		public List<EntryWithScore<Unit>> apply(String hdr, ParseState pHdr,
 				List<String> applicableRules) {
-			pHdr.setDictMatch();
-			int bestUnitMatch = pHdr.setSingleSpanMatchesUnit();
+			pHdr.setDictMatch(quantityDict);
+			int bestUnitMatch = pHdr.setSingleSpanMatchesUnit(quantityDict);
 			if (bestUnitMatch < 0) return null;
 			if (pHdr.dictMatch.hitPosition(bestUnitMatch)!= 0 || pHdr.dictMatch.hitEndPosition(bestUnitMatch)!=pHdr.tokens.size()-1)
 				return null;
-			if (pHdr.setWordFrequency() > UnitFrequencyThreshold) {
+			if (pHdr.setWordFrequency(quantityDict,wordFreq) > UnitFrequencyThreshold) {
 				applicableRules.add(name());
 				Unit unit = quantityDict.idToUnitMap.get(pHdr.dictMatch.hitDocId(bestUnitMatch));
 				List<EntryWithScore<Unit>> units = new Vector<EntryWithScore<Unit>>();
@@ -385,9 +267,10 @@ public class RuleBasedParser extends SimpleParser {
 		}
 	}
 	List<Rule> rules;
-	public List<EntryWithScore<Unit> > parseHeaderExplain(String hdr, List<String> applicableRules, int debugLvl) throws IOException {
-		applicableRules.clear();
-		State hdrToks = new State(hdr);
+	public List<EntryWithScore<Unit> > parseHeaderExplain(String hdr, List<String> applicableRules, int debugLvl, ParseState hdrMatches[]) throws IOException {
+		if (applicableRules != null) applicableRules.clear();
+		ParseState hdrToks = new ParseState(hdr);
+		if (hdrMatches != null && hdrMatches.length > 0) hdrMatches[0] = hdrToks;
 		List<EntryWithScore<Unit> > unitsToRet = null;
 		for (Rule rule: rules) {
 			int sz = applicableRules.size();
@@ -430,7 +313,7 @@ public class RuleBasedParser extends SimpleParser {
 	public RuleBasedParser(Element elem, QuantityCatalog dict)
 	throws IOException, ParserConfigurationException, SAXException {
 		super(elem, dict);
-		wordFreq = new WordnetFrequency();
+		wordFreq = new WordnetFrequency(elem);
 		rules = new Vector<RuleBasedParser.Rule>();
 		rules.add(new IsUrl());
 		rules.add(new NoUnit());
@@ -449,7 +332,7 @@ public class RuleBasedParser extends SimpleParser {
 	}
 	public static void main(String args[])  throws Exception {
 		List<String> vec = new Vector<String>();
-		List<EntryWithScore<Unit>> unitsR = new RuleBasedParser(null,null).parseHeaderExplain("Production (t)", vec);
+		List<EntryWithScore<Unit>> unitsR = new RuleBasedParser(null,null).parseHeaderExplain("Production (t)", vec, 1, null);
 		//				"
 		System.out.println(unitsR);
 		System.out.println(Arrays.toString(vec.toArray()));
