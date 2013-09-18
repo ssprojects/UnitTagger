@@ -48,7 +48,7 @@
     </unit>
     <unit name="million" symbol="million" conversionFactor="= 1000000">
       <lemmaset>
-	<String>mil</String>			  
+	<String frequency="0.7">mil</String>			  
 	<String>m</String>			  
 	<String>milion</String>			  
 	<String>mln</String>			  
@@ -99,6 +99,7 @@
 	<String>RUB</String>
       </lemmaset>
     </unit>
+<!--
     <unit name="Afghan afghani" symbol="؋" conversionFactor="">
       <lemmaset>
 	<String>AFN</String>
@@ -228,6 +229,7 @@
 	<String>BTN</String>
       </lemmaset>
     </unit>
+-->
     <unit name="Indian rupee" symbol="" conversionFactor="">
       <lemmaset>
 	<String>INR</String>
@@ -239,13 +241,16 @@
 	<String>paise</String>
       </lemmaset>
     </unit>
+    <!--
     <unit name="Bolivian boliviano" symbol="Bs." conversionFactor="">
       <lemmaset>
 	<String>BOB</String>
       </lemmaset>
     </unit>
+
     <unit name="Bosnia and Herzegovina convertible mark" symbol="KM" conversionFactor="">
       <lemmaset>
+	<String frequency="0.001">KM</String>			  
 	<String>BAM</String>
       </lemmaset>
     </unit>
@@ -255,6 +260,7 @@
 	<String frequency="0.001">p</String>			  
       </lemmaset>
     </unit>
+
     <unit name="Brazilian real" symbol="R$" conversionFactor="">
       <lemmaset>
 	<String>BRL</String>
@@ -303,12 +309,14 @@
 	<String>XAF</String>
       </lemmaset>
     </unit>
+-->
     <unit name="Canadian dollar" symbol="$" conversionFactor="">
       <lemmaset>
 	<String frequency="0.0001">$</String>
 	<String>CAD</String>
       </lemmaset>
     </unit>
+<!--
     <unit name="Cape Verdean escudo" symbol="Esc; $" conversionFactor="">
       <lemmaset>
 	<String>CVE</String>
@@ -771,6 +779,7 @@
 	<String>OMR</String>
       </lemmaset>
     </unit>
+
     <unit name="Pakistani rupee" symbol="₨" conversionFactor="">
       <lemmaset>
 	<String>PKR</String>
@@ -1045,6 +1054,7 @@
 	<String>ZWL</String>
       </lemmaset>
     </unit>
+-->
   </concept>
   <concept name="Length">
     <Synset>
@@ -1207,6 +1217,7 @@
     </unit>
     <unit name="kilometre" symbol="km" conversionFactor="≡ 1000 m">
       <lemmaset>
+	<String frequency="0.99">KM</String>			  
 	<String>kilometer</String>
 	<String>kilometers</String>
 	<String>kms</String>
@@ -1237,10 +1248,12 @@
     </unit>
     <unit name="mil;" symbol="mil" conversionFactor="≡ 2.54×10−5 m">
       <lemmaset>
+	<String frequency="0.01">mil</String>			  
       </lemmaset>
     </unit>
     <unit name="mil (Sweden and Norway)" symbol="mil" conversionFactor="= 10000 m">
       <lemmaset>
+	<String frequency="0.01">mil</String>			  
       </lemmaset>
     </unit>
     <unit name="mile (international)" symbol="mi" conversionFactor="≡ 1609.344 m">
@@ -1504,6 +1517,7 @@
 	<String>square kilometer</String>
 	<String>sq-km</String>
 	<String>sq km</String>
+	<String>sq.km</String>
 	<String>Km²</String>
       </lemmaset>
     </unit>
