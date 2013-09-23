@@ -275,4 +275,7 @@ public class Unit {
 	public void setCompoundUnitParts(Unit unit1, Unit unit2) {
 		firstBaseNameParts = new Unit[]{unit1,unit2};
 	}
+	public Unit firstAlternative() {
+		return this;
+	}
 }

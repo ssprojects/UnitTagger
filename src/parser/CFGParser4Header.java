@@ -896,7 +896,7 @@ public class CFGParser4Header extends RuleBasedParser {
 		//  
 		//
 		Vector<UnitFeatures> featureList = new Vector();
-		List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).getTopKUnits("Wealth (in $mil)",  1, featureList,1);
+		List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).getTopKUnits("Revenues ($ millions)",  1, featureList,1);
 		/*List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).parseHeader("Wealth (in " + UnitSpan.StartXML + " $mil "+UnitSpan.EndXML+")",null, 2,null, 
 				//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}
 				//,{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}}

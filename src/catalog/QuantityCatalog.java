@@ -56,7 +56,7 @@ public class QuantityCatalog implements WordFrequency {
 	public Index<String> tokenDict = new IndexImpl<String>();
 
 	MultiValueMap conceptDict = new MultiValueMap();
-	public static String QuantTaxonomyPath = "configs/QuantityTaxonomy.xml";
+	public static String QuantTaxonomyPath = "/mnt/a99/d0/sunita/workspace/QuantityTagger/configs/QuantityTaxonomy.xml";
 	ArrayList<Quantity> taxonomy;
 	public static class IdToUnitMap extends Vector<Unit> {
 		public static final byte ConceptMatch = (byte)'c';
@@ -447,6 +447,11 @@ public class QuantityCatalog implements WordFrequency {
 				{"km²","","square kilometre"}
 		};
 		QuantityCatalog matcher = new QuantityCatalog(QuantityReader.loadQuantityTaxonomy(QuantTaxonomyPath));
+		String unitName = "kilometre/hour"; // "United States Dollar [billion]";
+		Unit parsedUnit = matcher.getUnitFromBaseName(unitName);
+		if (!parsedUnit.getBaseName().equalsIgnoreCase(unitName))
+			throw new Exception("Mistake in unit parsing");
+		
 		
 /*		DocResult res = matcher.tokenDict.findSubsequenceMatchesCosine(new SignatureSetImpl<String>(matcher.getTokens(tests[0][1])), 0.8f);
 		for (int h = 0; h < res.numHits(); h++) {
@@ -502,13 +507,40 @@ public class QuantityCatalog implements WordFrequency {
 		return 0;
 	}
 	public Unit getUnitFromBaseName(String unitName) {
-		Collection<Unit> units = nameDict.getCollection(unitName);
+		if (unitName == null) return null;
+		Collection<Unit> units = nameDict.getCollection(unitName.toLowerCase());
 		if (units != null && units.size()>0)
 			return units.iterator().next();
+		if (units==null) {
+			String parts[] =  UnitPair.extractUnitParts(unitName);
+			if (parts != null) {
+				Unit unit1 = null, unit2 = null;
+				units = nameDict.getCollection(parts[0].toLowerCase());
+				if (units != null && units.size()>0)
+					unit1 = units.iterator().next();
+				units = nameDict.getCollection(parts[1].toLowerCase());
+				if (units != null && units.size()>0)
+					unit2 = units.iterator().next();
+				if (unit1 != null && unit2 != null) {
+					return new UnitPair(unit1, unit2, UnitPair.getOpTypeFromOpStr(parts[2]));
+				}
+			}
+		}
 		return null;
 	}
 	public boolean isUnit(String str) {
 		List<EntryWithScore<Unit>> matches = getTopK(str, "", 0.9);
 		return (matches != null && matches.size()>0);
+	}
+	public float convert(float value, Unit fromUnit, Unit toUnit, boolean success[]) {
+		success[0] = true;
+		if (toUnit == null)
+			return value;
+		double convValue = value*(fromUnit==null?1:fromUnit.getMultiplier())/toUnit.getMultiplier();
+		if (Double.isNaN(convValue) || Double.isInfinite(convValue)) {
+			success[0] = false;
+			return value;
+		}
+		return (float) convValue;
 	}
 }
