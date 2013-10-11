@@ -621,7 +621,6 @@ public class CFGParser4Header extends RuleBasedParser {
 		return parseHeader(hdr, null, 0);
 	}
 	
-
 	List<UnitFeatures > bestUnits = new Vector<UnitFeatures>();
 	List<UnitFeatures> bestUnits2 = new Vector<UnitFeatures>();
 	FeatureVector tmpFVec;
@@ -873,19 +872,19 @@ public class CFGParser4Header extends RuleBasedParser {
 		}
 	}
 	@Override
-	public List<EntryWithScore<Unit>> parseHeaderExplain(String hdr,
-			List<String> explanation, int debugLvl, ParseState hdrMatches[]) throws IOException {
+	public List<EntryWithScore<Unit>> parseHeaderProbabilistic(String hdr,
+			List<String> explanation, int debugLvl, int k, ParseState hdrMatches[]) throws IOException {
 		if (hdrMatches==null) {
 			hdrMatches = new ParseState[1];
 		}
 		if (explanation==null) {
 			explanation = new Vector<String>();
 		}
-		List<EntryWithScore<Unit>> units = super.parseHeaderExplain(hdr, explanation, debugLvl,hdrMatches);
+		List<EntryWithScore<Unit>> units = super.parseHeaderProbabilistic(hdr, explanation, debugLvl,k,hdrMatches);
 		if (explanation != null && explanation.size()==1) {
 			return units;
 		}
-		return parseHeader(hdrMatches[0].hdr, hdrMatches[0],debugLvl,null,null,1, null);
+		return parseHeader(hdrMatches[0].hdr, hdrMatches[0],debugLvl,null,null,k, null);
 	}
 	public static void main(String args[]) throws Exception {
 		// ,  

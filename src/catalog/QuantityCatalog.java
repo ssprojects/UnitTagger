@@ -522,7 +522,7 @@ public class QuantityCatalog implements WordFrequency {
 				if (units != null && units.size()>0)
 					unit2 = units.iterator().next();
 				if (unit1 != null && unit2 != null) {
-					return new UnitPair(unit1, unit2, UnitPair.getOpTypeFromOpStr(parts[2]));
+					return UnitPair.newUnitPair(unit1, unit2, UnitPair.getOpTypeFromOpStr(parts[2]));
 				}
 			}
 		}

@@ -151,10 +151,13 @@ public class SimpleParser implements HeaderUnitParser{
 	}
 
 	@Override
-	public List<EntryWithScore<Unit>> parseHeaderExplain(String hdr,
-			List<String> explanation, int debugLvl, ParseState hdrMatches[]) throws IOException {
+	public List<EntryWithScore<Unit>> parseHeaderProbabilistic(String hdr,
+			List<String> explanation, int debugLvl, int k, ParseState hdrMatches[]) throws IOException {
 		if (explanation != null) explanation.clear();
 		return parseHeader(hdr);
+	}
+	public List<EntryWithScore<Unit> > parseHeaderExplain(String hdr, List<String> explanation, int debugLvl, ParseState hdrMatches[]) throws IOException {
+		return parseHeaderProbabilistic(hdr, explanation, debugLvl, 1, hdrMatches);
 	}
 }
 

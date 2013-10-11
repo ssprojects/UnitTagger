@@ -266,8 +266,9 @@ public class RuleBasedParser extends SimpleParser {
 			return null;
 		}
 	}
+	
 	List<Rule> rules;
-	public List<EntryWithScore<Unit> > parseHeaderExplain(String hdr, List<String> applicableRules, int debugLvl, ParseState hdrMatches[]) throws IOException {
+	public List<EntryWithScore<Unit> > parseHeaderProbabilistic(String hdr, List<String> applicableRules, int debugLvl, int k, ParseState hdrMatches[]) throws IOException {
 		if (applicableRules != null) applicableRules.clear();
 		ParseState hdrToks = new ParseState(hdr);
 		if (hdrMatches != null && hdrMatches.length > 0) hdrMatches[0] = hdrToks;

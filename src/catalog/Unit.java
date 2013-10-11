@@ -232,7 +232,7 @@ public class Unit {
 			// remove the space until the first non-digit is seen.
 			for (int c = 1; c < doubleStr.length(); c++) {
 				char ch = doubleStr.charAt(c);
-				if (!(Character.isDigit(ch) || ch=='.' || ch=='-' || ch=='+' || ch==' ' || ch=='e' || ch=='E' )) {
+				if (!(Character.isDigit(ch) || ch==',' || ch=='.' || ch=='-' || ch=='+' || ch==' ' || ch=='e' || ch=='E' )) {
 					remStr  = doubleStr.substring(c);
 					doubleStr = doubleStr.substring(0,c);
 					break;
@@ -250,7 +250,7 @@ public class Unit {
 			if (remStr.startsWith("±")) {
 				for (int c = 1; c < remStr.length(); c++) {
 					char ch = remStr.charAt(c);
-					if (!(Character.isDigit(ch) || ch=='.' || ch==' ' )) {
+					if (!(Character.isDigit(ch)  || ch==',' || ch=='.' || ch==' ' )) {
 						remStr  = remStr.substring(c);
 						break;
 					}
@@ -262,11 +262,11 @@ public class Unit {
 				for (; expEnd < remStr.length() && Character.isDigit(remStr.charAt(expEnd));expEnd++) {
 				}
 				if (Character.isDigit(remStr.charAt(expEnd-1))) {
-					doubleStr += "e"+remStr.substring(expStart,expEnd).trim().replace('−', '-');
+					doubleStr += "E"+remStr.substring(expStart,expEnd).trim().replace('−', '-');
 				}
 			}
 		}
-		if (doubleStr.endsWith(".")) {
+		if (doubleStr.endsWith(".") || doubleStr.endsWith(",")) {
 			doubleStr = doubleStr.substring(0,doubleStr.length()-1);
 		}
 		return doubleStr;

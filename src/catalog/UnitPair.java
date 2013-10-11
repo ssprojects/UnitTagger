@@ -50,6 +50,9 @@ public class UnitPair extends Unit {
 	}
 	@Override
 	public double getMultiplier() {
+		if (op == OpType.Ratio) {
+			return unit1.getMultiplier()/unit2.getMultiplier();
+		}
 		return 1;
 	}
 	public String getBaseName() {
@@ -86,5 +89,12 @@ public class UnitPair extends Unit {
 		if (op.equals(OpType.Alt))
 			return unit1;
 		return this;
+	}
+	public static Unit newUnitPair(Unit unit12, Unit unit22, OpType opTypeFromOpStr) {
+		switch (opTypeFromOpStr) {
+		case Mult:
+			return new UnitMultPair(unit12, unit22);
+		}
+		return new UnitPair(unit12,unit22,opTypeFromOpStr);
 	}
 }
