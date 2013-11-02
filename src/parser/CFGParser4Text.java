@@ -83,7 +83,7 @@ public class CFGParser4Text extends CFGParser4Header {
 	public static void main(String args[]) throws Exception {
 		Vector<UnitFeatures> featureList = new Vector();
 		Vector<String> explanation = new Vector<String>();
-		List<EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeaderExplain("by $qqqq per litre", explanation,1); 
+		List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeaderExplain("by $qqqq per litre", explanation,1,null); 
 		/*List<EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeader("year qqqq billion kilowatt hour",	null
 				//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.Q.ordinal()},{(short) Tags.Mult.ordinal()},{(short) Tags.SU.ordinal()}
 				//,{(short) Tags.SU.ordinal()}}

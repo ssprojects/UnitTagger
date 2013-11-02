@@ -21,6 +21,7 @@ import catalog.QuantityCatalog;
 import catalog.Unit;
 
 import parser.CFGParser4Header;
+import parser.FeatureBasedParser;
 import parser.HeaderUnitParser;
 import parser.RuleBasedParser;
 
@@ -54,7 +55,7 @@ public class Test {
 			for (HeaderUnitParser parser : parsers) {
 				p++;
 				boolean matched=false;
-				List<EntryWithScore<Unit>> extractedUnits = parser.parseHeaderExplain(hdr, applicableRules);
+				List<? extends EntryWithScore<Unit>> extractedUnits = parser.parseHeaderExplain(hdr, applicableRules, 0, null);
 				
 				if ((trueUnits==null || trueUnits.size()==0) && (extractedUnits==null || extractedUnits.size()==0)) {
 					matched = true;
@@ -92,7 +93,9 @@ public class Test {
 	}
 	public static void main(String args[]) throws IOException, ParserConfigurationException, SAXException {
 		QuantityCatalog dict = new QuantityCatalog((Element)null);
-		HeaderUnitParser[] parsers = new HeaderUnitParser[]{new CFGParser4Header(null,dict)};
+		HeaderUnitParser[] parsers = new HeaderUnitParser[]{new RuleBasedParser(null, dict), 
+				new FeatureBasedParser(null, dict), 
+				new CFGParser4Header(null,dict)};
 		new Test(parsers,GroundTruthFile);
 	}
 }

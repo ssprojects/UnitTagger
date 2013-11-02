@@ -36,12 +36,14 @@ public class PrUnitGivenWord implements Co_occurrenceScores  {
 				for (int id = units.size()-1; id >= 0; id--) {
 					Unit unit = units.get(id);
 					float f = Float.POSITIVE_INFINITY;
-					for (int p = 0; unit.getBaseNamePart(p) != null; p++) {
-						Unit unitPart = unit.getBaseNamePart(p);
+					// 1 Nov 2013: disabling this part of the code since now we are also collecting statistics for compound units.
+					//for (int p =  0; unit.getBaseNamePart(p) != null; p++) {
+						//Unit unitPart = unit.getBaseNamePart(p);
+						Unit unitPart = unit;
 						int freq = coOcurStats.getOccurrenceFrequency(hdrToks.get(start), unitPart.getBaseName(), unitPart.getParentQuantity().getConcept(), total);
 						float ff = freq + CoccurMixWeight*total[1];
 						f = Math.min(f, ff);
-					}
+					//}
 					freqs[id] = f;
 					totalFreq += f;
 					maxFreq = Math.max(maxFreq, f);

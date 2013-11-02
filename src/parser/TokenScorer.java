@@ -12,6 +12,7 @@ import gnu.trove.TFloatArrayList;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectFloatHashMap;
+import gnu.trove.TObjectFloatIterator;
 import iitb.shared.EntryWithScore;
 import iitb.shared.StringMap;
 import iitb.shared.SignatureSetIndex.DocResult;
@@ -40,9 +41,9 @@ import parser.CFGParser4Header.WordIndex;
 import parser.CFGParser4Header.EnumIndex.Tags;
 import parser.CFGParser4Header.Params.FTypes;
 import parser.CFGParser4Header.StateIndex.States;
-import parser.cfgTrainer.FeatureVector;
 import parser.coOccurMethods.Co_occurrenceScores;
 import parser.coOccurMethods.PrUnitGivenWord;
+import parser.trainer.FeatureVector;
 import catalog.Co_occurrenceStatistics;
 import catalog.Quantity;
 import catalog.QuantityCatalog;
@@ -55,7 +56,7 @@ import conditionalCFG.ConditionalLexicon;
 public class TokenScorer implements ConditionalLexicon {
 	private static final float NegInfty = -100;
 	private static final float ScoreEps = 0.01f;
-	
+
 	private DocResult dictMatches;
 	private List<Token> sentence;
 	protected List<String> hdrToks;
@@ -74,7 +75,7 @@ public class TokenScorer implements ConditionalLexicon {
 	protected Unit bestUnit[][][];
 	int lastMatch[] = new int[1];
 	public UnitFeatures newUnit(Unit newUnit, int start, int end) {
-		UnitFeatures unitObj = new UnitFeatures(newUnit, 0);
+		UnitFeatures unitObj = new UnitFeatures(newUnit, 0,start,end);
 		unitObj.setScore(defaultFeatureScore(start, end, trainMode?unitObj:null));
 		return unitObj;
 	}
@@ -101,7 +102,7 @@ public class TokenScorer implements ConditionalLexicon {
 		this.matcher = matcher;
 		params = new Params();
 		this.stateIndex = stateIndex;
-		
+
 		forcedTags = null;
 		this.wordFreq = wordFreq;
 		this.coOcurStats = coOcurStats;
@@ -131,13 +132,13 @@ public class TokenScorer implements ConditionalLexicon {
 		return fillScoreArrays(debugLvl,trainMode);
 	}
 	private void initForcedUnitState(UnitSpan forcedUnit) {
-			if (forcedUnit.isOpType(UnitPair.OpType.Ratio)) {
-				forcedUnit.rootState=stateIndex.indexOf(States.CU2); // or States.CU2_Q;
-			} else if (forcedUnit.isOpType(UnitPair.OpType.Alt)) {
-				forcedUnit.rootState = stateIndex.indexOf(States.UL);
-			} else if (forcedUnit.isOpType(UnitPair.OpType.Mult)) {
-				forcedUnit.rootState = stateIndex.indexOf(States.U);
-			} else {
+		if (forcedUnit.isOpType(UnitPair.OpType.Ratio)) {
+			forcedUnit.rootState=stateIndex.indexOf(States.CU2); // or States.CU2_Q;
+		} else if (forcedUnit.isOpType(UnitPair.OpType.Alt)) {
+			forcedUnit.rootState = stateIndex.indexOf(States.UL);
+		} else if (forcedUnit.isOpType(UnitPair.OpType.Mult)) {
+			forcedUnit.rootState = stateIndex.indexOf(States.U);
+		} else {
 			forcedUnit.rootState=stateIndex.indexOf(Tags.SU.name());
 			forcedUnit.rootState=Tags.SU.ordinal();
 		}
@@ -152,7 +153,7 @@ public class TokenScorer implements ConditionalLexicon {
 			sortedUnits = new Vector[hdrToks.size()][hdrToks.size()][2];
 		} 
 		float unitBias = (float) params.weights[FTypes.UnitBias.ordinal()];
-		
+
 		for (int i = 0; i < hdrToks.size(); i++) {
 			for (int j = i; j < hdrToks.size(); j++) {
 				Arrays.fill(scores[i][j],0);
@@ -162,10 +163,32 @@ public class TokenScorer implements ConditionalLexicon {
 				Arrays.fill(bestUnit[i][j],null);
 				for (int s = 0; s < sortedUnits[i][j].length; s++) if (sortedUnits[i][j][s] != null) sortedUnits[i][j][s].clear();
 			}
-			
+
 			//Arrays.fill(scores[i][i], unitBias);
 		}
 
+		// collect unit matches for a position, so as to collectively find their frequencies in wordnet.
+		TObjectFloatHashMap<Unit> unitFreqs[] = new TObjectFloatHashMap[hdrToks.size()];
+		for (int h = res.numHits()-1; h >= 0; h--) {
+			int id = res.hitDocId(h);
+			if (res.hitLength(h) > 1) continue;
+			float score = res.hitMatch(h);
+			if (matcher.idToUnitMap.getType(id) == matcher.idToUnitMap.SymbolMatch && score + params.weights[FTypes.SymbolDictMatchThreshold.ordinal()] < 0)
+				continue;
+			if (matcher.idToUnitMap.getType(id) == matcher.idToUnitMap.LemmaMatch && score + params.weights[FTypes.LemmaDictMatchThreshold.ordinal()] < 0)
+				continue;
+			if (matcher.idToUnitMap.getType(id) == matcher.idToUnitMap.ConceptMatch) continue;
+			Unit unit = matcher.idToUnitMap.get(id);
+			int p = res.hitPosition(h);
+			if (unitFreqs[p]==null)
+				unitFreqs[p] = new TObjectFloatHashMap<Unit>();
+			unitFreqs[p].put(unit, -res.hitDocId(h)-1);
+		}
+		for (int i = 0; i < unitFreqs.length; i++) {
+			if (unitFreqs[i] != null) {
+				getFrequencies(unitFreqs[i], hdrToks.get(i));
+			}
+		}
 		int maxMatchLen = 0;
 		for (int h = res.numHits()-1; h >= 0; h--) {
 			int id = res.hitDocId(h);
@@ -174,25 +197,25 @@ public class TokenScorer implements ConditionalLexicon {
 				continue;
 			if (matcher.idToUnitMap.getType(id) == matcher.idToUnitMap.LemmaMatch && score + params.weights[FTypes.LemmaDictMatchThreshold.ordinal()] < 0)
 				continue;
-			
+
 
 			Unit unit = matcher.idToUnitMap.get(id);
 			int state = unitState;
 			if (Quantity.isUnitLess(unit.getParentQuantity())) {
 				state = multUnitState;
 			}
-			UnitFeatures unitObject  = new UnitFeatures(unit, 0);
 			int start = res.hitPosition(h);
 			int end = res.hitEndPosition(h);
+			UnitFeatures unitObject  = new UnitFeatures(unit, 0,start,end);
 			if (matcher.idToUnitMap.getType(id) != matcher.idToUnitMap.ConceptMatch) {
 				maxMatchLen = Math.max(maxMatchLen, res.hitLength(h));
 				//Quantity concept = matcher.idToUnitMap.getConcept(id);
 				score = (float) (score*params.weights[FTypes.DictMatchWeight.ordinal()]);
-				 registerFeatureInfo(start, end, state, FTypes.DictMatchWeight, res.hitMatch(h), unit.getName(), trainMode?unitObject:null);
+				registerFeatureInfo(start, end, state, FTypes.DictMatchWeight, res.hitMatch(h), unit.getName(), trainMode?unitObject:null);
 				score += unitBias;
 				registerFeatureInfo(start, end, state, FTypes.UnitBias, 1, unit.getName(), trainMode?unitObject:null);
 				score += (res.hitLength(h)-1)*params.weights[FTypes.MatchLength.ordinal()];
-				 registerFeatureInfo(start, end, state, FTypes.MatchLength, res.hitLength(h)-1, unit.getName(), trainMode?unitObject:null);
+				registerFeatureInfo(start, end, state, FTypes.MatchLength, res.hitLength(h)-1, unit.getName(), trainMode?unitObject:null);
 				List<String> unitToks = matcher.idToUnitMap.getTokens(id);
 
 				int startM = getMaximalTokens(res.hitMatch(h), unitToks,hdrToks,start,end,lastMatch);
@@ -206,7 +229,7 @@ public class TokenScorer implements ConditionalLexicon {
 				if (startM==endM) {
 					float freq = getFrequency(unit, hdrToks.get(startM), id);
 					score += (1-freq)*params.weights[FTypes.INLANG.ordinal()];
-					 registerFeatureInfo(start, end, state, FTypes.INLANG, (1-freq), unit.getName(), trainMode?unitObject:null);
+					registerFeatureInfo(start, end, state, FTypes.INLANG, (1-freq), unit.getName(), trainMode?unitObject:null);
 				}
 
 				float bestScore = 0;
@@ -220,28 +243,38 @@ public class TokenScorer implements ConditionalLexicon {
 					}
 				}
 				score += params.weights[FTypes.ContextWord.ordinal()]*bestScore;
-				 registerFeatureInfo(start, end, state, FTypes.ContextWord, bestScore, unit.getName(), trainMode?unitObject:null);
+				registerFeatureInfo(start, end, state, FTypes.ContextWord, bestScore, unit.getName(), trainMode?unitObject:null);
 
-				if (bestUnit[start][end][state] ==null || scores[start][end][state] < score-Float.MIN_VALUE) {
-					scores[start][end][state] = score;
-					bestUnit[start][end][state] = unit;
-					for (int a = 1; a < altUnitCounts; a++) {
-						bestUnit[start][end][a*2+state]=null;
-					}
-				} else if (Math.abs(scores[start][end][state]-score) < Float.MIN_VALUE) {
-					for (int a = 0; a < altUnitCounts; a++) {
-						if (bestUnit[start][end][a*2+state]==null || bestUnit[start][end][a*2+state]==unit) {
-							bestUnit[start][end][a*2+state] = unit;
-							break;
+				if (sortedUnits[start][end][state]==null) {
+					sortedUnits[start][end][state] = new Vector<UnitFeatures>();
+				}
+				if (unitObject != null) unitObject.setScore(score);
+				sortedUnits[start][end][state].add(unitObject);
+			}
+		}
+
+		for (int start = 0; start < sortedUnits.length; start++) {
+			for (int end = 0; end < sortedUnits[start].length; end++) {
+				for (int state = 0; state  < sortedUnits[start][end].length; state++) {
+					if (sortedUnits[start][end][state]==null) continue;
+					for (EntryWithScore<Unit> unitObject : sortedUnits[start][end][state]) {
+						float score = (float) unitObject.getScore();
+						Unit unit = unitObject.getKey();
+						if (bestUnit[start][end][state] ==null || scores[start][end][state] < score-Float.MIN_VALUE) {
+							scores[start][end][state] = score;
+							bestUnit[start][end][state] = unit;
+							for (int a = 1; a < altUnitCounts; a++) {
+								bestUnit[start][end][a*2+state]=null;
+							}
+						} else if (Math.abs(scores[start][end][state]-score) < Float.MIN_VALUE) {
+							for (int a = 0; a < altUnitCounts; a++) {
+								if (bestUnit[start][end][a*2+state]==null || bestUnit[start][end][a*2+state]==unit) {
+									bestUnit[start][end][a*2+state] = unit;
+									break;
+								}
+							}
 						}
 					}
-				}
-				if (sortedUnits!=null) {
-					if (sortedUnits[start][end][state]==null) {
-						sortedUnits[start][end][state] = new Vector<UnitFeatures>();
-					}
-					if (unitObject != null) unitObject.setScore(score);
-					sortedUnits[start][end][state].add(unitObject);
 				}
 			}
 		}
@@ -305,7 +338,7 @@ public class TokenScorer implements ConditionalLexicon {
 							float freq = (start==end && coOcurStats.adjustFrequency())?getFrequency(unit, hdrToks.get(start),-1):1;
 							adjustedScores[a] = coOcurStats.freqAdjustedScore(freq,totalScores[id]);
 							maxFreq = Math.max(maxFreq, adjustedScores[a]);
-							
+
 						}
 						Unit unitsT[] = new Unit[altUnitCounts];
 						for (int a = 0, uCtr=0; a < altUnitCounts && bestUnit[start][end][a*2+state] != null; a++) {
@@ -319,9 +352,6 @@ public class TokenScorer implements ConditionalLexicon {
 						if (unitsT[0] != null) {
 							scores[start][end][state] += maxFreq*params.weights[FTypes.Co_occurStats.ordinal()];
 							registerFeatureInfo(start,end,state,FTypes.Co_occurStats,maxFreq,unitsT[0].getName(), null);
-						}
-						if (start==3 && end==4) {
-							System.out.println();
 						}
 						for (int a = 0; a < unitsT.length && unitsT[a]!=null;a++) {
 							bestUnit[start][end][a*2+state] = unitsT[a];
@@ -342,7 +372,7 @@ public class TokenScorer implements ConditionalLexicon {
 			}
 		}
 
-				/*
+		/*
 				int numM = 0;
 				for(int p = 0; p < bestUnit[start][end].length&& p < 4; p++) {
 					if (bestUnit[start][end][p] != null) numM++;
@@ -379,7 +409,7 @@ public class TokenScorer implements ConditionalLexicon {
 						}
 					}
 				}
-				 */
+		 */
 
 		sentence = new Vector<Token>();
 		for (int i = 0; i < hdrToks.size(); i++) {
@@ -441,13 +471,12 @@ public class TokenScorer implements ConditionalLexicon {
 			}
 		}
 		 */
-		if (sortedUnits!=null) {
 		for (int start = 0; start < hdrToks.size(); start++) {
 			for (int end = start; end < hdrToks.size(); end++) {
 				for (int state = 0; state < 2; state++) {
 					if (sortedUnits[start][end][state] != null && sortedUnits[start][end][state].size()>0) {
 						Vector<UnitFeatures> unitVec = sortedUnits[start][end][state];
-						if (forcedUnit != null && start >= forcedUnit.start && end <= forcedUnit.end) {
+						if (forcedUnit != null && start >= forcedUnit.start() && end <= forcedUnit.end()) {
 							for(int i = unitVec.size()-1; i >= 0; i--) {
 								if (!forcedUnit.allowed(unitVec.get(i).getKey())) {
 									unitVec.get(i).setScore(Double.NEGATIVE_INFINITY);
@@ -464,10 +493,66 @@ public class TokenScorer implements ConditionalLexicon {
 				}
 			}
 		}
-		}
 		return sentence;
 	}
-	
+
+	public void getFrequencies(TObjectFloatHashMap<Unit> unitFreqs, String unitMention) {
+		float freq = 0.01f;
+		boolean found = true;
+		// 19 Jul: first searching in catalog because words like h for hour have no match in wordnet.
+		// get relative frequencies 
+		for (TObjectFloatIterator<Unit> iter = unitFreqs.iterator(); iter.hasNext(); ) {
+			iter.advance();
+			Unit unit = iter.key();
+			int id = (int) -iter.value() - 1;
+			float relativeFreqInCatalog = 0;
+			if (id == -1) 
+				relativeFreqInCatalog = matcher.getRelativeFrequency(unit, unitMention);
+			else
+				relativeFreqInCatalog = matcher.getRelativeFrequency(id);
+			if (relativeFreqInCatalog > Float.MIN_VALUE) {
+				freq = relativeFreqInCatalog;
+				iter.setValue(freq);
+			} else {
+				found = false;
+			}
+		}
+		// for unit without frequency info, in catalog search wordnet.
+		// any wordnet synset found has to be a noun, has to be of type unit, and is matched to the best of the give units 
+		// provided at least one word in the wordform matches the unit's base name. 
+		if (!found) {
+			found = wordFreq.getRelativeFrequency(unitMention,freqVector);
+			for (EntryWithScore<String[]> entry : freqVector) {
+				String[] wordForms = entry.getKey();
+				List<Unit> bestUnits = matcher.bestMatchUnit(wordForms);
+				if (bestUnits != null) {
+					for (Unit bestUnit : bestUnits) {
+						if (unitFreqs.contains(bestUnit)) {
+							float oldFreq = unitFreqs.get(bestUnit);
+							if (oldFreq > 0) continue;
+							unitFreqs.put(bestUnit, (float) entry.getScore());
+						}
+					}
+				}
+			}
+		}
+		// set frequency of units not found in either wordnet or catalog to zero.
+		for (TObjectFloatIterator<Unit> iter = unitFreqs.iterator(); iter.hasNext(); ) {
+			iter.advance();
+			Unit unit = iter.key();
+			float oldFreq = iter.value();
+			if (oldFreq < 0) iter.setValue(1);
+		}
+		/*
+		for (TObjectFloatIterator<Unit> iter = unitFreqs.iterator(); iter.hasNext(); ) {
+			iter.advance();
+			Unit unit = iter.key();
+			float oldFreq = iter.value();
+			System.out.println(unit.getBaseName() + " "+oldFreq);
+		}
+		 */
+		return;
+	}
 	private float getFrequency(Unit unit, String unitMention, int id) {
 		float freq = 0.01f;
 		boolean found = false;
@@ -508,7 +593,7 @@ public class TokenScorer implements ConditionalLexicon {
 			freq = 1;
 			//System.out.println("Found no match in wordnet for "+hdrToks.get(startM) + " "+unit.getBaseName());
 		} else {
-			
+
 		}
 		if (SimpleParser.wordSymbolsHash.contains(unitMention)) {
 			if (freq > 0.5f) {
@@ -660,7 +745,7 @@ public class TokenScorer implements ConditionalLexicon {
 		if (forcedTags != null && forcedTags.length > loc && forcedTags[loc][0] != iTW.tag) {
 			System.out.println("Disallowed tags tried");
 		}
-		if (forcedUnit != null && forcedUnit.start==loc && forcedUnit.end==loc && (forcedUnit.rootState != iTW.tag)) {
+		if (forcedUnit != null && forcedUnit.start()==loc && forcedUnit.end()==loc && (forcedUnit.rootState != iTW.tag)) {
 			return Float.NEGATIVE_INFINITY;
 		}
 		float score = scoreSpan(fvec,loc,loc,tagIndex.isMultUnit(iTW.tag())?multUnitState:(tagIndex.isSimpleUnit(iTW.tag())?unitState:-1));
@@ -681,10 +766,10 @@ public class TokenScorer implements ConditionalLexicon {
 			System.out.print("");
 		}
 		if (forcedUnit != null) {
-			if ((forcedUnit.start==start && forcedUnit.end==end && forcedUnit.rootState != rule.parent)
-					||  ((forcedUnit.start > end || forcedUnit.end < start)) && stateIndex.hasUnit(rule.parent)
-					|| (forcedUnit.start > start  && stateIndex.hasUnit(rule.parent)) // || forcedUnit.end < end-1
-					) {
+			if ((forcedUnit.start()==start && forcedUnit.end()==end && forcedUnit.rootState != rule.parent)
+					||  ((forcedUnit.start() > end || forcedUnit.end() < start)) && stateIndex.hasUnit(rule.parent)
+					|| (forcedUnit.start() > start  && stateIndex.hasUnit(rule.parent)) // || forcedUnit.end < end-1
+			) {
 				return Float.NEGATIVE_INFINITY;
 			}
 		}
@@ -742,7 +827,7 @@ public class TokenScorer implements ConditionalLexicon {
 			} else {
 				// Penalize multiplier unit-pair from appearing as a list of units.
 				// when there is no / separating the two.
-				
+
 				// Jul 25, disabled again because even if ambigous words like "m" are marked as meter instead of million this problem remains.
 				//	if (someUnitInside(start,split-1, multUnitState) || someUnitInside(unitStart,end, multUnitState)) {
 				//		return NegInfty;
@@ -767,7 +852,7 @@ public class TokenScorer implements ConditionalLexicon {
 		} else if (rule.parent == Tags.SU.ordinal() && (stateIndex.isState(States.SU_MW, rule.leftChild))) {
 			// 15 Jul 2013: should reward dictionary match only when a true compound unit otherwise things like "sq m" take double reward by
 			// outputing "sq (new unit) million"
-			
+
 			return scoreSpan(fvec,start,end,stateToScorePosition(rule.parent));
 		}
 		return 0;
@@ -804,12 +889,12 @@ public class TokenScorer implements ConditionalLexicon {
 			//return scores[start][end][state]+getLexScore(start, end, state);
 			int index = 0;
 			Vector<UnitFeatures> unitVec = sortedUnits[start][end][state];
-			
+
 			return ((unitVec != null && unitVec.size()>0 && index >= 0)?(float)unitVec.get(index).getScore():defaultFeatureScore(start,end,null)) +getLexScore(start, end, state);
 		}
 		return 0;
 	}
-	
+
 	@Override
 	public void writeData(Writer w) throws IOException {
 		// TODO Auto-generated method stub
@@ -838,6 +923,8 @@ public class TokenScorer implements ConditionalLexicon {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+	public static void main(String args[]) {
 
+	}
 
 }

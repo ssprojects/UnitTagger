@@ -123,6 +123,10 @@ public class RuleBasedParser extends SimpleParser {
 			return null;
 		}
 	}
+	EntryWithScore<Unit> newUnit(Unit unit, ParseState pHdr,
+			int bestUnitMatch) {
+		return new UnitSpan(unit, pHdr.dictMatch.hitMatch(bestUnitMatch), pHdr.dictMatch.hitPosition(bestUnitMatch), pHdr.dictMatch.hitEndPosition(bestUnitMatch));
+	}
 	public class DictConceptMatch1Unit extends IsUrl {
 		@Override
 		public
@@ -155,12 +159,13 @@ public class RuleBasedParser extends SimpleParser {
 					Unit unit =  quantityDict.idToUnitMap.get(res.hitDocId(matchId));
 					applicableRules.add(name());
 					List<EntryWithScore<Unit>> units = new Vector<EntryWithScore<Unit>>();
-					units.add(new EntryWithScore<Unit>(unit, pHdr.dictMatch.hitMatch(matchId)));
+					units.add(newUnit(unit, pHdr, matchId));
 					return units;
 				}
 			}
 			return null;
 		}
+
 		@Override
 		public boolean terminal() {
 			return true;
@@ -175,7 +180,7 @@ public class RuleBasedParser extends SimpleParser {
 			if (unit.getBaseSymbols()[0].equals("%") && hdr.indexOf('/') < 0) {
 				applicableRules.add(name());
 				List<EntryWithScore<Unit>> units = new Vector<EntryWithScore<Unit>>();
-				units.add(new EntryWithScore<Unit>(unit, pHdr.dictMatch.hitMatch(bestUnitMatch)));
+				units.add(newUnit(unit, pHdr, bestUnitMatch));
 				return units;
 			}
 			return null;
@@ -190,7 +195,7 @@ public class RuleBasedParser extends SimpleParser {
 			if (unit.getBaseName().equalsIgnoreCase("year") && !hdr.toLowerCase().contains("year-")) {
 				applicableRules.add(name());
 				List<EntryWithScore<Unit>> units = new Vector<EntryWithScore<Unit>>();
-				units.add(new EntryWithScore<Unit>(unit, pHdr.dictMatch.hitMatch(bestUnitMatch)));
+				units.add(newUnit(unit, pHdr, bestUnitMatch));
 				return units;
 			}
 			return null;
@@ -237,8 +242,28 @@ public class RuleBasedParser extends SimpleParser {
 					applicableRules.add(name());
 					Unit unit = quantityDict.idToUnitMap.get(pHdr.dictMatch.hitDocId(bestUnitMatch));
 					List<EntryWithScore<Unit>> units = new Vector<EntryWithScore<Unit>>();
-					units.add(new EntryWithScore<Unit>(unit, pHdr.dictMatch.hitMatch(bestUnitMatch)));
+					units.add(newUnit(unit, pHdr, bestUnitMatch));
 					return units;
+				}
+			}
+			return null;
+		}
+	}
+
+	public class SingleUnitAfterIn extends IsUrl {
+		// unless it is m.
+		public List<EntryWithScore<Unit>> apply(String hdr, ParseState pHdr, List<String> applicableRules) {
+			for (int t = 0; t < pHdr.tokens.size(); t++) {
+				if (pHdr.tokens.get(t).equals("in")) {
+					pHdr.setDictMatch(quantityDict);
+					int h = pHdr.singleMatchIgnoringToken(quantityDict, t);
+					if (h >= 0) {
+						applicableRules.add(name());
+						Unit unit = quantityDict.idToUnitMap.get(pHdr.dictMatch.hitDocId(h));
+						List<EntryWithScore<Unit>> units = new Vector<EntryWithScore<Unit>>();
+						units.add(newUnit(unit, pHdr, h));
+						return units;
+					}
 				}
 			}
 			return null;
@@ -260,15 +285,15 @@ public class RuleBasedParser extends SimpleParser {
 				applicableRules.add(name());
 				Unit unit = quantityDict.idToUnitMap.get(pHdr.dictMatch.hitDocId(bestUnitMatch));
 				List<EntryWithScore<Unit>> units = new Vector<EntryWithScore<Unit>>();
-				units.add(new EntryWithScore<Unit>(unit, pHdr.dictMatch.hitMatch(bestUnitMatch)));
+				units.add(newUnit(unit, pHdr, bestUnitMatch));
 				return units;
 			}
 			return null;
 		}
 	}
-	
+
 	List<Rule> rules;
-	public List<EntryWithScore<Unit> > parseHeaderProbabilistic(String hdr, List<String> applicableRules, int debugLvl, int k, ParseState hdrMatches[]) throws IOException {
+	public List<? extends EntryWithScore<Unit>> parseHeaderProbabilistic(String hdr, List<String> applicableRules, int debugLvl, int k, ParseState hdrMatches[]) throws IOException {
 		if (applicableRules != null) applicableRules.clear();
 		ParseState hdrToks = new ParseState(hdr);
 		if (hdrMatches != null && hdrMatches.length > 0) hdrMatches[0] = hdrToks;
@@ -310,7 +335,32 @@ public class RuleBasedParser extends SimpleParser {
 		}
 		return unitsToRet;
 	}
-
+	ParseState getTokensWithSpan(String hdr, UnitSpan forcedUnit, ParseState hdrMatches) {
+		if (hdrMatches != null && forcedUnit == null && hdrMatches.hdr.equalsIgnoreCase(hdr)) return hdrMatches;
+		hdr = hdr.replace(UnitSpan.StartXML, UnitSpan.StartString);
+		hdr = hdr.replace(UnitSpan.EndXML, UnitSpan.EndString);
+		TIntArrayList unitSpanPos = null;
+		TIntArrayList brackets = new TIntArrayList();
+		if (forcedUnit != null) {
+			unitSpanPos = new TIntArrayList();
+		}
+		List<String> hdrToks = quantityDict.getTokens(hdr,brackets,UnitSpan.SpecialTokens,unitSpanPos);
+		if (forcedUnit != null) {
+			int start = -1, end = -1;
+			for (int i = 0; i < unitSpanPos.size(); i++) {
+				if (i %2==0) {
+					start = (unitSpanPos.get(i) & ((1<<16)-1));
+				} else {
+					end = (unitSpanPos.get(i) & ((1<<16)-1))-1;
+				}
+			}
+			forcedUnit.setSpan(start, end);
+		}
+		hdrMatches = new ParseState(hdr);
+		hdrMatches.tokens = hdrToks;
+		hdrMatches.brackets=brackets;
+		return hdrMatches;
+	}
 	public RuleBasedParser(Element elem, QuantityCatalog dict)
 	throws IOException, ParserConfigurationException, SAXException {
 		super(elem, dict);
@@ -325,6 +375,7 @@ public class RuleBasedParser extends SimpleParser {
 		rules.add(new SingleLetterNotUnit());
 		rules.add(new SingleUnitWithinBrackets());
 		rules.add(new OnlyFreqUnitWords());
+		rules.add(new SingleUnitAfterIn());
 		// single words like meter, feet, points
 		// text in % .. ignore match of in to inch when a unit follows.
 		// truly ambiguous units (nm, km)
@@ -333,7 +384,7 @@ public class RuleBasedParser extends SimpleParser {
 	}
 	public static void main(String args[])  throws Exception {
 		List<String> vec = new Vector<String>();
-		List<EntryWithScore<Unit>> unitsR = new RuleBasedParser(null,null).parseHeaderExplain("Production (t)", vec, 1, null);
+		List<? extends EntryWithScore<Unit>> unitsR = new RuleBasedParser(null,null).parseHeaderExplain("mass in kilogram", vec, 1, null);
 		//				"
 		System.out.println(unitsR);
 		System.out.println(Arrays.toString(vec.toArray()));

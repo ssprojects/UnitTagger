@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -495,6 +496,59 @@ public class QuantityCatalog implements WordFrequency {
 		}
 		return freq;
 	}
+	public List<Unit> bestMatchUnit(String[] wordForms) {
+		HashSet<Unit> visited = new HashSet<Unit>();
+		Vector<Unit> bestUnits = null;
+		float bestScore = Float.NEGATIVE_INFINITY;
+		for (String word : wordForms) {
+			Collection<Unit> units = nameDict.getCollection(word.toLowerCase());
+			if (units != null) {
+				for (Unit unit : units) {
+					if (visited.contains(unit)) continue;
+					visited.add(unit);
+					float score = matchScore(unit, wordForms);
+					if (score > bestScore) {
+						bestScore = score;
+						if (bestUnits != null) bestUnits.clear();
+						else bestUnits = new Vector<Unit>();
+						bestUnits.add(unit);
+					} else if (bestScore - score < Float.MIN_VALUE) {
+						bestUnits.add(unit);
+					}
+				}
+			}
+		}
+		return bestUnits;
+	}
+	public float matchScore(Unit unit, String[] wordForms) {
+		float score = 0;
+		for (String word : wordForms) {
+			boolean wordMatched = false;
+			for (String baseName : unit.baseNames) {
+				if (baseName.equalsIgnoreCase(word)) {
+					score += 1;
+					wordMatched = true;
+					break;
+				}
+			}
+			if (wordMatched) continue;
+			for (String lemma : unit.getLemmas()) {
+				if (lemma.equalsIgnoreCase(word)) {
+					wordMatched = true;
+					score += 0.7;
+					break;
+				}
+			}
+			if (wordMatched) continue;
+			for (String symbol : unit.baseSyms) {
+				if (symbol.equalsIgnoreCase(word)) {
+					score += 0.5;
+					break;
+				}
+			}
+		}
+		return score;
+	}
 	public float getRelativeFrequency(int id) {
 		Unit u = idToUnitMap.get(id);
 		List<String> tokens = idToUnitMap.getTokens(id);
@@ -528,9 +582,9 @@ public class QuantityCatalog implements WordFrequency {
 		}
 		return null;
 	}
-	public boolean isUnit(String str) {
+	public Unit isUnit(String str) {
 		List<EntryWithScore<Unit>> matches = getTopK(str, "", 0.9);
-		return (matches != null && matches.size()>0);
+		return (matches != null && matches.size()>0)?matches.get(0).getKey():null;
 	}
 	public float convert(float value, Unit fromUnit, Unit toUnit, boolean success[]) {
 		success[0] = true;
@@ -543,4 +597,5 @@ public class QuantityCatalog implements WordFrequency {
 		}
 		return (float) convValue;
 	}
+	
 }

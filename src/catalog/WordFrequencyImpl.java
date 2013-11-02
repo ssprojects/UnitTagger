@@ -13,6 +13,7 @@ public class WordFrequencyImpl implements WordFrequency {
 	@Override
 	public boolean getRelativeFrequency(String str,
 			List<EntryWithScore<String[]>> matches) {
+				return false;
 
 	}
 

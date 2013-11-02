@@ -2,16 +2,18 @@ package parser;
 
 import iitb.shared.EntryWithScore;
 import parser.CFGParser4Header.Params.FTypes;
-import parser.cfgTrainer.FeatureVector;
+import parser.trainer.FeatureVector;
 import catalog.Unit;
 
 public class UnitFeatures extends EntryWithScore<Unit> {
+	int span=0;
 	FeatureVector fvals;
-	public UnitFeatures(Unit key, double score) {
+	public UnitFeatures(Unit key, double score, int start, int end) {
 		super(key, score);
+		setStartEnd(start, end);
 	}
-	public UnitFeatures(Unit unit, double d,UnitFeatures unit1, UnitFeatures unit2) {
-		this(unit,d);
+	public UnitFeatures(Unit unit, double d,UnitFeatures unit1, UnitFeatures unit2, int start, int end) {
+		this(unit,d,start,end);
 		if (unit1 != null && unit1.fvals != null) {
 			if (fvals==null) setFvals();
 			fvals.add(unit1.fvals);
@@ -46,5 +48,32 @@ public class UnitFeatures extends EntryWithScore<Unit> {
 			fw += weights[i]*fvals.get(i);
 		}
 		assert(Math.abs(fw-getScore()) < 1e-6);
+	}
+	public int start() {
+		return (span  >> 16);
+	}
+	public int end(){
+		return span & ((1<<16)-1);
+	}
+	public void setStartEnd(int start, int end) {
+		span = (start << 16) + end;
+	}
+	// 27 Oct 2013: do not change this because the hash in CFGParser4Headers depends on equality only based on units.
+	@Override
+	public int hashCode() {
+		return getKey().hashCode();
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		UnitFeatures other = (UnitFeatures) obj;
+		if (!getKey().equals(other.getKey()))
+			return false;
+		return true;
 	}
 }

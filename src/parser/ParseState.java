@@ -98,6 +98,46 @@ public class ParseState {
 		singleUnitMatch = matchId;
 		return matchId;
 	}
+	public int singleMatchIgnoringToken(QuantityCatalog quantityDict, int tokenId) {
+		DocResult res = dictMatch;
+		int matchId = -1;
+		Unit singleUnit = null;
+		float maxScore = Float.NEGATIVE_INFINITY;
+		for (int h = res.numHits()-1; h >= 0; h--) {
+			int id = res.hitDocId(h);
+			byte type = quantityDict.idToUnitMap.getType(id);
+			if (res.hitLength(h)==1 && res.hitPosition(h)==tokenId) continue;
+			if (quantityDict.idToUnitMap.getType(id)!=quantityDict.idToUnitMap.ConceptMatch) {
+				Unit unit =  quantityDict.idToUnitMap.get(res.hitDocId(h));
+				float score = res.hitMatch(h);
+				if (score < RuleBasedParser.ThresholdTight) continue;
+				if (maxScore < score) {
+					maxScore = score;
+					matchId = h;
+					singleUnit = unit;
+				} else if (maxScore < score + Float.MIN_VALUE) {
+				}
+			}
+		}
+		if (matchId >= 0) {
+			// now make sure that for no other span we have a unit that is different.
+			for (int h = res.numHits()-1; h >= 0; h--) {
+				if (res.hitLength(h)==1 && res.hitPosition(h)==tokenId) continue;
+				if (h == matchId) continue;
+				int id = res.hitDocId(h);
+				byte type = quantityDict.idToUnitMap.getType(id);
+				if (quantityDict.idToUnitMap.getType(id)!=quantityDict.idToUnitMap.ConceptMatch) {
+					Unit unit =  quantityDict.idToUnitMap.get(res.hitDocId(h));
+					if (unit.getBaseName().toLowerCase().contains(singleUnit.getBaseName().toLowerCase())) continue;
+					if (unit != singleUnit) {
+						matchId=-1;
+						break;
+					}
+				}
+			}
+		}
+		return matchId;
+	}
 	public float setWordFrequency(QuantityCatalog quantityDict, WordnetFrequency wordFreq) {
 		if (!Float.isInfinite(freq)) return freq;
 		freqVector = new Vector<EntryWithScore<String[]>>();
@@ -124,9 +164,6 @@ public class ParseState {
 			}
 			if (isUnit) {
 				numMatches++;
-				if (numMatches>1) {
-					System.out.println("Violated uniqueness assumption of base unit");
-				}
 				freq += (float) entry.getScore();
 			}
 		}

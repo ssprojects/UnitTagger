@@ -27,7 +27,8 @@ public class WordnetFrequency implements WordFrequency {
 	float stopWordFreq = 0.9f;
 	// p -- percent as against poise and poncelet.
 	// s is often used as a pluralizer in headers.
-	static String stopWords[] = new String[]{"in","are","at","a","from","of","to","the","for","and","all","st","with","on","total","per","no","number","amp","apos","quot","hr","s"};
+	static String stopWords[] = new String[]{"in","are","at","a","from","of","to","the","for","and","all","st"
+		,"with","on","total","per","no","number","amp","apos","quot","hr","s"};
 	static HashSet<String> stopWordsHash=new HashSet<String>(Arrays.asList(stopWords));
 	public WordnetFrequency(Element options) {
 		System.out.println("Using "+extractLoadFile(options));
@@ -107,7 +108,7 @@ public class WordnetFrequency implements WordFrequency {
 	 */
 	public static void main(String[] args) {
 		//args = HeaderSegmenter.WordSymbols;
-		args = new String[]{"mil"};
+		args = new String[]{"in"};
 		WordnetFrequency wordFreq = new WordnetFrequency(null);
 		List<EntryWithScore<String[]>> matches = new Vector<EntryWithScore<String[]>>();
 		wordFreq.getRelativeFrequency(args[0], matches);
