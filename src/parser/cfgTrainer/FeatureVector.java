@@ -33,8 +33,11 @@ public class FeatureVector {
 		}
 		return;
 	}
+	public String toString() {
+		return Arrays.toString(fvals);
+	}
 	public float get(int i) {
-		return fvals[i];
+		return i >= fvals.length?0:fvals[i];
 	}
 
 }

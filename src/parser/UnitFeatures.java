@@ -2,7 +2,8 @@ package parser;
 
 import iitb.shared.EntryWithScore;
 import parser.CFGParser4Header.Params.FTypes;
-import parser.trainer.FeatureVector;
+import parser.cfgTrainer.FeatureVector;
+import weka.core.parser.JFlex.NFA;
 import catalog.Unit;
 
 public class UnitFeatures extends EntryWithScore<Unit> {
@@ -22,6 +23,11 @@ public class UnitFeatures extends EntryWithScore<Unit> {
 			if (fvals==null) setFvals();
 			fvals.add(unit2.fvals);
 		}
+	}
+	public UnitFeatures(UnitFeatures f, int length) {
+		this(f.getKey(),f.getScore(),f.start(),f.end());
+		fvals = new FeatureVector(length);
+		fvals.add(f.fvals);
 	}
 	private void setFvals() {
 		fvals = new FeatureVector(FTypes.WithinBracket.ordinal()); // this is the largest set of unit-specific features.
@@ -59,7 +65,7 @@ public class UnitFeatures extends EntryWithScore<Unit> {
 		span = (start << 16) + end;
 	}
 	// 27 Oct 2013: do not change this because the hash in CFGParser4Headers depends on equality only based on units.
-	@Override
+/*	@Override
 	public int hashCode() {
 		return getKey().hashCode();
 	}
@@ -73,6 +79,38 @@ public class UnitFeatures extends EntryWithScore<Unit> {
 			return false;
 		UnitFeatures other = (UnitFeatures) obj;
 		if (!getKey().equals(other.getKey()))
+			return false;
+		return true;
+	}
+	*/
+	
+	public int numFeatures() {
+		return fvals.size();
+	}
+	public FeatureVector getFeatureVector() {
+		return fvals;
+	}
+	public String toString(){
+		return super.toString()+"["+start()+","+end()+"]";
+	}
+	                         
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + span;
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		UnitFeatures other = (UnitFeatures) obj;
+		if (span != other.span)
 			return false;
 		return true;
 	}

@@ -1,15 +1,13 @@
 package parser;
 
+import gnu.trove.TObjectFloatHashMap;
+import gnu.trove.TObjectFloatIterator;
+import iitb.shared.EntryWithScore;
+
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.Character.Subset;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -18,47 +16,30 @@ import java.util.Vector;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TObjectFloatHashMap;
-import gnu.trove.TObjectFloatIterator;
-import gnu.trove.TObjectIntHashMap;
-import iitb.shared.EntryWithScore;
-import iitb.shared.ReusableVector;
-
 import org.apache.commons.lang.NotImplementedException;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import parser.CFGParser4Header.EnumIndex.Tags;
+import parser.cfgTrainer.FeatureVector;
+import parser.coOccurMethods.PrUnitGivenWord;
 import catalog.Co_occurrenceStatistics;
 import catalog.QuantityCatalog;
 import catalog.Unit;
 import catalog.UnitMultPair;
 import catalog.UnitPair;
-import catalog.WordnetFrequency;
-
 import conditionalCFG.ConditionalCFGParser;
-
-import parser.CFGParser4Header.EnumIndex.Tags;
-import parser.coOccurMethods.PrUnitGivenWord;
-import parser.trainer.FeatureVector;
-
 import edu.stanford.nlp.ling.HasTag;
 import edu.stanford.nlp.ling.HasWord;
-import edu.stanford.nlp.ling.Word;
 import edu.stanford.nlp.parser.lexparser.BinaryGrammar;
 import edu.stanford.nlp.parser.lexparser.BinaryRule;
-import edu.stanford.nlp.parser.lexparser.ExhaustivePCFGParser;
 import edu.stanford.nlp.parser.lexparser.IntTaggedWord;
 import edu.stanford.nlp.parser.lexparser.Lexicon;
 import edu.stanford.nlp.parser.lexparser.Options;
 import edu.stanford.nlp.parser.lexparser.UnaryGrammar;
 import edu.stanford.nlp.parser.lexparser.UnaryRule;
 import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.util.HashIndex;
 import edu.stanford.nlp.util.Index;
-import edu.stanford.nlp.util.IntPair;
 import edu.stanford.nlp.util.ScoredObject;
 import edu.stanford.nlp.util.StringUtils;
 
@@ -531,6 +512,9 @@ public class CFGParser4Header extends RuleBasedParser {
 			public int numFeatures() {
 				return FTypes.values().length;
 			}
+			public String featureName(int i) {
+				return FTypes.values()[i].name();
+			}
 	}
 	
 	public static class Token implements HasWord {
@@ -617,7 +601,7 @@ public class CFGParser4Header extends RuleBasedParser {
 	protected String getGrammar() {
 		return grammar+basicUnitGrammar;
 	}
-	public List<EntryWithScore<Unit>> parseHeader(String hdr) {
+	public List<? extends EntryWithScore<Unit>> parseHeader(String hdr) {
 		return parseHeader(hdr, null, 0);
 	}
 	
@@ -625,17 +609,17 @@ public class CFGParser4Header extends RuleBasedParser {
 	List<UnitFeatures> bestUnits2 = new Vector<UnitFeatures>();
 	FeatureVector tmpFVec;
 
-	public List<EntryWithScore<Unit>> getTopKUnits(String hdr, int k, Vector<UnitFeatures> featureList, int debugLvl) {
+	public List<? extends EntryWithScore<Unit>> getTopKUnits(String hdr, int k, Vector<UnitFeatures> featureList, int debugLvl) {
 		return parseHeader(hdr, null, debugLvl, k, featureList);
 	}
-	public List<EntryWithScore<Unit>> parseHeader(String hdr, short[][] forcedTags, int debugLvl) {
+	public List<? extends EntryWithScore<Unit>> parseHeader(String hdr, short[][] forcedTags, int debugLvl) {
 		return parseHeader(hdr, forcedTags, debugLvl, 1, null);
 	}
-	public List<EntryWithScore<Unit>> parseHeader(String hdr, short[][] forcedTags, int debugLvl, int k, Vector<UnitFeatures> featureList) {
+	public List<? extends EntryWithScore<Unit>> parseHeader(String hdr, short[][] forcedTags, int debugLvl, int k, Vector<UnitFeatures> featureList) {
 		return parseHeader(hdr, null, debugLvl,forcedTags, null, k, featureList);
 	}
 	
-	public List<EntryWithScore<Unit>> parseHeader(String hdr, ParseState hdrMatches, int debugLvl, short[][] forcedTags, UnitSpan forcedUnit, int k, Vector<UnitFeatures> featureList) {			
+	public List<? extends EntryWithScore<Unit>> parseHeader(String hdr, ParseState hdrMatches, int debugLvl, short[][] forcedTags, UnitSpan forcedUnit, int k, Vector<UnitFeatures> featureList) {			
 		if (debugLvl > 0) System.out.println(hdr);
 		if (isURL(hdr)) return null;
 		
@@ -879,7 +863,7 @@ public class CFGParser4Header extends RuleBasedParser {
 		//  
 		//
 		Vector<UnitFeatures> featureList = new Vector();
-		List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).getTopKUnits("Length in kilometres",  3, featureList,1);
+		List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).getTopKUnits("Bullet Weight [ g ]",  3, featureList,1);
 		/*List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).parseHeader("Wealth (in " + UnitSpan.StartXML + " $mil "+UnitSpan.EndXML+")",null, 2,null, 
 				//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}
 				//,{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}}
@@ -899,5 +883,8 @@ public class CFGParser4Header extends RuleBasedParser {
 	}
 	public double[] getParamsArray() {
 		return params.weights;
+	}
+	public String featureName(int i) {
+		return params.featureName(i);
 	}
 }

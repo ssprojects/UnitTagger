@@ -60,13 +60,13 @@ public class Trainer implements ConstraintsGenerator {
 				}
 			}
 			
-			List<EntryWithScore<Unit>> extractedUnits = ruleParser.parseHeaderExplain(hdr, applicableRules);
+			List<? extends EntryWithScore<Unit>> extractedUnits = ruleParser.parseHeaderExplain(hdr, applicableRules,0,null);
 			if (applicableRules.size()==1) {
 				if (unitsMatchedIndex(trueUnits,extractedUnits)>=0) continue;
 				throw new Exception("Mistake in rule-based extractor for "+hdr+trueUnits.toString()+ " "+extractedUnits.toString());
 			} else {
 				Vector<UnitFeatures> featureList = new Vector();//
-				extractedUnits = parser.parseHeader(hdr, null, new UnitSpan(trueUnits), 1, 1, featureList);
+				extractedUnits = parser.parseHeader(hdr, null,1,null, new UnitSpan(trueUnits), 1, featureList);
 				int index = unitsMatchedIndex(trueUnits, extractedUnits);
 				if (!(index == 0 && trueUnits.length()==0 || index == 1)) {
 					System.out.println("True unit not found");
@@ -77,21 +77,28 @@ public class Trainer implements ConstraintsGenerator {
 		StructTrainer structTrainer = new StructTrainer(this);
 		structTrainer.train(parser.getParamsArray(), options);
 	}
-	private int unitsMatchedIndex(String trueUnits,
+	public Trainer() {
+		// TODO Auto-generated constructor stub
+	}
+	protected int unitsMatchedIndex(String trueUnits,
 			List<? extends EntryWithScore<Unit>> extractedUnits) {
-		boolean matched = false;
 		if ((trueUnits==null || trueUnits.length()==0) && (extractedUnits==null || extractedUnits.size()==0)) {
 			return 0;
 		} else {
 			if (trueUnits != null && extractedUnits != null && trueUnits.length() > 0 && extractedUnits.size()>0) {
-				matched=true;
+				float maxScore = Float.NEGATIVE_INFINITY;
+				int matchedId = -1;
 				for (int p = extractedUnits.size()-1; p >= 0; p--) {
 					EntryWithScore<Unit> unitScore = extractedUnits.get(p);
 					Unit unit = unitScore.getKey();
 					if (trueUnits.equals(unit.getBaseName().toLowerCase()) || trueUnits.equals(unit.getName())) {
-						return p+1;
+						if (matchedId == -1 || maxScore < unitScore.getScore()) {
+							matchedId = p+1;
+							maxScore = (float) unitScore.getScore();
+						}
 					}
 				}
+				return matchedId;
 			}
 		}
 		return -1;

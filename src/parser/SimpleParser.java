@@ -57,7 +57,7 @@ public class SimpleParser implements HeaderUnitParser{
 	 * @see parser.HeaderUnitParser#parseHeader(java.lang.String)
 	 */
 	@Override
-	public List<EntryWithScore<Unit> > parseHeader(String hdr) throws IOException {
+	public List<? extends EntryWithScore<Unit>> parseHeader(String hdr) throws IOException {
 		if (isURL(hdr)) return null;
 		List<String> hdrToks = quantityDict.getTokens(hdr);
 		DocResult res = quantityDict.subSequenceMatch(hdrToks, 0.7f);
