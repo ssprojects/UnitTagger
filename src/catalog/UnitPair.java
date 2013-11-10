@@ -10,6 +10,7 @@ import catalog.UnitPair.OpType;
 /* sunita: Oct 2, 2012 */
 public class UnitPair extends Unit {
 	public static enum OpType {Ratio,Alt,Mult};
+	static String OpStringFull[] = new String[]{" per ","|","["};
 	static String OpString[] = new String[]{"/","|","["};
 	static String OpStringRegex[] = new String[]{"/","|","\\["};
 	Unit unit1;
@@ -56,7 +57,13 @@ public class UnitPair extends Unit {
 		return 1;
 	}
 	public String getBaseName() {
-		return unit1.getBaseName() + OpString[op.ordinal()]+ unit2.getBaseName();
+		return unit1.getBaseName() + OpStringFull[op.ordinal()]+ unit2.getBaseName();
+	}
+	public String getBaseName(int i) {
+		if (i==0) return getBaseName();
+		if (i == 1 && !OpStringFull[op.ordinal()].equals(OpString[op.ordinal()]))
+			return unit1.getBaseName() + OpString[op.ordinal()]+ unit2.getBaseName();
+		return null;
 	}
 	public Unit getUnit(int id) {
 		if (id==0) return unit1;

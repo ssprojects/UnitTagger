@@ -6,6 +6,7 @@ import iitb.shared.XMLConfigs;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -33,35 +34,48 @@ public class Test {
 		int len = nodeList.getLength();
 
 		int total = 0;
+		int totalNoUnit = 0;
 		int mistakes[] = new int[parsers.length];
 		int criticalMistakes[] = new int[parsers.length];
+		int noUnitError[] = new int[parsers.length];
 		Vector<String> applicableRules = new Vector<String>();
+		int numPred[] = new int[parsers.length];
+		int numMatched[] = new int[parsers.length];
 		for (int r = 0; r < len; r++) {
 			total++;
 			Element rec = (Element) nodeList.item(r);
 			String hdr = XMLConfigs.getElement(rec, "h").getTextContent();
 			NodeList unitList = rec.getElementsByTagName("u");
 			HashSet<String> trueUnits = null;
+			String trueUnitsString = "";
 			if (unitList != null && unitList.getLength()>0) {
 				trueUnits = new HashSet<String>();
 				for (int u = 0; u < unitList.getLength();u++) {
 					trueUnits.add(unitList.item(u).getTextContent().toLowerCase());
+					if (u > 0) trueUnitsString.concat("|");
+					//System.out.println(unitList.item(u).getTextContent());
+					trueUnitsString += unitList.item(u).getTextContent().toLowerCase();
 				}
 			}
 			int p = -1;
 			boolean matchedA[] = new boolean[parsers.length];
 			Arrays.fill(matchedA, false);
-
+			if (trueUnitsString.length()==0) totalNoUnit++;
 			for (HeaderUnitParser parser : parsers) {
 				p++;
 				boolean matched=false;
 				List<? extends EntryWithScore<Unit>> extractedUnits = parser.parseHeaderExplain(hdr, applicableRules, 0, null);
-				
+				if (applicableRules.size()>0) 
+					numPred[p]++;
+				else if (applicableRules.size()==0 && parser.getClass().getSimpleName().startsWith("Rule")) {
+					continue;
+				}
+				int matchedIndex = Utils.unitsMatchedIndex(trueUnitsString, extractedUnits);
+				/*
 				if ((trueUnits==null || trueUnits.size()==0) && (extractedUnits==null || extractedUnits.size()==0)) {
 					matched = true;
 				} else {
 					if (trueUnits != null && extractedUnits != null && trueUnits.size()==extractedUnits.size()) {
-						
 						matched=true;
 						for (EntryWithScore<Unit> unitScore : extractedUnits) {
 							Unit unit = unitScore.getKey();
@@ -72,30 +86,45 @@ public class Test {
 						}
 					}
 				}
+				*/
+				matched=((matchedIndex == 0 || matchedIndex==1) && (extractedUnits == null || extractedUnits.size()<=1));
+				System.out.println(matched + " " + hdr); 
 				if (!matched) {
-					System.out.println(hdr); //"Extracted from " + parser.getClass().getSimpleName() + " " + extractedUnits);
+					//"Extracted from " + parser.getClass().getSimpleName() + " " + extractedUnits);
 					mistakes[p]++;
 					if (applicableRules.size()==1) {
 						criticalMistakes[p]++;
 					}
-				}
+					if (trueUnitsString.length()==0) {
+						noUnitError[p]++;
+					}
+				} else
+					numMatched[p]++;
 				matchedA[p] = matched;
 			} 
 			if (p > 0 && matchedA[0] != matchedA[1]) {
-				System.out.println("Mismatched");
+				//System.out.println("Mismatched");
 			}
 		}
 		int p = 0;
 		for (HeaderUnitParser parser : parsers) {
-			System.out.println(parser.getClass().getSimpleName() + "  " + mistakes[p]+ " / "+total);
+			float recall = ((float)numMatched[p])/total;
+			float precision =  ((float)numMatched[p])/numPred[p];
+			System.out.println(parser.getClass().getSimpleName() + "  " + mistakes[p]+ " / "+total + " prec="+precision + " recall="+recall + " NoUnitError="+noUnitError[p]+"/"+totalNoUnit);
 			p++;
 		}
 	}
-	public static void main(String args[]) throws IOException, ParserConfigurationException, SAXException {
+	public static void main(String args[]) throws IOException, ParserConfigurationException, SAXException, SecurityException, IllegalArgumentException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
 		QuantityCatalog dict = new QuantityCatalog((Element)null);
-		HeaderUnitParser[] parsers = new HeaderUnitParser[]{new RuleBasedParser(null, dict), 
-				new FeatureBasedParser(null, dict), 
-				new CFGParser4Header(null,dict)};
+		Element emptyElement = XMLConfigs.emptyElement();
+		//emptyElement.setAttribute("co-occur-class", "PrUnitGivenWordNoFreq");
+		emptyElement.setAttribute("params", "Co_occurStats=0");
+		//emptyElement.setAttribute("params", "AfterIN=0,WithinBracket=0");
+		HeaderUnitParser[] parsers = new HeaderUnitParser[]{
+				new RuleBasedParser(emptyElement, dict), 
+				new FeatureBasedParser(emptyElement, dict),
+				new CFGParser4Header(emptyElement,dict)
+				};
 		new Test(parsers,GroundTruthFile);
 	}
 }

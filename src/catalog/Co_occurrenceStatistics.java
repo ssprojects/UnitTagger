@@ -37,9 +37,9 @@ import parser.UnitSpan;
 public class Co_occurrenceStatistics {
 	public static final String CoOccurFilePath = "configs/cooccurrence.txt";
 	QuantityCatalog quantityDict;
-	List<String> units = new Vector<String>();
-	TIntArrayList freqs = new TIntArrayList();
-	TObjectLongHashMap<String> word2UnitsHashMap = new TObjectLongHashMap<String>();
+	//	List<String> units = new Vector<String>();
+	//TIntArrayList freqs = new TIntArrayList();
+	//	TObjectLongHashMap<String> word2UnitsHashMap = new TObjectLongHashMap<String>();
 	TObjectIntHashMap<Pair<String,String>> counts = new TObjectIntHashMap<Pair<String,String>>();
 	int numHdrs = 0;
 	RuleBasedParser parser;
@@ -96,10 +96,10 @@ public class Co_occurrenceStatistics {
 		}
 	}
 	// use rule-based parser to find high precision unit matches.
-	public List<EntryWithScore<Unit>>  addHeader(String hdr, Vector<String> explanation) throws IOException {
+	public List<? extends EntryWithScore<Unit>>  addHeader(String hdr, Vector<String> explanation) throws IOException {
 		numHdrs++;
 		ParseState[] hdrMatches = new ParseState[1];
-		List<EntryWithScore<Unit>> units = parser.parseHeaderExplain(hdr, explanation, 0, hdrMatches);
+		List<? extends EntryWithScore<Unit>> units = parser.parseHeaderExplain(hdr, explanation, 0, hdrMatches);
 		List<String> tokens = hdrMatches[0].tokens;
 		if (tokens == null) return null;
 		for (String tok : tokens) {
@@ -122,7 +122,45 @@ public class Co_occurrenceStatistics {
 		}
 		return units;
 	}
-	
+
+	// use rule-based parser to find high precision unit matches.
+	public List<? extends EntryWithScore<Unit>>  addHeaderPMI(String hdr, Vector<String> explanation) throws IOException {
+		numHdrs++;
+		List<String> tokens = quantityDict.getTokens(hdr);
+		if (tokens == null) return null;
+		int matchLen = 0;  Unit unit = null;
+		int start = -1;
+		int end = -1;
+		for (int i = 0; i < tokens.size(); i++) {
+			String sub="";
+			for (int j = i; j >= 0; j--) {
+				sub = tokens.get(j) + (i > j?" "+sub:"");
+				Unit tunit = quantityDict.getUnitFromBaseName(sub, true);
+				if (tunit != null && matchLen < (i-j+1)) {
+					unit = tunit;
+					matchLen = i-j+1;
+					start = j;
+					end = i;
+				}
+			}
+		}
+		for (String tok : tokens) {
+			wordFreqs.adjustOrPutValue(tok, 1, 1);
+		}
+		if (unit == null)
+			return null;
+		unitsFreqs.adjustOrPutValue(unit.getBaseName(), 1, 1);
+		for (int t = 0; t < tokens.size(); t++) {
+			if (t >= start && t <= end) continue;
+			if (WordnetFrequency.stopWordsHash.contains(tokens.get(t))) continue;
+			//if (!checkTokensCorrectness(tokens.get(t))) return false;
+			if (tokens.get(t).length()>1 && Character.isLetter(tokens.get(t).charAt(0))) {
+				counts.adjustOrPutValue(new Pair(tokens.get(t), unit.getBaseName()), 1, 1);
+			}
+		}
+		return null;
+	}
+
 	private boolean checkTokensCorrectness(String string) {
 		for (int c = string.length()-2; c > 1; c--) {
 			if (Character.isDigit(string.charAt(c))) return true;
@@ -184,13 +222,12 @@ public class Co_occurrenceStatistics {
 	public void load(BufferedReader statFile) throws IOException, ParserConfigurationException, SAXException {
 		String line=null;
 		for (int l = 0; (line=statFile.readLine()) != null; l++) {
-			if (l == 0) {
-				numHdrs = -1;
-				if (line.startsWith("#")) {
-					String toks[] = line.split(" ");
-					numHdrs = Integer.parseInt(toks[3]);
-				}
-				if (numHdrs < 0) {
+			//if (l == 0) {
+			if (line.startsWith("# statistics over ")) {
+				String toks[] = line.split(" ");
+				numHdrs += Integer.parseInt(toks[3]);
+
+				if (numHdrs <= 0) {
 					throw new IOException("First line should contain number of headers as the four word");
 				}
 				continue;
@@ -209,40 +246,47 @@ public class Co_occurrenceStatistics {
 				String e[] = tokens[t].split("\\|");
 				String unitName = e[0];
 				int cnt = Integer.parseInt(e[1]);
-				unitsFreqs.put(unitName,cnt);
+				unitsFreqs.adjustOrPutValue(unitName,cnt,cnt);
 				continue;
 			}
-			int pos = units.size();
-			word2UnitsHashMap.put(tokens[0],pos);
+			//int pos = units.size();
+			//word2UnitsHashMap.put(tokens[0],pos);
 			int total = 0;
-			TObjectIntHashMap<String> conceptCount = new TObjectIntHashMap<String>();
+			//TObjectIntHashMap<String> conceptCount = new TObjectIntHashMap<String>();
 			for (int t = 1; t < tokens.length;t++) {
-				if (tokens[t].startsWith("=")) continue;
+				if (tokens[t].startsWith("=")) {
+					//int cnt = Integer.parseInt(tokens[t].substring(1));
+					//counts.add(new Pair(tokens[0],"="),cnt,cnt);
+					continue;
+				}
 				String e[] = tokens[t].split("\\|");
 				if (e.length!=2) {
 					throw new IOException("Wrong format at line "+(l+1));
 				}
 				String unitName = e[0];
 				int cnt = Integer.parseInt(e[1]);
-				units.add(unitName);
-				freqs.add(cnt);
+				counts.adjustOrPutValue(new Pair(tokens[0],unitName), cnt,cnt);
+				//units.add(unitName);
+				//freqs.add(cnt);
 				total += cnt;
 				if (quantityDict != null) {
 					Unit unit = quantityDict.getUnitFromBaseName(unitName);
 					if (unit!=null) {
-						conceptCount.adjustOrPutValue(unit.getParentQuantity().getConcept(), cnt, cnt);
+						counts.adjustOrPutValue(new Pair(tokens[0], unit.getParentQuantity().getConcept()), cnt, cnt);
 					}
 				}
 			}
+			/*
 			for (TObjectIntIterator<String> iter = conceptCount.iterator(); iter.hasNext(); ) {
 				iter.advance();
 				units.add(iter.key());
 				freqs.add(iter.value());
 			}
 			units.add("="); freqs.add(total);
+			 */
 		}
 	}
-	public int getOccurrenceFrequency(String word, String unitName, String conceptName, int total[]) {
+	/*	public int getOccurrenceFrequency(String word, String unitName, String conceptName, int total[]) {
 		if (total != null) {total[0] = 0;total[1]=0;}
 		if (!word2UnitsHashMap.contains(word)) {
 			return 0;
@@ -264,16 +308,32 @@ public class Co_occurrenceStatistics {
 		}
 		return freq;
 	}
+	 */
+	Pair<String,String> tmpPair = new Pair("","");
+	public int getOccurrenceFrequency(String word, String unitName, String conceptName, int total[]) {
+		if (total != null) {total[0] = 0;total[1]=0;}
+		int freq = counts.get(formTmpPair(word,unitName));
+		if (conceptName != null && total != null && counts.containsKey(formTmpPair(word,conceptName))) {
+			total[1] = counts.get(tmpPair);
+		}
+		if (total!=null) {
+			total[0] = wordFreqs.get(word);
+		}
+		if (total != null && total.length > 2) {
+			total[2] = unitsFreqs.get(unitName);
+		}
+		return freq;
+	}
+	private Pair<String, String> formTmpPair(String word, String unitName) {
+		tmpPair.first = word; tmpPair.second = unitName;
+		return tmpPair;
+	}
 	private int getPos(long posLen) {
 		return (int) posLen;
 	}
-	public static void main(String args[]) throws IOException, ParserConfigurationException, SAXException {
-		int total[] = new int[2];
-		Co_occurrenceStatistics stats = new Co_occurrenceStatistics(null,"/tmp/cooccurrence.txt");
-		System.out.println(stats.getOccurrenceFrequency("weight", "gram", "weight", total));
-	}
+
 	public boolean tokenPresent(String word) {
-		return word2UnitsHashMap.contains(word);
+		return wordFreqs.contains(word);
 	}
 	public float unitFrequency(String unitName) {
 		return unitsFreqs.get(unitName);
@@ -283,5 +343,25 @@ public class Co_occurrenceStatistics {
 	}
 	public int numDocs() {
 		return numHdrs;
+	}
+
+	public static void main(String args[]) throws IOException, ParserConfigurationException, SAXException {
+		int total[] = new int[3]; int totalOld[] = new int[3];
+		Co_occurrenceStatistics stats[] = new Co_occurrenceStatistics[2];
+		stats[0] = new Co_occurrenceStatistics(new QuantityCatalog((Element)null),"/mnt/a99/d0/sunita/workspace/QuantityTagger/configs/cooccurrencePMI.txt");
+		stats[1] = new Co_occurrenceStatistics(stats[0].quantityDict,"/mnt/a99/d0/sunita/workspace/QuantityTagger/configs/cooccurrence.txt");
+		String tests[][] = {{"amount", "metre", "Length"},
+				{"weight","kilogram","Mass"}
+		,{"duration","second","Time"}
+		};
+		for (String[] test : tests) {
+			System.out.println(Arrays.toString(test));
+			for (Co_occurrenceStatistics stat : stats) {
+				System.out.println(stat.getOccurrenceFrequency(test[0],test[1],test[2], total));
+				System.out.println(Arrays.toString(total));
+				System.out.println(stat.numHdrs);
+			}
+		}
+		stats[0].addHeaderPMI("speed in kilometre per second", null);
 	}
 }

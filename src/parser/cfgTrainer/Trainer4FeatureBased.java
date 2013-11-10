@@ -4,6 +4,7 @@ import iitb.shared.EntryWithScore;
 import iitb.shared.XMLConfigs;
 
 import java.io.FileReader;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
@@ -56,7 +57,7 @@ public class Trainer4FeatureBased extends Trainer{
 		attributes.addElement(new weka.core.Attribute("Class",classNames));
 		Instances dataset = new Instances("FeatureBasedParser",attributes,1000);
 		dataset.setClassIndex(attributes.size()-1);
-//		System.out.println(attributes);
+		//		System.out.println(attributes);
 		for (int r = 0; r < len; r++) {
 			total++;
 			Element rec = (Element) nodeList.item(r);
@@ -88,10 +89,10 @@ public class Trainer4FeatureBased extends Trainer{
 						/*
 						 * create training instance with pairs of positive and negatives and ask for their score > 0.
 						 */
-						
+
 						if (trueFeatures != null) System.out.println(trueFeatures.getKey().getBaseName() + " "+trueFeatures.getFeatureVector());
 						System.out.println(featureList.get(i).getKey().getBaseName() + " "+predFeatures);
-						
+
 						Instance instance = new Instance(attributes.size());
 						Instance instanceNeg = new Instance(attributes.size());
 						for (int f = 0; f < attributes.size()-1; f++) {
@@ -110,18 +111,26 @@ public class Trainer4FeatureBased extends Trainer{
 			}
 		}
 		System.out.println(dataset);
-		classifier = new weka.classifiers.functions.Logistic();//  new weka.classifiers.functions.SMO();
+		weka.classifiers.functions.Logistic classifier = new weka.classifiers.functions.Logistic();
+		//weka.classifiers.functions.SMO classifier = new weka.classifiers.functions.SMO();
 		try {
 			((OptionHandler)classifier).setOptions(classifierOptions.split(":"));
 			int numFolds = 3;
 			for (int f = 0; f < numFolds; f++) {
-			classifier.buildClassifier(dataset.trainCV(numFolds, f));
-			System.out.println(classifier.toString());
-			Evaluation eval = new Evaluation(dataset);
-			//eval.crossValidateModel(classifier, dataset, 3, new Random(1));
-			eval.evaluateModel(classifier, dataset.testCV(numFolds, f));
-			System.out.println(eval.toSummaryString()+" "+eval.toMatrixString());
+				classifier.buildClassifier(dataset.trainCV(numFolds, f));
+				System.out.println(classifier.toString());
+				Evaluation eval = new Evaluation(dataset);
+				//eval.crossValidateModel(classifier, dataset, 3, new Random(1));
+				eval.evaluateModel(classifier, dataset.testCV(numFolds, f));
+				System.out.println(eval.toSummaryString()+" "+eval.toMatrixString());
 			}
+			classifier.buildClassifier(dataset);
+			System.out.println(classifier.toString());
+			double [][] coeff = classifier.
+			for (int i = 1; i < coeff.length; i++) {
+				System.out.print((i > 1?",":"") + "{\""+dataset.attribute(i-1).name() + "\",\""+(-coeff[i][0])+ "\"}");
+			}
+			System.out.println("}");
 			//test(nonDups,0,data);"C0
 			//test(dups,1,data);
 

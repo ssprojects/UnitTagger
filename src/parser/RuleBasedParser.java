@@ -309,6 +309,7 @@ public class RuleBasedParser extends SimpleParser {
 				if (rule.terminal()) break;
 			}
 		}
+		/*
 		if (applicableRules.size()==0) {
 			// return all matching units from dictMatch as candidates.
 			TObjectDoubleHashMap<Unit> unitScore = new TObjectDoubleHashMap<Unit>();
@@ -332,7 +333,7 @@ public class RuleBasedParser extends SimpleParser {
 			}
 			Collections.sort(units);
 			unitsToRet = units;
-		}
+		}*/
 		return unitsToRet;
 	}
 	ParseState getTokensWithSpan(String hdr, UnitSpan forcedUnit, ParseState hdrMatches) {

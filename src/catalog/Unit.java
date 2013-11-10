@@ -200,7 +200,9 @@ public class Unit {
 	public String getBaseName() {
 		return baseNames[0];
 	}
-
+	public String getBaseName(int i) {
+		return (i < baseNames.length?baseNames[i]:null);
+	}
 	public float getLemmaFrequency(int l) {
 		if (freqs==null || freqs.size() <= l) return 0;
 		return freqs.get(l);

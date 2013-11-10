@@ -561,11 +561,14 @@ public class QuantityCatalog implements WordFrequency {
 		return 0;
 	}
 	public Unit getUnitFromBaseName(String unitName) {
+		return getUnitFromBaseName(unitName, false);
+	}
+	public Unit getUnitFromBaseName(String unitName, boolean onlyDict) {
 		if (unitName == null) return null;
 		Collection<Unit> units = nameDict.getCollection(unitName.toLowerCase());
 		if (units != null && units.size()>0)
 			return units.iterator().next();
-		if (units==null) {
+		if (units==null && !onlyDict) {
 			String parts[] =  UnitPair.extractUnitParts(unitName);
 			if (parts != null) {
 				Unit unit1 = null, unit2 = null;

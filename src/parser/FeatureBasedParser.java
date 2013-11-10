@@ -4,6 +4,7 @@ import iitb.shared.BoundedPriorityQueue;
 import iitb.shared.EntryWithScore;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Vector;
 
@@ -12,6 +13,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+import parser.CFGParser4Header.Params.FTypes;
+
 import catalog.QuantityCatalog;
 import catalog.Unit;
 import edu.stanford.nlp.ling.HasWord;
@@ -19,7 +22,7 @@ import edu.stanford.nlp.ling.HasWord;
 public class FeatureBasedParser extends CFGParser4Header {
 
 	public FeatureBasedParser(Element elem, QuantityCatalog dict)
-			throws IOException, ParserConfigurationException, SAXException {
+			throws IOException, ParserConfigurationException, SAXException, SecurityException, IllegalArgumentException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
 		super(elem, dict);
 		// TODO Auto-generated constructor stub
 	}
@@ -35,19 +38,29 @@ public class FeatureBasedParser extends CFGParser4Header {
 		hdrMatches = getTokensWithSpan(hdr,null,hdrMatches);
 		if (hdrMatches.tokens.size()==0) return null;
 		List<? extends HasWord> sentence = tokenScorer.cacheScores(hdrMatches,null,debugLvl,featureList != null,null);
+		
+		
 		/*
 		 * pick the single unit over all spans with the highest score...
 		 */
 		BoundedPriorityQueue<UnitFeatures> boundedQ = new BoundedPriorityQueue<UnitFeatures>(k);
 		List<String> hdrToks = hdrMatches.tokens;
 		for (int start = 0; start < hdrToks.size(); start++) {
+			int addAfterIn = -1;
+			if (start > 0 && hdrToks.get(start-1).equals("in")) {
+				addAfterIn=FTypes.AfterIN.ordinal();
+			}
 			for (int end = start; end < hdrToks.size(); end++) {
 				for (int state = 0; state < 2; state++) {
 					if (tokenScorer.sortedUnits[start][end][state] != null && tokenScorer.sortedUnits[start][end][state].size()>0) {
 						Vector<UnitFeatures> unitVec = tokenScorer.sortedUnits[start][end][state];
+						for (UnitFeatures unitF : unitVec) {
+							unitF.setScore(unitF.getScore()+(addAfterIn>=0?params.weights[addAfterIn]:0)+tokenScorer.getLexScore(start, end, tokenScorer.getUnitState(unitF.getKey())));
+						}
 						int sz = (k > 1)?unitVec.size():1;
 						for (int u = 0; u < sz; u++) {
-							boundedQ.add(unitVec.get(u));
+							if (unitVec.get(u).getScore() > 0) 
+								boundedQ.add(unitVec.get(u));
 						}
 					}
 				}
@@ -62,6 +75,9 @@ public class FeatureBasedParser extends CFGParser4Header {
 				UnitFeatures fvec = new UnitFeatures(f,getParamsArray().length);
 				featureList.add(fvec);
 				tokenScorer.addLexFeatures(fvec.fvals, start, end, tokenScorer.getUnitState(f.getKey()));
+				if (start > 0 && hdrToks.get(start-1).equals("in")) {
+					fvec.fvals.add(FTypes.AfterIN.ordinal(),1);
+				}
 			}
 		}
 		return list;

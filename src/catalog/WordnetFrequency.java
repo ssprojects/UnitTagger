@@ -108,7 +108,7 @@ public class WordnetFrequency implements WordFrequency {
 	 */
 	public static void main(String[] args) {
 		//args = HeaderSegmenter.WordSymbols;
-		args = new String[]{"in"};
+		args = new String[]{"mhz"};
 		WordnetFrequency wordFreq = new WordnetFrequency(null);
 		List<EntryWithScore<String[]>> matches = new Vector<EntryWithScore<String[]>>();
 		wordFreq.getRelativeFrequency(args[0], matches);
@@ -156,7 +156,8 @@ public class WordnetFrequency implements WordFrequency {
 		// was "period of time" earlier and did not capture words like week.
 		boolean retVal = (synset.getDefinition().contains("unit") 
 				|| (synset.getDefinition().contains("period") && synset.getDefinition().contains("time"))
-				|| synset.getDefinition().contains(" number ") // 17 Jul 2013: added for words like thousand, billion
+				|| (synset.getDefinition().contains("period") && synset.getDefinition().contains("second"))
+				|| synset.getDefinition().contains(" number ") || synset.getDefinition().contains("a proportion multiplied by 100")// 17 Jul 2013: added for words like thousand, billion
 		);
 		if (!retVal) {
 			// adding this since terms like milligram do not have unit in their definition.
