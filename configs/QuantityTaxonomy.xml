@@ -49,7 +49,7 @@
     <unit name="million" symbol="million" conversionFactor="= 1000000">
       <lemmaset>
 	<String frequency="0.7">mil</String>			  
-	<String>m</String>			  
+	<String frequency="0.2">m</String>			  
 	<String>milion</String>			  
 	<String>mln</String>			  
       </lemmaset>
@@ -72,6 +72,7 @@
     <unit name="United States dollar (SI base unit)" symbol="$" conversionFactor=" = 1">
       <lemmaset>
 	<String>USD</String>
+	<String>dollar</String>
 	<String>US $</String>
 	<String frequency="0.99">$</String>
       </lemmaset>
@@ -99,15 +100,21 @@
 	<String>RUB</String>
       </lemmaset>
     </unit>
+    <unit name="Euro" symbol="€" conversionFactor="">
+      <lemmaset>
+	<String>EUR</String>
+      </lemmaset>
+    </unit>
+    <unit name="Australian dollar" symbol="$" conversionFactor="">
+      <lemmaset>
+		<String frequency="0.001">$</String>
+	<String>AUD</String>
+      </lemmaset>
+    </unit>
 <!--
     <unit name="Afghan afghani" symbol="؋" conversionFactor="">
       <lemmaset>
 	<String>AFN</String>
-      </lemmaset>
-    </unit>
-    <unit name="Euro" symbol="€" conversionFactor="">
-      <lemmaset>
-	<String>EUR</String>
       </lemmaset>
     </unit>
     <unit name="Albanian lek" symbol="L" conversionFactor="">
@@ -167,12 +174,6 @@
       <lemmaset>
 	<String frequency="0.0001">£</String>
 	<String>SHP</String>
-      </lemmaset>
-    </unit>
-    <unit name="Australian dollar" symbol="$" conversionFactor="">
-      <lemmaset>
-		<String frequency="0.001">$</String>
-	<String>AUD</String>
       </lemmaset>
     </unit>
     <unit name="Azerbaijani manat" symbol="" conversionFactor="">
@@ -316,6 +317,17 @@
 	<String>CAD</String>
       </lemmaset>
     </unit>
+    <unit name="Japanese yen" symbol="¥" conversionFactor="">
+      <lemmaset>
+	<String>JPY</String>
+      </lemmaset>
+    </unit>
+    <unit name="Pakistani rupee" symbol="₨" conversionFactor="">
+      <lemmaset>
+	<String>PKR</String>
+      </lemmaset>
+    </unit>
+
 <!--
     <unit name="Cape Verdean escudo" symbol="Esc; $" conversionFactor="">
       <lemmaset>
@@ -554,11 +566,6 @@
 	<String>JMD</String>
       </lemmaset>
     </unit>
-    <unit name="Japanese yen" symbol="¥" conversionFactor="">
-      <lemmaset>
-	<String>JPY</String>
-      </lemmaset>
-    </unit>
     <unit name="Jersey pound" symbol="£" conversionFactor="">
       <lemmaset>
 	<String frequency="0.0001">£</String>
@@ -780,11 +787,6 @@
       </lemmaset>
     </unit>
 
-    <unit name="Pakistani rupee" symbol="₨" conversionFactor="">
-      <lemmaset>
-	<String>PKR</String>
-      </lemmaset>
-    </unit>
     <unit name="Palauan dollar" symbol="$" conversionFactor="">
       <lemmaset>
 	<String frequency="0.0001">$</String>
@@ -2318,6 +2320,7 @@
     </unit>
     <unit name="pound" symbol="lb" conversionFactor="= 0.45359237 kg">
       <lemmaset>
+	<String>lbs</String>
       </lemmaset>
     </unit>
     <unit name="pound (avoirdupois)" symbol="lb av" conversionFactor="≡ 0.453 592 37 kg">
@@ -2678,6 +2681,7 @@
     </unit>
     <unit name="second (SI base unit)" symbol="s" conversionFactor="">
       <lemmaset>
+	<String frequency="0.1">s</String>
       </lemmaset>
     </unit>
     <unit name="shake" symbol=" " conversionFactor="= 10 ns">
@@ -2695,6 +2699,7 @@
     </unit>
     <unit name="svedberg" symbol="S" conversionFactor="= 100 fs">
       <lemmaset>
+		<String frequency="0.0001">s</String>
       </lemmaset>
     </unit>
     <unit name="week" symbol="wk" conversionFactor="= 168 h = 10 080 min = 604 800 s">
@@ -2788,20 +2793,8 @@
     </unit>
     </concept><concept name="Speed">
     <Synset>
+      <String>Length per Time</String>
     </Synset>
-    <typicalUsage>
-      <String>runner : 212</String>
-      <String>speed (km/h) : 625</String>
-      <String>speed (mph) : 50</String>
-      <String>wind (knots) : 93</String>
-      <String>wind(km/h) : 66</String>
-      <String>wind speed : 863</String>
-      <String>avg. speed : 139</String>
-      <String>wind gust(mph) : 89</String>
-      <String>gusts (knots) : 70</String>
-      <String>average speed (mph) : 55</String>
-      <String>gust speed : 117</String>
-    </typicalUsage>
     <unit name="foot per hour" symbol="fph" conversionFactor="≈ 8.466 667×10−5 m/s">
       <lemmaset>
       </lemmaset>
@@ -2849,7 +2842,7 @@
       <lemmaset>
       </lemmaset>
     </unit>
-    <unit name="mach number" symbol="M" conversionFactor="≈ 340 to 295 m/s for aircraft">
+    <unit name="mach number" symbol="M" conversionFactor="≈ 295 to 340 m/s for aircraft">
       <lemmaset>
 	<String>mach</String>
       </lemmaset>
@@ -2901,6 +2894,7 @@
     </unit>
     </concept><concept name="Flow">
     <Synset>
+      <String>Volume per Time</String>
     </Synset>
     <typicalUsage>
     </typicalUsage>
@@ -2945,6 +2939,7 @@
     </unit>
     </concept><concept name="Acceleration">
     <Synset>
+      <String>Length per Time per Time</String>
     </Synset>
     <typicalUsage>
     </typicalUsage>
@@ -2992,8 +2987,9 @@
       <lemmaset>
       </lemmaset>
     </unit>
-    <unit name="standard gravity" symbol="g" conversionFactor="= 9.806 65 m/s2">
+    <unit name="standard gravity;g-force" symbol="g" conversionFactor="= 9.806 65 m/s2">
       <lemmaset>
+	<String>gee</String>			  
       </lemmaset>
     </unit>
     </concept><concept name="Force">
@@ -3909,7 +3905,6 @@
 	<String>lm</String>
 	<String>lumen</String>
 	<String>lumens</String>
-	<String>lbs meats/a</String>
       </lemmaset>
     </unit>
     </concept><concept name="Illuminance">
