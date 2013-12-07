@@ -4,6 +4,7 @@ import gnu.trove.TObjectFloatHashMap;
 import gnu.trove.TObjectFloatIterator;
 import iitb.shared.EntryWithScore;
 import iitb.shared.IntFloatPair;
+import iitb.shared.RobustMath;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -688,7 +689,11 @@ public class CFGParser4Header extends RuleBasedParser {
 		return parseHeader(hdr, null, debugLvl,forcedTags, null, k, featureList);
 	}
 	
-	public List<? extends EntryWithScore<Unit>> parseHeader(String hdr, ParseState hdrMatches, int debugLvl, short[][] forcedTags, UnitSpan forcedUnit, int k, Vector<UnitFeatures> featureList) {			
+	public List<? extends EntryWithScore<Unit>> parseHeader(String hdr, ParseState hdrMatches, int debugLvl, short[][] forcedTags, UnitSpan forcedUnit, int k, Vector<UnitFeatures> featureList) {	
+		return parseHeader(hdr, hdrMatches, null, debugLvl, forcedTags, forcedUnit, k, featureList);
+	}
+		
+	public List<? extends EntryWithScore<Unit>> parseHeader(String hdr, ParseState hdrMatches, ParseState context, int debugLvl, short[][] forcedTags, UnitSpan forcedUnit, int k, Vector<UnitFeatures> featureList) {			
 		if (debugLvl > 0) System.out.println(hdr);
 		if (isURL(hdr)) return null;
 		
@@ -696,10 +701,19 @@ public class CFGParser4Header extends RuleBasedParser {
 		if (hdrMatches.tokens.size()==0) return null;
 		if (featureList!=null) featureList.clear();
 		List<String> hdrToks = hdrMatches.tokens;
-		List<? extends HasWord> sentence = tokenScorer.cacheScores(hdrMatches,forcedTags,debugLvl,featureList!=null,forcedUnit);
+		List<? extends HasWord> sentence = tokenScorer.cacheScores(hdrMatches,forcedTags,debugLvl,featureList!=null,forcedUnit,context);
 		if (parser.parse(sentence)) {
 			TObjectFloatHashMap<UnitFeatures> units = new TObjectFloatHashMap<UnitFeatures>();
-			List<ScoredObject<Tree>> trees = (k>=1?parser.getBestParses():parser.getKBestParses(k));
+			List<ScoredObject<Tree>> trees = parser.getBestParses();
+			if (k > 1) {
+				double bestScore = (trees.size()>0?trees.get(0).score():Double.POSITIVE_INFINITY)-Double.MIN_VALUE;
+				List<ScoredObject<Tree>> treesK = parser.getKBestParses(k);
+				for (int r = 0; r < treesK.size(); r++) {
+					if (treesK.get(r).score() < bestScore && trees.size() < k) {
+						trees.add(treesK.get(r));
+					}
+				}
+			}
 			for (ScoredObject<Tree> stree : trees) {
 				Tree tree = stree.object();
 				Vector<Tree> unitNodes = new Vector<Tree>();
@@ -728,7 +742,7 @@ public class CFGParser4Header extends RuleBasedParser {
 							for (int a2 = 0; a2 < bestUnits2.size(); a2++) {
 								Unit bestUnit2 = bestUnits2.get(a2).getKey();
 								float val2 = (float) bestUnits2.get(a2).getScore() - baseScore2 + val;
-								Unit newUnit = new UnitPair(bestUnit, bestUnit2, UnitPair.OpType.Alt);
+								Unit newUnit = new UnitPair(bestUnit, bestUnit2, UnitPair.OpType.Alt,bestUnit.getParentQuantity());
 								UnitFeatures newUnitF = addFeatureVector(featureList, bestUnits.get(a),bestUnits2.get(a2),treeFeatureVector,val2, newUnit);
 								units.adjustOrPutValue(newUnitF, val2, val2);
 							}
@@ -738,15 +752,23 @@ public class CFGParser4Header extends RuleBasedParser {
 			}
 			if (units.size()>0) {
 				Vector<EntryWithScore<Unit>> possibleUnits = new Vector<EntryWithScore<Unit>>();
+				double logNorm = 0;
 				for (TObjectFloatIterator<UnitFeatures> iter = units.iterator(); iter.hasNext();) {
 					iter.advance();
-					possibleUnits.add(new UnitSpan(iter.key().getKey(), iter.value(),iter.key().start(),iter.key().end()));
+					if (iter.value() > 0) possibleUnits.add(new UnitSpan(iter.key().getKey(), iter.value(),iter.key().start(),iter.key().end()));
+					logNorm = RobustMath.logSumExp(logNorm, iter.value());
 				}
 				Collections.sort(possibleUnits);
 				if (possibleUnits.size()>k) {
 					while (possibleUnits.size() > k) {
 						possibleUnits.remove(possibleUnits.size()-1);
 					}
+				}
+				if (k > 1) {
+					// normalize the units to get probabilities.
+				//	for (EntryWithScore<Unit> entry : possibleUnits) {
+				//		entry.setScore(Math.exp(entry.getScore()-logNorm));
+				//	}
 				}
 				if (featureList!=null) {
 					for (UnitFeatures obj : featureList) {
@@ -937,7 +959,7 @@ public class CFGParser4Header extends RuleBasedParser {
 		//  
 		//
 		Vector<UnitFeatures> featureList = new Vector();
-		List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).getTopKUnits("Weeks  on Chart",  3, featureList,1);
+		List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).getTopKUnits("Worth ($ bilion)",  3, featureList,1);
 		/*List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).parseHeader("Wealth (in " + UnitSpan.StartXML + " $mil "+UnitSpan.EndXML+")",null, 2,null, 
 				//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}
 				//,{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}}
@@ -960,5 +982,10 @@ public class CFGParser4Header extends RuleBasedParser {
 	}
 	public String featureName(int i) {
 		return params.featureName(i);
+	}
+	@Override
+	public List<? extends EntryWithScore<Unit>> parseCell(String unitStr,
+			int k, ParseState context) throws IOException {
+		return parseHeader(unitStr, null, context, 0, null,null, k, null);
 	}
 }

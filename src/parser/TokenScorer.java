@@ -14,6 +14,7 @@ import gnu.trove.TObjectFloatIterator;
 import iitb.shared.EntryWithScore;
 import iitb.shared.StringMap;
 import iitb.shared.SignatureSetIndex.DocResult;
+import iitb.shared.SignatureSetIndex.Result;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -65,7 +66,7 @@ public class TokenScorer implements ConditionalLexicon {
 	int unitState=1;
 	Params params;
 	private float scores[][][];
-//	protected Unit bestUnit[][][];
+	//	protected Unit bestUnit[][][];
 	int lastMatch[] = new int[1];
 	public UnitFeatures newUnit(Unit newUnit, int start, int end) {
 		UnitFeatures unitObj = new UnitFeatures(newUnit, 0,start,end);
@@ -92,6 +93,7 @@ public class TokenScorer implements ConditionalLexicon {
 	HashSet<String> unitWords = new HashSet<String>();
 	int debugLvl;
 	private boolean trainMode;
+	ParseState context;
 	UnitSpan forcedUnit;
 	String hdr;
 	public TokenScorer(StateIndex stateIndex, EnumIndex tagIndex, QuantityCatalog matcher, 
@@ -105,14 +107,14 @@ public class TokenScorer implements ConditionalLexicon {
 		this.wordFreq = wordFreq;
 		this.coOcurStats = coOcurStats;
 	}
-	public List<? extends HasWord> cacheScores(ParseState hdrState, short[][] forcedTags, int debugLvl, boolean trainMode, UnitSpan forcedUnit) {
+	public List<? extends HasWord> cacheScores(ParseState hdrState, short[][] forcedTags, int debugLvl, boolean trainMode, UnitSpan forcedUnit, ParseState context) {
 		this.hdr = hdrState.hdr;
 		this.hdrToks = hdrState.tokens;
 		this.dictMatches=hdrState.setDictMatch(matcher);
 		this.brackets = hdrState.brackets;
 		this.forcedTags=forcedTags;
 		this.forcedUnit = forcedUnit;
-		this.params = params;
+		this.context = context;
 		hdrState.setConceptsFound(matcher);
 		if (forcedUnit != null) {
 			initForcedUnitState(forcedUnit);
@@ -238,20 +240,20 @@ public class TokenScorer implements ConditionalLexicon {
 					score += (1-freq)*params.weights[FTypes.INLANG.ordinal()];
 					registerFeatureInfo(start, end, state, FTypes.INLANG, (1-freq), unit.getName(), trainMode?unitObject:null);
 				}
-
 				float bestScore = 0;
-				for (int hp = res.numHits()-1; hp >= 0; hp--) {
-					if (hp == h) continue;
-					int idp = res.hitDocId(hp);
+				DocResult contextDictMatch = (context==null?res:context.dictMatch);
+				for (int hp = contextDictMatch.numHits()-1; hp >= 0; hp--) {
+					int idp = contextDictMatch.hitDocId(hp);
 					if (matcher.idToUnitMap.getType(idp) != matcher.idToUnitMap.ConceptMatch) continue;
-					if (res.hitEndPosition(hp) >= start || start - res.hitEndPosition(hp) > 2) continue;
+					if (context == null) if (contextDictMatch.hitEndPosition(hp) >= start || start - contextDictMatch.hitEndPosition(hp) > 2) continue;
 					if (matcher.idToUnitMap.get(idp).getParentQuantity()==unit.getParentQuantity()) {
-						bestScore = Math.max(bestScore,res.hitMatch(hp));
+						bestScore = Math.max(bestScore,contextDictMatch.hitMatch(hp));
 					}
 				}
-				score += params.weights[FTypes.ContextWord.ordinal()]*bestScore;
-				registerFeatureInfo(start, end, state, FTypes.ContextWord, bestScore, unit.getName(), trainMode?unitObject:null);
-
+				if (bestScore > 0) {
+					score += params.weights[FTypes.ContextWord.ordinal()]*bestScore;
+					registerFeatureInfo(start, end, state, FTypes.ContextWord, bestScore, unit.getName(), trainMode?unitObject:null);
+				}
 				if (sortedUnits[start][end][state]==null) {
 					sortedUnits[start][end][state] = new Vector<UnitFeatures>();
 				}
@@ -273,7 +275,7 @@ public class TokenScorer implements ConditionalLexicon {
 							for (int a = 1; a < altUnitCounts; a++) {
 								bestUnit[start][end][a*2+state]=null;
 							}
-							*/
+							 */
 						} /*else if (Math.abs(scores[start][end][state]-score) < Float.MIN_VALUE) {
 							for (int a = 0; a < altUnitCounts; a++) {
 								if (bestUnit[start][end][a*2+state]==null || bestUnit[start][end][a*2+state]==unit) {
@@ -333,7 +335,7 @@ public class TokenScorer implements ConditionalLexicon {
 					}
 				}
 			}
-			float totalScores[] = coOcurStats.getCo_occurScores(hdrToks, units);
+			float totalScores[] = coOcurStats.getCo_occurScores((context==null?hdrToks:context.tokens), units);
 			// the total contribution from co-occurrence statistics is now available.
 			// now add the winning units in each slots.
 			for (int start = 0; start < hdrToks.size(); start++) {
@@ -367,16 +369,16 @@ public class TokenScorer implements ConditionalLexicon {
 							bestUnit[start][end][a*2+state] = unitsT[a];
 						}
 						if (sortedUnits!=null && sortedUnits[start][end][state] != null) {
-						*/
-							for (int a = sortedUnits[start][end][state].size()-1; a >= 0; a--) {
-								UnitFeatures unit  = sortedUnits[start][end][state].get(a);
-								int id = units.get(unit.getKey());
-								if (id < 0) continue;
-								float freq = (start==end && coOcurStats.adjustFrequency())?unitFreqs[start].get(unit.getKey()):1;   //getFrequency(unit.getKey(), hdrToks.get(start),-1):1;
-								float cooccurScore = coOcurStats.freqAdjustedScore(freq,totalScores[id]);
-								unit.setScore(unit.getScore()+cooccurScore*params.weights[FTypes.Co_occurStats.ordinal()]);
-								registerFeatureInfo(start,end,state,FTypes.Co_occurStats,cooccurScore,unit.getKey().getName(), unit);
-							}
+						 */
+						for (int a = sortedUnits[start][end][state].size()-1; a >= 0; a--) {
+							UnitFeatures unit  = sortedUnits[start][end][state].get(a);
+							int id = units.get(unit.getKey());
+							if (id < 0) continue;
+							float freq = (start==end && coOcurStats.adjustFrequency())?unitFreqs[start].get(unit.getKey()):1;   //getFrequency(unit.getKey(), hdrToks.get(start),-1):1;
+							float cooccurScore = coOcurStats.freqAdjustedScore(freq,totalScores[id]);
+							unit.setScore(unit.getScore()+cooccurScore*params.weights[FTypes.Co_occurStats.ordinal()]);
+							registerFeatureInfo(start,end,state,FTypes.Co_occurStats,cooccurScore,unit.getKey().getName(), unit);
+						}
 					}
 				}
 			}
@@ -852,20 +854,25 @@ public class TokenScorer implements ConditionalLexicon {
 				//		return NegInfty;
 				//	}
 			}
-			int numUnkToks = 0;
-			int numW = 0;
-			for (int p = unitStart; p <= end; p++) {
-				if (sentence.get(p).tag==Tags.W) {
-					numW++;
-					if (((WordIndex) wordIndex).isUnknown(sentence.get(p).wrd))
-						numUnkToks++;
+			float totalFractionUnk=0;
+			for (int child = 0; child <= 1; child++) {
+				int numUnkToks = 0;
+				int numW = 0;
+				for (int p = child==0?start:unitStart; p <= (child==0?unitStart-1:end); p++) {
+					if (sentence.get(p).tag==Tags.W) {
+						numW++;
+						if (((WordIndex) wordIndex).isUnknown(sentence.get(p).wrd))
+							numUnkToks++;
+					}
+				}
+				float fractionUnk  = ((float)numUnkToks)/Math.max(numW, 1);
+				totalFractionUnk += fractionUnk;
+				if (fractionUnk > params.weights[FTypes.PercenUnkInUnitThreshold.ordinal()]) {
+					score += fractionUnk*params.weights[FTypes.PercentUnkInUnit.ordinal()];
+					if (fvec!=null) fvec.add(FTypes.PercentUnkInUnit.ordinal(), fractionUnk);
 				}
 			}
-			float fractionUnk  = ((float)numUnkToks)/Math.max(numW, 1);
-			if (fractionUnk > params.weights[FTypes.PercenUnkInUnitThreshold.ordinal()]) {
-				score += fractionUnk*params.weights[FTypes.PercentUnkInUnit.ordinal()];
-				if (fvec!=null) fvec.add(FTypes.PercentUnkInUnit.ordinal(), fractionUnk);
-			} else if (start==end-1 && !hasDelim(start,end)) {
+			if (start==end-1 && !hasDelim(start,end) && totalFractionUnk <= params.weights[FTypes.PercenUnkInUnitThreshold.ordinal()]) {
 				score += params.weights[FTypes.UL_Cont.ordinal()];
 				if (fvec!=null) fvec.add(FTypes.UL_Cont.ordinal(), 1);
 			}

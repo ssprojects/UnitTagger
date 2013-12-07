@@ -118,13 +118,14 @@ public class Test {
 		QuantityCatalog dict = new QuantityCatalog((Element)null);
 		Element emptyElement = XMLConfigs.emptyElement();
 		//emptyElement.setAttribute("co-occur-class", "PrUnitGivenWordNoFreq");
-		emptyElement.setAttribute("params", "Co_occurStats=0");
-		//emptyElement.setAttribute("params", "AfterIN=0,WithinBracket=0");
+		//emptyElement.setAttribute("params", "Co_occurStats=0");
+		emptyElement.setAttribute("params", "AfterIN=0,WithinBracket=0,INLANG=0,ContextWord=0");
 		HeaderUnitParser[] parsers = new HeaderUnitParser[]{
-				new RuleBasedParser(emptyElement, dict), 
+				//new RuleBasedParser(emptyElement, dict), 
 				new FeatureBasedParser(emptyElement, dict),
-				new CFGParser4Header(emptyElement,dict)
+				//new CFGParser4Header(emptyElement,dict)
 				};
 		new Test(parsers,GroundTruthFile);
+		//,"/mnt/a99/d0/sunita/workspace.broken/WWT/expts/quant/DictConceptMatch1Unit3");/
 	}
 }

@@ -1,7 +1,9 @@
 package catalog;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
+import org.apache.commons.collections.map.MultiValueMap;
 import org.apache.commons.lang.NotImplementedException;
 
 import catalog.Unit;
@@ -16,7 +18,8 @@ public class UnitPair extends Unit {
 	Unit unit1;
 	Unit unit2;
 	OpType op;
-	public UnitPair(Unit unit1, Unit unit2, OpType op) {
+	public UnitPair(Unit unit1, Unit unit2, OpType op, Quantity quant) {
+		super((quant == null && op == OpType.Alt)?unit1.getParentQuantity():quant);
 		this.unit1 = unit1;
 		this.unit2 = unit2;
 		this.op = op;
@@ -97,11 +100,19 @@ public class UnitPair extends Unit {
 			return unit1;
 		return this;
 	}
-	public static Unit newUnitPair(Unit unit12, Unit unit22, OpType opTypeFromOpStr) {
+	public static Unit newUnitPair(Unit unit12, Unit unit22, OpType opTypeFromOpStr, MultiValueMap conceptDict) {
 		switch (opTypeFromOpStr) {
 		case Mult:
 			return new UnitMultPair(unit12, unit22);
 		}
-		return new UnitPair(unit12,unit22,opTypeFromOpStr);
+		String conceptName = unit12.getParentQuantity()+OpStringFull[opTypeFromOpStr.ordinal()]+unit22.getParentQuantity();
+		Quantity quant = null;
+		Collection<Quantity> units = conceptDict.getCollection(conceptName.toLowerCase().trim());
+		if (units != null && units.size()>0) {
+			quant = units.iterator().next();
+		} else {
+			quant = new Quantity(conceptName, null, null, null);
+		}
+		return new UnitPair(unit12,unit22,opTypeFromOpStr,quant);
 	}
 }

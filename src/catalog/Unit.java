@@ -34,10 +34,15 @@ public class Unit {
 
 	public Unit(String Name,String Sym,String Conv,ArrayList<String> lemmas)
 	{
+		this(Name,Sym,Conv,lemmas,null);
+	}
+	public Unit(String Name,String Sym,String Conv,ArrayList<String> lemmas, Quantity parent)
+	{
 		setName(Name);
 		setSymbol(Sym);
 		setConversionFactor(Conv);
 		lemmaSet=lemmas;
+		parentQuantity = parent;
 	
 	}
 	/*
@@ -279,5 +284,14 @@ public class Unit {
 	}
 	public Unit firstAlternative() {
 		return this;
+	}
+
+	public boolean sameConcept(Unit toUnit) {
+		if (this.getBaseName() != toUnit.getBaseName() &&
+				getParentQuantity()!=toUnit.getParentQuantity() && 
+				!getParentQuantity().getConcept().equals(toUnit.getParentQuantity().getConcept())) {
+			return false;
+		}
+		return true;
 	}
 }

@@ -190,6 +190,9 @@ public class QuantityCatalog implements WordFrequency {
 				}
 			}
 			conceptDict.put(q.getConcept().toLowerCase().trim(), q);
+			for (int syns = q.getSynSets().size()-1; syns >= 0; syns--) {
+				conceptDict.put(q.getSynSets().get(syns).toLowerCase().trim(),q);
+			}
 			List<String> ctoks = getTokens(q.getConcept());
 			tokenDict.put(signSet.toSignSet(ctoks), idToUnitMap.size());
 			if (q.SIUnit==null) {
@@ -404,7 +407,7 @@ public class QuantityCatalog implements WordFrequency {
 		return tokenDict.findSubsequenceMatchesCosine(signSet.toSignSet(tokens), minThreshold);
 	}
 	static class NewUnit extends Unit {
-		public NewUnit(String Name,String Sym)
+		public NewUnit(String Name,String Sym,Quantity parent)
 		{
 			super(Name,Sym,"",null);
 		}
@@ -414,62 +417,20 @@ public class QuantityCatalog implements WordFrequency {
 		for (String subString : subList) {
 			name += subString;
 		}
-		return new NewUnit(name,name);
+		return new NewUnit(name,name,new Quantity(name, null, null, null));
 	}
 	public Unit newUnit(String name) {
-		return new NewUnit(name,name);
+		return new NewUnit(name,name,new Quantity(name, null, null, null));
 	}
 	public Unit newUnit(Unit unit1, Unit unit2, UnitPair.OpType op) {
-		String name = unit1.getSymbol() + op + unit2.getSymbol();
+		String name = unit1.getSymbol() + UnitPair.OpString[op.ordinal()] + unit2.getSymbol();
 		if (symbolDict.containsKey(name)) {
 			for(Object unit : symbolDict.getCollection(name))
 				return (Unit) unit;
 		}
-		return new UnitPair(unit1, unit2, op);
+		return UnitPair.newUnitPair(unit1, unit2, op, conceptDict);
 	}
-	public static void main(String args[]) throws Exception {
-		String tests[][] = {
-				{"sq.km.","Area","square kilometre"},
-				{"million Km", "", "kilometre [million]"},
-				{"$mil", "net worth", "united states dollar [million]"},
-				{"millions of Miles", "Distance from earth in millions miles", "mile [million]"},
-				{"FY 2006, USD billion", "", "united states dollar [billion]"},
-				{"cm", "Diameter", "centimetre"},
-				{"in", "length", "inch"},
-				{"\"", "length", "inch"},
-				{"Miles", "", "mile"},
-				{"Miles(approx)", "", "mile"},
-				{"mil $", "", "united states dollar [million]"}, 
-				{"$", "net worth", "united states dollar"},
-				{"ft./s", "Average Length","foot"},
-				{"m", "value", "metre"},
-				{"y", "decay, half-life", "year"}, // the spurious a needs to be removed.
-				{"h", "decay, half-life", "hour"},
-				{"km²","","square kilometre"}
-		};
-		QuantityCatalog matcher = new QuantityCatalog(QuantityReader.loadQuantityTaxonomy(QuantTaxonomyPath));
-		String unitName = "kilometre/hour"; // "United States Dollar [billion]";
-		Unit parsedUnit = matcher.getUnitFromBaseName(unitName);
-		if (!parsedUnit.getBaseName().equalsIgnoreCase(unitName))
-			throw new Exception("Mistake in unit parsing");
-		
-		
-/*		DocResult res = matcher.tokenDict.findSubsequenceMatchesCosine(new SignatureSetImpl<String>(matcher.getTokens(tests[0][1])), 0.8f);
-		for (int h = 0; h < res.numHits(); h++) {
-			System.out.println(res.hitDocId(h) + " " + matcher.idToUnitMap.getString(res.hitDocId(h))
-					+ "\n " + matcher.idToUnitMap.get(res.hitDocId(h))
-					+ " "+res.hitMatch(h)+ " "+res.hitPosition(h)+ " "+res.hitEndPosition(h));
-		}
-		*/
-		for (int i = 0; i < tests.length; i++) {
-			//List<String> toks = matcher.getTokens(tests[i][0]);
-			//System.out.println(tests[i][0]+"--->"+toks);
-			List<EntryWithScore<Unit>> matches = matcher.getTopK(tests[i][0], tests[i][1], MinMatchThreshold);
-			if (!(matches != null && matches.size()>0 && matches.get(0).getKey().getBaseName().equalsIgnoreCase(tests[i][2]))) {
-				System.out.println("Mistake for "+tests[i][0]+ " predicted "+ (matches != null?matches.get(0).getKey().getBaseName():""));
-			}
-		}
-	}
+	
 	public boolean getRelativeFrequency(String str, List<EntryWithScore<String[]>> matchesArg) {
 		Collection matches = lemmaDict.getCollection(str);
 		matchesArg.clear();
@@ -579,7 +540,7 @@ public class QuantityCatalog implements WordFrequency {
 				if (units != null && units.size()>0)
 					unit2 = units.iterator().next();
 				if (unit1 != null && unit2 != null) {
-					return UnitPair.newUnitPair(unit1, unit2, UnitPair.getOpTypeFromOpStr(parts[2]));
+					return UnitPair.newUnitPair(unit1, unit2, UnitPair.getOpTypeFromOpStr(parts[2]),conceptDict);
 				}
 			}
 		}
@@ -590,6 +551,10 @@ public class QuantityCatalog implements WordFrequency {
 		return (matches != null && matches.size()>0)?matches.get(0).getKey():null;
 	}
 	public float convert(float value, Unit fromUnit, Unit toUnit, boolean success[]) {
+		if (fromUnit != null && toUnit != null && !fromUnit.sameConcept(toUnit)) { 
+			success[0] = false;
+			return 0;
+		}
 		success[0] = true;
 		if (toUnit == null)
 			return value;
@@ -601,4 +566,54 @@ public class QuantityCatalog implements WordFrequency {
 		return (float) convValue;
 	}
 	
+	
+	public static void main(String args[]) throws Exception {
+		String tests[][] = {
+				{"sq.km.","Area","square kilometre"},
+				{"million Km", "", "kilometre [million]"},
+				{"$mil", "net worth", "united states dollar [million]"},
+				{"millions of Miles", "Distance from earth in millions miles", "mile [million]"},
+				{"FY 2006, USD billion", "", "united states dollar [billion]"},
+				{"cm", "Diameter", "centimetre"},
+				{"in", "length", "inch"},
+				{"\"", "length", "inch"},
+				{"Miles", "", "mile"},
+				{"Miles(approx)", "", "mile"},
+				{"mil $", "", "united states dollar [million]"}, 
+				{"$", "net worth", "united states dollar"},
+				{"ft./s", "Average Length","foot"},
+				{"m", "value", "metre"},
+				{"y", "decay, half-life", "year"}, // the spurious a needs to be removed.
+				{"h", "decay, half-life", "hour"},
+				{"km²","","square kilometre"}
+		};
+		QuantityCatalog matcher = new QuantityCatalog(QuantityReader.loadQuantityTaxonomy(QuantTaxonomyPath));
+		String unitName = "kilometre/hour"; // "United States Dollar [billion]";
+		Unit parsedUnit = matcher.getUnitFromBaseName(unitName);
+		if (!parsedUnit.getBaseName().equalsIgnoreCase(unitName) && !parsedUnit.getBaseName(1).equalsIgnoreCase(unitName))
+			throw new Exception("Mistake in unit parsing");
+		
+		
+/*		DocResult res = matcher.tokenDict.findSubsequenceMatchesCosine(new SignatureSetImpl<String>(matcher.getTokens(tests[0][1])), 0.8f);
+		for (int h = 0; h < res.numHits(); h++) {
+			System.out.println(res.hitDocId(h) + " " + matcher.idToUnitMap.getString(res.hitDocId(h))
+					+ "\n " + matcher.idToUnitMap.get(res.hitDocId(h))
+					+ " "+res.hitMatch(h)+ " "+res.hitPosition(h)+ " "+res.hitEndPosition(h));
+		}
+		*/
+		String conceptName = "Length per Time";
+		Collection<Quantity> units = matcher.conceptDict.getCollection(conceptName.toLowerCase().trim());
+		if (units != null && units.size()>0) {
+			Quantity quant = units.iterator().next();
+			System.out.println(quant);
+		}
+		for (int i = 0; i < tests.length; i++) {
+			//List<String> toks = matcher.getTokens(tests[i][0]);
+			//System.out.println(tests[i][0]+"--->"+toks);
+			List<EntryWithScore<Unit>> matches = matcher.getTopK(tests[i][0], tests[i][1], MinMatchThreshold);
+			if (!(matches != null && matches.size()>0 && matches.get(0).getKey().getBaseName().equalsIgnoreCase(tests[i][2]))) {
+				System.out.println("Mistake for "+tests[i][0]+ " predicted "+ (matches != null?matches.get(0).getKey().getBaseName():""));
+			}
+		}
+	}
 }

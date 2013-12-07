@@ -108,7 +108,7 @@ public class WordnetFrequency implements WordFrequency {
 	 */
 	public static void main(String[] args) {
 		//args = HeaderSegmenter.WordSymbols;
-		args = new String[]{"mhz"};
+		args = new String[]{"lb"};
 		WordnetFrequency wordFreq = new WordnetFrequency(null);
 		List<EntryWithScore<String[]>> matches = new Vector<EntryWithScore<String[]>>();
 		wordFreq.getRelativeFrequency(args[0], matches);
@@ -165,7 +165,8 @@ public class WordnetFrequency implements WordFrequency {
 			NounSynset hypos[] = ((NounSynset) synset).getHypernyms();
 			for (int h = 0; h < hypos.length; h++) {
 				NounSynset nsyn = hypos[0];
-				if (nsyn.getDefinition().contains("unit of")) return true;
+				String defn = nsyn.getDefinition();
+				if (defn.contains("unit of") || defn.contains("units of")) return true;
 			}
 		}
 		return retVal;

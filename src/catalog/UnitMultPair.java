@@ -8,7 +8,7 @@ import catalog.Unit;
 /* sunita: Oct 2, 2012 */
 public class UnitMultPair extends UnitPair {
 	public UnitMultPair(Unit key, Unit mult) {
-		super(key,mult, UnitPair.OpType.Mult);
+		super(key,mult, UnitPair.OpType.Mult,key.getParentQuantity());
 	}
 	@Override
 	public Quantity getParentQuantity() {
