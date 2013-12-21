@@ -705,7 +705,7 @@ public class CFGParser4Header extends RuleBasedParser {
 		if (parser.parse(sentence)) {
 			TObjectFloatHashMap<UnitFeatures> units = new TObjectFloatHashMap<UnitFeatures>();
 			List<ScoredObject<Tree>> trees = parser.getBestParses();
-			if (k > 1) {
+			if (trees.size() < k) {
 				double bestScore = (trees.size()>0?trees.get(0).score():Double.POSITIVE_INFINITY)-Double.MIN_VALUE;
 				List<ScoredObject<Tree>> treesK = parser.getKBestParses(k);
 				for (int r = 0; r < treesK.size(); r++) {
@@ -781,7 +781,7 @@ public class CFGParser4Header extends RuleBasedParser {
 					if (debugLvl > 0) {
 						for (UnitFeatures unitObj : featureList) {
 							System.out.println(unitObj.getKey().getBaseName()+ " "+unitObj.getScore()); 
-							unitObj.fvals.print(Params.FTypes.values());
+							unitObj.fvals.print(Params.FTypes.values(), params.weights);
 						}
 					}
 				}
@@ -959,13 +959,17 @@ public class CFGParser4Header extends RuleBasedParser {
 		//  
 		//
 		Vector<UnitFeatures> featureList = new Vector();
-		List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).getTopKUnits("Worth ($ bilion)",  3, featureList,1);
-		/*List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).parseHeader("Wealth (in " + UnitSpan.StartXML + " $mil "+UnitSpan.EndXML+")",null, 2,null, 
+		List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).getTopKUnits("wealth in billion us$",  3, featureList,1);
+//		List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).parseHeader("Wealth (in " + UnitSpan.StartXML + " $mil "+UnitSpan.EndXML+")",null, 2,null, 
 				//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}
 				//,{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}}
-			new UnitSpan("united states dollar [million]"),
-			1,featureList);
-			*/
+	//		new UnitSpan("united states dollar [million]"),	1,featureList);
+		
+/*		List<EntryWithScore<Unit>> unitsR = (List<EntryWithScore<Unit>>) new CFGParser4Header(null).parseHeader("Wealth in billion us$", 
+				new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.IN.ordinal()},{(short) Tags.Mult.ordinal()},{(short) Tags.W.ordinal()}
+				,{(short) Tags.W.ordinal()}}
+				,1,1,featureList);
+*/		
 		//"billions usd", new short[][]{{(short) Tags.Mult.ordinal()},{(short) Tags.SU.ordinal()}});
 		//Loading g / m ( gr / ft )"); 
 		// Max. 10-min. average sustained wind Km/h

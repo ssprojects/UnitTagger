@@ -83,7 +83,9 @@ public class TokenScorer implements ConditionalLexicon {
 			unitObj.addFeature(FTypes.UnitBias,1);
 			unitObj.addFeature(Params.FTypes.MatchLength, matchFeatureValue(end-start+1));
 		}
-		return (float) (params.weights[FTypes.UnitBias.ordinal()] + params.weights[Params.FTypes.MatchLength.ordinal()]*(matchFeatureValue(end-start+1)));
+		return (float) (params.weights[FTypes.UnitBias.ordinal()] 
+		                               + params.weights[Params.FTypes.MatchLength.ordinal()]*(matchFeatureValue(end-start+1)))
+		                               ;
 	}
 	Vector<UnitFeatures> sortedUnits[][][];
 	short forcedTags[][]=null;
@@ -781,12 +783,8 @@ public class TokenScorer implements ConditionalLexicon {
 	}
 	public float score(BinaryRule rule, int start, int end, int split, FeatureVector fvec) {
 		if (rule==null) return Float.NEGATIVE_INFINITY;
-		//System.out.println(rule.toString(stateIndex));
-		if (start+1==end || start == end) return 0; // since score already accounted for at the word-level
+		if (start+1==end || start == end) {assert(false); return 0;} // since score already accounted for at the word-level
 		end = end-1;
-		if (start==1 && end==1) {
-			System.out.print("");
-		}
 		if (forcedUnit != null) {
 			if ((forcedUnit.start()==start && forcedUnit.end()==end && forcedUnit.rootState != rule.parent)
 					||  ((forcedUnit.start() > end || forcedUnit.end() < start)) && stateIndex.hasUnit(rule.parent)

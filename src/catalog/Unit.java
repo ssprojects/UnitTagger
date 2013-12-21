@@ -287,11 +287,39 @@ public class Unit {
 	}
 
 	public boolean sameConcept(Unit toUnit) {
-		if (this.getBaseName() != toUnit.getBaseName() &&
+		if (!this.getBaseName().equalsIgnoreCase(toUnit.getBaseName()) &&
 				getParentQuantity()!=toUnit.getParentQuantity() && 
-				!getParentQuantity().getConcept().equals(toUnit.getParentQuantity().getConcept())) {
+				(getParentQuantity() == null || toUnit.getParentQuantity() == null || !getParentQuantity().getConcept().equalsIgnoreCase(toUnit.getParentQuantity().getConcept()))) {
 			return false;
 		}
 		return true;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (getName().hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Unit other = (Unit) obj;
+		String name = getName();
+		String otherName = other.getName();
+		if (name == null) {
+			if (otherName != null)
+				return false;
+		} else if (!name.equals(otherName))
+			return false;
+		return true;
+	}
+	
 }

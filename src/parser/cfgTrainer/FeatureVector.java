@@ -25,10 +25,10 @@ public class FeatureVector {
 	public int size() {
 		return fvals.length;
 	}
-	public void print(FTypes[] values) {
+	public void print(FTypes[] values, double[] weights) {
 		for (int i = 0; i < fvals.length; i++) {
 			if (fvals[i] > Float.MIN_VALUE) {
-				System.out.println(values[i].name()+ " "+fvals[i]);
+				System.out.println(values[i].name()+ " "+fvals[i]+" "+(weights[i]*fvals[i]));
 			}
 		}
 		return;

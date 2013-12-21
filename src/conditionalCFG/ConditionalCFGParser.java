@@ -834,7 +834,7 @@ oScore[split][end][br.rightChild] = totR;
             if (rS == Float.NEGATIVE_INFINITY) {
               continue;
             }
-            float tot = pS + lS + rS;
+            float tot = pS + lS + rS+ lex.score(rule,start,end,split);;
             int newWordsInSpan = wordsInSpan[start][split][leftState] + wordsInSpan[split][end][rightChild];
             float normTot = tot / newWordsInSpan;
             if (normTot > bestNormIScore) {
@@ -1644,6 +1644,8 @@ oScore[split][end][br.rightChild] = totR;
       if (internalTree == null) { break; }
       // restoreUnaries(internalTree);
       kBestTrees.add(new ScoredObject<Tree>(internalTree, dHat.get(v).get(i-1).score));
+      double score = scoreBinarizedTree(internalTree, 0);
+      assert(Math.abs(score-dHat.get(v).get(i-1).score) < 1e-6);
     }
     return kBestTrees;
   }
@@ -1657,7 +1659,8 @@ oScore[split][end][br.rightChild] = totR;
 
     List<Derivation> dHatV = dHat.get(v);
 
-    if (isTag[v.goal]) {
+    // sunita, 21 Dec 2013: fix by sunita, otherwise tag scores where incorrect.
+    if (isTag[v.goal] && v.end-v.start==1) {
       IntTaggedWord tagging = new IntTaggedWord(words[start], tagIndex.indexOf(goalStr));
       String contextStr = getCoreLabel(start).originalText();
       float tagScore = lex.score(tagging, start, wordIndex.get(words[start]), contextStr);
@@ -1673,6 +1676,7 @@ oScore[split][end][br.rightChild] = totR;
         if (tagNode.label() instanceof HasTag) {
           ((HasTag) tagNode.label()).setTag(tagNode.label().value());
         }
+        assert(v.end-v.start==1);
         return tagNode;
       } else {
         assert false;
@@ -1692,8 +1696,9 @@ oScore[split][end][br.rightChild] = totR;
       assert (t != null);
       children.add(t);
     }
-
-    return tf.newTreeNode(goalStr,children);
+    Tree t =  tf.newTreeNode(goalStr,children);
+    assert(t.getLeaves().size()==v.end-v.start);
+    return t;
   }
 
   private static class Vertex {
@@ -1792,7 +1797,8 @@ oScore[split][end][br.rightChild] = totR;
     List<Arc> bs = new ArrayList<Arc>();
 
     // pre-terminal??
-    if (isTag[v.goal]) {
+    // sunita, 21 Dec 2013: fix by sunita, otherwise tag scores where incorrect.
+    if (isTag[v.goal] && v.start==v.end-1) {
       List<Vertex> tails = new ArrayList<Vertex>();
       double score = iScore[v.start][v.end][v.goal];
       Arc arc = new Arc(tails, v, score);
@@ -1807,7 +1813,7 @@ oScore[split][end][br.rightChild] = totR;
         List<Vertex> tails = new ArrayList<Vertex>();
         tails.add(lChild);
         tails.add(rChild);
-        Arc arc = new Arc(tails, v, br.score);
+        Arc arc = new Arc(tails, v, br.score+lex.score(br, v.start,v.end,split));
         bs.add(arc);
       }
     }
