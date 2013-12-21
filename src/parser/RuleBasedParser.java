@@ -257,7 +257,7 @@ public class RuleBasedParser extends SimpleParser {
 				if (pHdr.tokens.get(t).equals("in")) {
 					pHdr.setDictMatch(quantityDict);
 					int h = pHdr.singleMatchIgnoringToken(quantityDict, t);
-					if (h >= 0) {
+					if (h >= 0 && pHdr.dictMatch.hitPosition(h) == t+1) {
 						applicableRules.add(name());
 						Unit unit = quantityDict.idToUnitMap.get(pHdr.dictMatch.hitDocId(h));
 						List<EntryWithScore<Unit>> units = new Vector<EntryWithScore<Unit>>();

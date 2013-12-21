@@ -705,7 +705,10 @@ public class CFGParser4Header extends RuleBasedParser {
 		if (parser.parse(sentence)) {
 			TObjectFloatHashMap<UnitFeatures> units = new TObjectFloatHashMap<UnitFeatures>();
 			List<ScoredObject<Tree>> trees = parser.getBestParses();
-			if (trees.size() < k) {
+			/* 21 Dec 2013: disabling this because the strings like "wealth in billion us$", the 
+			 * second match is "billion|USD" which has a very close score to the correct one.
+			 * 
+			 * if (trees.size() < k) {
 				double bestScore = (trees.size()>0?trees.get(0).score():Double.POSITIVE_INFINITY)-Double.MIN_VALUE;
 				List<ScoredObject<Tree>> treesK = parser.getKBestParses(k);
 				for (int r = 0; r < treesK.size(); r++) {
@@ -713,7 +716,7 @@ public class CFGParser4Header extends RuleBasedParser {
 						trees.add(treesK.get(r));
 					}
 				}
-			}
+			}*/
 			for (ScoredObject<Tree> stree : trees) {
 				Tree tree = stree.object();
 				Vector<Tree> unitNodes = new Vector<Tree>();
@@ -959,7 +962,7 @@ public class CFGParser4Header extends RuleBasedParser {
 		//  
 		//
 		Vector<UnitFeatures> featureList = new Vector();
-		List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).getTopKUnits("wealth in billion us$",  3, featureList,1);
+		List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).getTopKUnits("Age when at peak of earnings, or in 2006 for living people",  3, featureList,1);
 //		List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).parseHeader("Wealth (in " + UnitSpan.StartXML + " $mil "+UnitSpan.EndXML+")",null, 2,null, 
 				//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}
 				//,{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}}
