@@ -97,9 +97,9 @@ public class CFGParser4Header extends RuleBasedParser {
 
 		"IN_Mult ::- IN Mult 1f" + "\n" +
 		"Mult_OF ::- Mult OF 1f" + "\n";
-		;
-		String basicUnitGrammar = 
-			"BU ::- CU2 Sep_SU 1\n"+
+	;
+	String basicUnitGrammar = 
+		"BU ::- CU2 Sep_SU 1\n"+
 		"BU ::- CU2 1\n"+
 		"BU ::- SU 1"+ "\n" +
 
@@ -110,23 +110,24 @@ public class CFGParser4Header extends RuleBasedParser {
 		"PER_SU ::- PER SU 1"+ "\n" +
 
 		"SU ::- SU_MW SU_W 1f"+ "\n" +
-
+		"SU ::- SU_MW Number 1f"+ "\n" + // km 2 kind of parses.
+		"SU ::- SU_1W 1f \n"+ // SU of single words need to have a separate token because different features are fired over the two cases.
 		"SU_MW ::- SU_W 1f"+ "\n" + 
 		"SU_MW ::- SU_W Op 1f"+ "\n" + 
 		"SU_MW ::- SU_MW SU_W 1f"+ "\n";
 	// TODO: allow a multiplier for simple units like in mg/thousand litres.
 	public static class EnumIndex implements Index<String> {
-		public enum Tags {SU, SU_W, W, Mult, IN, OF, Op,PER, Number,Q,Boundary};
+		public enum Tags {SU_1W, SU_W, W, Mult, IN, OF, Op,PER, Number,Q,Boundary};
 		public short allowedTags[][] = {
-				{(short) Tags.SU.ordinal(),(short) Tags.SU_W.ordinal(),(short) Tags.W.ordinal()},
-				{(short) Tags.SU.ordinal(),(short) Tags.SU_W.ordinal(),(short) Tags.W.ordinal()},
-				{(short) Tags.SU.ordinal(),(short) Tags.SU_W.ordinal(),(short) Tags.W.ordinal()},
-				{(short) Tags.SU.ordinal(),(short) Tags.SU_W.ordinal(),(short) Tags.W.ordinal(),(short) Tags.Mult.ordinal()},
-				{(short) Tags.SU.ordinal(),(short) Tags.SU_W.ordinal(),(short) Tags.W.ordinal(),(short) Tags.IN.ordinal()},
+				{(short) Tags.SU_1W.ordinal(),(short) Tags.SU_W.ordinal(),(short) Tags.W.ordinal()},
+				{(short) Tags.SU_1W.ordinal(),(short) Tags.SU_W.ordinal(),(short) Tags.W.ordinal()},
+				{(short) Tags.SU_1W.ordinal(),(short) Tags.SU_W.ordinal(),(short) Tags.W.ordinal()},
+				{(short) Tags.SU_1W.ordinal(),(short) Tags.SU_W.ordinal(),(short) Tags.W.ordinal(),(short) Tags.Mult.ordinal()},
+				{(short) Tags.SU_1W.ordinal(),(short) Tags.SU_W.ordinal(),(short) Tags.W.ordinal(),(short) Tags.IN.ordinal()},
 				{(short) Tags.W.ordinal(),(short) Tags.OF.ordinal()},
 				{(short) Tags.W.ordinal(), (short) Tags.Op.ordinal()},
-				{(short) Tags.PER.ordinal(),(short) Tags.SU.ordinal(),(short)Tags.W.ordinal()},
-				{(short) Tags.W.ordinal(), (short) Tags.Mult.ordinal(),(short) Tags.SU_W.ordinal()},
+				{(short) Tags.PER.ordinal(),(short) Tags.SU_1W.ordinal(),(short)Tags.W.ordinal()},
+				{(short) Tags.W.ordinal(), (short) Tags.Mult.ordinal(),(short) Tags.Number.ordinal()},
 				{(short) Tags.Q.ordinal()},
 				{(short) Tags.Boundary.ordinal()}
 		};
@@ -140,7 +141,7 @@ public class CFGParser4Header extends RuleBasedParser {
 		}
 
 		boolean isSimpleUnit(int tag) {
-			return Tags.SU.ordinal()==tag;
+			return Tags.SU_1W.ordinal()==tag;
 		}
 		boolean isMultUnit(int tag) {
 			return Tags.Mult.ordinal()==tag;
@@ -244,7 +245,7 @@ public class CFGParser4Header extends RuleBasedParser {
 		public StateIndex(EnumIndex tagIndex) {
 			this.tagIndex = tagIndex;
 		}
-		public enum States {ROOT,ROOT_,Junk,Junk_U,Sep_U,IN_U,U, UL,IN_Mult,Mult_OF,BU,CU2,Sep_SU,SU_MW, PER_SU,Junk_QU,Q_U,SU_Q,BU_Q,CU2_Q};// W, Mult, IN, OF, Op,Boundary};
+		public enum States {ROOT,ROOT_,Junk,Junk_U,Sep_U,IN_U,U, UL,IN_Mult,Mult_OF,BU,CU2,Sep_SU,SU_MW,SU,PER_SU,Junk_QU,Q_U,SU_Q,BU_Q,CU2_Q};// W, Mult, IN, OF, Op,Boundary};
 		@Override
 		public Iterator<String> iterator() {
 			return null;
@@ -353,7 +354,7 @@ public class CFGParser4Header extends RuleBasedParser {
 			return isState(States.U,state);
 		}
 		public boolean isBaseUnit(int state) {
-			return (isCU2(state) || tagIndex.isSimpleUnit(state)) || isUnit(state);
+			return (isCU2(state) || tagIndex.isSimpleUnit(state)) || isUnit(state) || isState(States.SU, state);
 		}
 		public boolean hasUnit(int state) {
 			return isBaseUnit(state) || isState(States.UL, state);
@@ -523,59 +524,60 @@ public class CFGParser4Header extends RuleBasedParser {
 			SINGLELetter,INLANG, MatchLength, Co_occurStats,Subsumed,
 			WithinBracket,AfterIN,
 			SymbolDictMatchThreshold,LemmaDictMatchThreshold,
-			PercentUnkInUnit,PercenUnkInUnitThreshold, CU2Bias, MultBias,UL_Cont};
-			double[] weights=null;
-			EntryWithScore<String> weightsIndexed[] = new EntryWithScore[]{
-					new EntryWithScore<String>("ContextWord",0.5),
-					new EntryWithScore<String>("UnitBias",-0.3),
-					new EntryWithScore<String>("DictMatchWeight",1),
-					new EntryWithScore<String>("SINGLELetter",0),
-					new EntryWithScore<String>("INLANG",-1),
-					new EntryWithScore<String>("MatchLength",-0.01),
-					new EntryWithScore<String>("Co_occurStats",1.5),
-					new EntryWithScore<String>("Subsumed",-.07),
-					new EntryWithScore<String>("WithinBracket",0.5),
-					new EntryWithScore<String>("AfterIN",0.5),
-					new EntryWithScore<String>("SymbolDictMatchThreshold",-0.9),
-					new EntryWithScore<String>("LemmaDictMatchThreshold",-0.9),
-					new EntryWithScore<String>("PercentUnkInUnit",-2),
-					new EntryWithScore<String>("PercenUnkInUnitThreshold",0.5),
-					new EntryWithScore<String>("CU2Bias",0.06),
-					new EntryWithScore<String>("MultBias",0.04),
-					new EntryWithScore<String>("UL_Cont", -2) /* units lists cannot be contiguous */
-			};
-			/* 8 Nov 2013: Multbias should be less than unit bias because other new units get defined in the presence of a mult.
-			 * e.g. population (million) adds population as a new unit.
-			 * 
-			 */
-			String[][] learnedParams = null;// {{"ContextWord","3.202180785484943"},{"UnitBias","-105.3380056184916"},{"DictMatchWeight","83.61666183286786"},{"SINGLELetter","-9.866035985021725"},{"INLANG","-2.2194842396084"},{"MatchLength","-0.07966785895890988"},{"Co_occurStats","2.464134767464041"},{"Subsumed","-3.618467285251402"},{"WithinBracket","20.862932392986586"},{"AfterIN","11.400342284896563"}};
-			public Params(){
-				weights = new double[FTypes.values().length];
-				for (EntryWithScore<String> paramWt : weightsIndexed) {
-					//assert(Math.abs(weights[FTypes.valueOf(paramWt.getKey()).ordinal()] - paramWt.getScore()) < 0.001);
-					weights[FTypes.valueOf(paramWt.getKey()).ordinal()] = paramWt.getScore();
-				}
-				//weights=learnedWeightsSVM;
+			PercentUnkInUnit,PercenUnkInUnitThreshold, CU2Bias, MultBias,UL_Cont}
+		public static final int LargeWeight = 10000;;
+		double[] weights=null;
+		EntryWithScore<String> weightsIndexed[] = new EntryWithScore[]{
+				new EntryWithScore<String>("ContextWord",0.5),
+				new EntryWithScore<String>("UnitBias",-0.3), 
+				new EntryWithScore<String>("DictMatchWeight",1),
+				new EntryWithScore<String>("SINGLELetter",0),
+				new EntryWithScore<String>("INLANG",-1),
+				new EntryWithScore<String>("MatchLength",-0.01),
+				new EntryWithScore<String>("Co_occurStats",1.5),
+				new EntryWithScore<String>("Subsumed",-.07),
+				new EntryWithScore<String>("WithinBracket",0.5),
+				new EntryWithScore<String>("AfterIN",0.5),
+				new EntryWithScore<String>("SymbolDictMatchThreshold",-0.9),
+				new EntryWithScore<String>("LemmaDictMatchThreshold",-0.9),
+				new EntryWithScore<String>("PercentUnkInUnit",-2),
+				new EntryWithScore<String>("PercenUnkInUnitThreshold",0.5),
+				new EntryWithScore<String>("CU2Bias",0.06),
+				new EntryWithScore<String>("MultBias",0.2), // 27 Dec 2013, increasing to allow $m to be parsed preferentially as dollar million instead of dollar|meter
+				new EntryWithScore<String>("UL_Cont", -2) /* units lists cannot be contiguous */
+		};
+		/* 8 Nov 2013: Multbias should be less than unit bias because other new units get defined in the presence of a mult.
+		 * e.g. population (million) adds population as a new unit.
+		 * 
+		 */
+		String[][] learnedParams = null;// {{"ContextWord","3.202180785484943"},{"UnitBias","-105.3380056184916"},{"DictMatchWeight","83.61666183286786"},{"SINGLELetter","-9.866035985021725"},{"INLANG","-2.2194842396084"},{"MatchLength","-0.07966785895890988"},{"Co_occurStats","2.464134767464041"},{"Subsumed","-3.618467285251402"},{"WithinBracket","20.862932392986586"},{"AfterIN","11.400342284896563"}};
+		public Params(){
+			weights = new double[FTypes.values().length];
+			for (EntryWithScore<String> paramWt : weightsIndexed) {
+				//assert(Math.abs(weights[FTypes.valueOf(paramWt.getKey()).ordinal()] - paramWt.getScore()) < 0.001);
+				weights[FTypes.valueOf(paramWt.getKey()).ordinal()] = paramWt.getScore();
 			}
-			public Params(String paramsString){
-				this();
-				String extWts[] = paramsString.split(",");
-				for (int i = 0; i < extWts.length; i++) {
-					String paramsWt[] = extWts[i].split("=");
-					int f = FTypes.valueOf(paramsWt[0]).ordinal();
-					double v = Double.parseDouble(paramsWt[1]);
-					weights[f] = v;
-				}
+			//weights=learnedWeightsSVM;
+		}
+		public Params(String paramsString){
+			this();
+			String extWts[] = paramsString.split(",");
+			for (int i = 0; i < extWts.length; i++) {
+				String paramsWt[] = extWts[i].split("=");
+				int f = FTypes.valueOf(paramsWt[0]).ordinal();
+				double v = Double.parseDouble(paramsWt[1]);
+				weights[f] = v;
 			}
-			// CU2bias should be more than unitbias to prefer compound units when one side is known e.g. people per sq km
-			public int numFeatures() {
-				return FTypes.values().length;
-			}
-			public String featureName(int i) {
-				return FTypes.values()[i].name();
-			}
+		}
+		// CU2bias should be more than unitbias to prefer compound units when one side is known e.g. people per sq km
+		public int numFeatures() {
+			return FTypes.values().length;
+		}
+		public String featureName(int i) {
+			return FTypes.values()[i].name();
+		}
 	}
-	
+
 	public static class Token implements HasWord {
 		String wrd;
 		Tags tag;
@@ -633,7 +635,7 @@ public class CFGParser4Header extends RuleBasedParser {
 		ug.purgeRules();
 		Index<String> wordIndex = new WordIndex(this.quantityDict.tokenDict);
 		coOccurStats = new Co_occurrenceStatistics(options, quantityDict);
-		
+
 		Co_occurrenceScores coOccurMethod = null;
 		if (options != null && options.hasAttribute("co-occur-class")) {
 			coOccurMethod = (Co_occurrenceScores) iitb.shared.Utils.makeClassGivenArgs("parser.coOccurMethods." + options.getAttribute("co-occur-class"), new Class[]{Co_occurrenceStatistics.class}, new Object[]{coOccurStats});
@@ -646,7 +648,7 @@ public class CFGParser4Header extends RuleBasedParser {
 			params = new Params();
 		tokenScorer = new TokenScorer(index, tagIndex,quantityDict,wordIndex, wordFreq,coOccurMethod,params);
 		Options op = new Options();
-		
+
 		tmpFVec = new FeatureVector(params.numFeatures());
 		op.dcTags=false;
 		//op.testOptions.verbose=true;
@@ -674,7 +676,7 @@ public class CFGParser4Header extends RuleBasedParser {
 	public List<? extends EntryWithScore<Unit>> parseHeader(String hdr) {
 		return parseHeader(hdr, null, 0);
 	}
-	
+
 	List<UnitFeatures > bestUnits = new Vector<UnitFeatures>();
 	List<UnitFeatures> bestUnits2 = new Vector<UnitFeatures>();
 	FeatureVector tmpFVec;
@@ -688,15 +690,15 @@ public class CFGParser4Header extends RuleBasedParser {
 	public List<? extends EntryWithScore<Unit>> parseHeader(String hdr, short[][] forcedTags, int debugLvl, int k, Vector<UnitFeatures> featureList) {
 		return parseHeader(hdr, null, debugLvl,forcedTags, null, k, featureList);
 	}
-	
+
 	public List<? extends EntryWithScore<Unit>> parseHeader(String hdr, ParseState hdrMatches, int debugLvl, short[][] forcedTags, UnitSpan forcedUnit, int k, Vector<UnitFeatures> featureList) {	
 		return parseHeader(hdr, hdrMatches, null, debugLvl, forcedTags, forcedUnit, k, featureList);
 	}
-		
+
 	public List<? extends EntryWithScore<Unit>> parseHeader(String hdr, ParseState hdrMatches, ParseState context, int debugLvl, short[][] forcedTags, UnitSpan forcedUnit, int k, Vector<UnitFeatures> featureList) {			
 		if (debugLvl > 0) System.out.println(hdr);
 		if (isURL(hdr)) return null;
-		
+
 		hdrMatches = getTokensWithSpan(hdr,forcedUnit,hdrMatches);
 		if (hdrMatches.tokens.size()==0) return null;
 		if (featureList!=null) featureList.clear();
@@ -769,9 +771,9 @@ public class CFGParser4Header extends RuleBasedParser {
 				}
 				if (k > 1) {
 					// normalize the units to get probabilities.
-				//	for (EntryWithScore<Unit> entry : possibleUnits) {
-				//		entry.setScore(Math.exp(entry.getScore()-logNorm));
-				//	}
+					//	for (EntryWithScore<Unit> entry : possibleUnits) {
+					//		entry.setScore(Math.exp(entry.getScore()-logNorm));
+					//	}
 				}
 				if (featureList!=null) {
 					for (UnitFeatures obj : featureList) {
@@ -793,7 +795,7 @@ public class CFGParser4Header extends RuleBasedParser {
 		} else {
 			//	System.out.println("No unit");
 		}
-		
+
 		return null;
 	}
 
@@ -846,24 +848,32 @@ public class CFGParser4Header extends RuleBasedParser {
 			//float scoreArr[] = tokenScorer.scores[bestUTree.getSpan().getSource()][bestUTree.getSpan().getTarget()];
 
 			// a new compound unit.
-			if (bestUTree.numChildren()==1 && bestUTree.getChild(0).label().value().startsWith("CU2")&&tokenScorer.dictionaryMatch(bestUTree.getSpan().getSource(),bestUTree.getSpan().getTarget()) < 0.9) {
+			if (bestUTree.getChild(0).label().value().startsWith("CU2")&&tokenScorer.dictionaryMatch(bestUTree.getSpan().getSource(),bestUTree.getSpan().getTarget()) < 0.9) {
 				Vector<Tree> simpleUnits = new Vector<Tree>();
-				getUnitNodes(bestUTree, simpleUnits, Tags.SU.name());
-				if (simpleUnits.size()!=2) {
+				getUnitNodes(bestUTree, simpleUnits, StateIndex.States.SU.name());
+				if (simpleUnits.size()<2) {
 					throw new NotImplementedException("Error in parsing of Compund unit");
 				}
-				getUnit(simpleUnits.get(0), hdrToks,bestUnitsBase,hdr);
-				getUnit(simpleUnits.get(1), hdrToks,bestUnitsMult,hdr);
-				int a = 0;
-				for (int a1 = 0; a1 < bestUnitsBase.size(); a1++) {
-					Unit unit1 = bestUnitsBase.get(a1).getKey();
-					for (int a2 = 0; a2 < bestUnitsMult.size(); a2++) {
-						Unit unit2 = bestUnitsMult.get(a2).getKey();
-						int start = Math.min(bestUnitsBase.get(a1).start(),bestUnitsMult.get(a2).start());
-						int end = Math.max(bestUnitsBase.get(a1).end(),bestUnitsMult.get(a2).end());
-						bestUnitsVec.add(new UnitFeatures(quantityDict.newUnit(unit1,unit2,UnitPair.OpType.Ratio),newCompundScore(bestUnitsBase.get(a1).getScore(),bestUnitsMult.get(a2).getScore()), 
-								bestUnitsBase.get(a1), bestUnitsMult.get(a2),start,end));
-						a++;
+				for (int s = 1; s < simpleUnits.size(); s++) {
+					if (s == 1) { 
+						getUnit(simpleUnits.get(0), hdrToks,bestUnitsBase,hdr);
+					} else {
+						bestUnitsBase.clear();
+						bestUnitsBase.addAll(bestUnitsVec);
+						bestUnitsVec.clear();
+					}
+					getUnit(simpleUnits.get(s), hdrToks,bestUnitsMult,hdr);
+					int a = 0;
+					for (int a1 = 0; a1 < bestUnitsBase.size(); a1++) {
+						Unit unit1 = bestUnitsBase.get(a1).getKey();
+						for (int a2 = 0; a2 < bestUnitsMult.size(); a2++) {
+							Unit unit2 = bestUnitsMult.get(a2).getKey();
+							int start = Math.min(bestUnitsBase.get(a1).start(),bestUnitsMult.get(a2).start());
+							int end = Math.max(bestUnitsBase.get(a1).end(),bestUnitsMult.get(a2).end());
+							bestUnitsVec.add(new UnitFeatures(quantityDict.newUnit(unit1,unit2,UnitPair.OpType.Ratio),newCompundScore(bestUnitsBase.get(a1).getScore(),bestUnitsMult.get(a2).getScore()), 
+									bestUnitsBase.get(a1), bestUnitsMult.get(a2),start,end));
+							a++;
+						}
 					}
 				}
 			} else if (bestUnits[tokenScorer.unitState] == null || bestUnits[tokenScorer.unitState].size()==0) {
@@ -962,17 +972,17 @@ public class CFGParser4Header extends RuleBasedParser {
 		//  
 		//
 		Vector<UnitFeatures> featureList = new Vector();
-		List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).getTopKUnits("Age when at peak of earnings, or in 2006 for living people",  3, featureList,1);
-//		List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).parseHeader("Wealth (in " + UnitSpan.StartXML + " $mil "+UnitSpan.EndXML+")",null, 2,null, 
-				//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}
-				//,{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}}
-	//		new UnitSpan("united states dollar [million]"),	1,featureList);
-		
-/*		List<EntryWithScore<Unit>> unitsR = (List<EntryWithScore<Unit>>) new CFGParser4Header(null).parseHeader("Wealth in billion us$", 
-				new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.IN.ordinal()},{(short) Tags.Mult.ordinal()},{(short) Tags.W.ordinal()}
-				,{(short) Tags.W.ordinal()}}
+		//	List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).getTopKUnits("Sales (£m)",  3, featureList,1);
+		//		List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).parseHeader("Wealth (in " + UnitSpan.StartXML + " $mil "+UnitSpan.EndXML+")",null, 2,null, 
+		//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}
+		//,{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}}
+		//		new UnitSpan("united states dollar [million]"),	1,featureList);
+
+		List<EntryWithScore<Unit>> unitsR = (List<EntryWithScore<Unit>>) new CFGParser4Header(null).parseHeader("pounds/acre/year", 
+				//	new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.SU_1W.ordinal()},{(short) Tags.Mult.ordinal()}}
+				null
 				,1,1,featureList);
-*/		
+
 		//"billions usd", new short[][]{{(short) Tags.Mult.ordinal()},{(short) Tags.SU.ordinal()}});
 		//Loading g / m ( gr / ft )"); 
 		// Max. 10-min. average sustained wind Km/h

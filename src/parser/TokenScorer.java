@@ -50,6 +50,7 @@ import conditionalCFG.ConditionalLexicon;
 public class TokenScorer implements ConditionalLexicon {
 	private static final float NegInfty = -100;
 	private static final float ScoreEps = 0.01f;
+	boolean disableNewUnits = true;
 
 	private DocResult dictMatches;
 	private List<Token> sentence;
@@ -83,6 +84,8 @@ public class TokenScorer implements ConditionalLexicon {
 			unitObj.addFeature(FTypes.UnitBias,1);
 			unitObj.addFeature(Params.FTypes.MatchLength, matchFeatureValue(end-start+1));
 		}
+		if (disableNewUnits)
+			return -Params.LargeWeight;
 		return (float) (params.weights[FTypes.UnitBias.ordinal()] 
 		                               + params.weights[Params.FTypes.MatchLength.ordinal()]*(matchFeatureValue(end-start+1)))
 		                               ;
@@ -144,8 +147,8 @@ public class TokenScorer implements ConditionalLexicon {
 		} else if (forcedUnit.isOpType(UnitPair.OpType.Mult)) {
 			forcedUnit.rootState = stateIndex.indexOf(States.U);
 		} else {
-			forcedUnit.rootState=stateIndex.indexOf(Tags.SU.name());
-			forcedUnit.rootState=Tags.SU.ordinal();
+			forcedUnit.rootState=stateIndex.indexOf(States.SU.name());
+			//forcedUnit.rootState=Tags.SU.ordinal();
 		}
 	}
 	int getUnitState(Unit unit) {
@@ -876,7 +879,7 @@ public class TokenScorer implements ConditionalLexicon {
 			}
 			if (fvec!=null) addLexFeatures(fvec, start, end, unitState);
 			return score+getLexScore(start, end, unitState);
-		} else if (rule.parent == Tags.SU.ordinal() && (stateIndex.isState(States.SU_MW, rule.leftChild))) {
+		} else if (stateIndex.isState(States.SU,rule.parent) && (stateIndex.isState(States.SU_MW, rule.leftChild))) {
 			// 15 Jul 2013: should reward dictionary match only when a true compound unit otherwise things like "sq m" take double reward by
 			// outputing "sq (new unit) million"
 

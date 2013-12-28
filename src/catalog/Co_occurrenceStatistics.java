@@ -33,6 +33,7 @@ import org.xml.sax.SAXException;
 import parser.ParseState;
 import parser.RuleBasedParser;
 import parser.UnitSpan;
+import parser.coOccurMethods.ConceptTypeScores;
 
 public class Co_occurrenceStatistics {
 	public static final String CoOccurFilePath = "configs/cooccurrence.txt";
@@ -40,12 +41,13 @@ public class Co_occurrenceStatistics {
 	//	List<String> units = new Vector<String>();
 	//TIntArrayList freqs = new TIntArrayList();
 	//	TObjectLongHashMap<String> word2UnitsHashMap = new TObjectLongHashMap<String>();
-	TObjectIntHashMap<Pair<String,String>> counts = new TObjectIntHashMap<Pair<String,String>>();
+	private TObjectIntHashMap<Pair<String,String>> counts = new TObjectIntHashMap<Pair<String,String>>();
 	int numHdrs = 0;
 	RuleBasedParser parser;
 	Vector<String> explanation = new Vector<String>();
 	TObjectIntHashMap<String> wordFreqs = new TObjectIntHashMap<String>();
 	TObjectIntHashMap<String> unitsFreqs = new TObjectIntHashMap<String>();
+	private ConceptTypeScores conceptClassifier;
 	public Co_occurrenceStatistics(QuantityCatalog dict) throws IOException, ParserConfigurationException, SAXException {
 		this(dict,null);
 		parser = new RuleBasedParser(null, dict);
@@ -108,6 +110,10 @@ public class Co_occurrenceStatistics {
 		if (units == null || units.size()==0 || explanation.size()!=1)
 			return null;
 		UnitSpan unitSpan = (UnitSpan) units.get(0);
+		addHeader(tokens, unitSpan);
+		return units;
+	}
+	public void  addHeader(List<String> tokens, UnitSpan unitSpan) throws IOException {
 		int start = unitSpan.start();
 		int end = unitSpan.end();
 		Unit unit = unitSpan.getKey();
@@ -118,9 +124,9 @@ public class Co_occurrenceStatistics {
 			//if (!checkTokensCorrectness(tokens.get(t))) return false;
 			if (tokens.get(t).length()>1 && Character.isLetter(tokens.get(t).charAt(0))) {
 				counts.adjustOrPutValue(new Pair(tokens.get(t), unit.getBaseName()), 1, 1);
+				counts.adjustOrPutValue(new Pair(tokens.get(t), unit.getParentQuantity().getConcept()), 1, 1);
 			}
 		}
-		return units;
 	}
 
 	// use rule-based parser to find high precision unit matches.
@@ -344,12 +350,19 @@ public class Co_occurrenceStatistics {
 	public int numDocs() {
 		return numHdrs;
 	}
-
-	public static void main(String args[]) throws IOException, ParserConfigurationException, SAXException {
+	public float[] getConceptFrequencies(String word) {
+		List<Quantity> concepts = quantityDict.getQuantities();
+		float freqs[]=new float[concepts.size()];
+		for (int i = 0; i < freqs.length; i++) {
+			freqs[i] = counts.get(formTmpPair(word, concepts.get(i).getConcept()));
+		}
+		return freqs;
+	}
+	public static void main(String args[]) throws Exception {
 		int total[] = new int[3]; int totalOld[] = new int[3];
 		Co_occurrenceStatistics stats[] = new Co_occurrenceStatistics[2];
-		stats[0] = new Co_occurrenceStatistics(new QuantityCatalog((Element)null),"/mnt/a99/d0/sunita/workspace/QuantityTagger/configs/cooccurrencePMI.txt");
-		stats[1] = new Co_occurrenceStatistics(stats[0].quantityDict,"/mnt/a99/d0/sunita/workspace/QuantityTagger/configs/cooccurrence.txt");
+		stats[0] = new Co_occurrenceStatistics(new QuantityCatalog((Element)null),"/mnt/a99/d0/sunita/workspace/QuantityTagger/configs/cooccurrence.txt");
+		stats[1] = new Co_occurrenceStatistics(stats[0].quantityDict,"/mnt/a99/d0/sunita/workspace/QuantityTagger/configs/cooccurrencePMI.txt");
 		String tests[][] = {{"amount", "metre", "Length"},
 				{"weight","kilogram","Mass"}
 		,{"duration","second","Time"}
@@ -362,6 +375,17 @@ public class Co_occurrenceStatistics {
 				System.out.println(stat.numHdrs);
 			}
 		}
-		stats[0].addHeaderPMI("speed in kilometre per second", null);
+		String conceptTests[] = {"distance", "from", "sun", "net", "worth", "year", "of", "first", "flight"};
+		//stats[0].addHeaderPMI("speed in kilometre per second", null);
+		List<Quantity> concepts = stats[0].quantityDict.getQuantities();
+		for (String hdr : conceptTests) {
+			float freq[] = stats[0].getConceptFrequencies(hdr); 
+			System.out.print(hdr);
+			for (int i = 0; i < freq.length; i++) {
+				if (freq[i] > 0) System.out.print(" "+concepts.get(i).getConcept()+ " "+freq[i]);
+			}
+			System.out.println();
+		}
 	}
+	
 }

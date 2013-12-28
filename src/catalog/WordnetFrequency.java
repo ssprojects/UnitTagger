@@ -29,7 +29,7 @@ public class WordnetFrequency implements WordFrequency {
 	// s is often used as a pluralizer in headers.
 	static String stopWords[] = new String[]{"in","are","at","a","from","of","to","the","for","and","all","st"
 		,"with","on","total","per","no","number","amp","apos","quot","hr","s"};
-	static HashSet<String> stopWordsHash=new HashSet<String>(Arrays.asList(stopWords));
+	public static HashSet<String> stopWordsHash=new HashSet<String>(Arrays.asList(stopWords));
 	public WordnetFrequency(Element options) {
 		System.out.println("Using "+extractLoadFile(options));
 		System.setProperty("wordnet.database.dir", extractLoadFile(options));

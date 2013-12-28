@@ -3,7 +3,6 @@ package parser;
 import iitb.shared.EntryWithScore;
 import parser.CFGParser4Header.Params.FTypes;
 import parser.cfgTrainer.FeatureVector;
-import weka.core.parser.JFlex.NFA;
 import catalog.Unit;
 
 public class UnitFeatures extends EntryWithScore<Unit> {

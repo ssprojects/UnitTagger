@@ -36,11 +36,15 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import parser.UnitSpan;
+import parser.coOccurMethods.ConceptTypeScores;
 
 /* sunita: Sep 8, 2012 */
-public class QuantityCatalog implements WordFrequency {
+public class QuantityCatalog implements WordFrequency, ConceptTypeScores {
 	private static final double MinContextOverlap = 0.5;
 	private static final double MinMatchThreshold = 0.5;
+	public static String QuantConfigDirPath =  "/mnt/a99/d0/sunita/workspace/QuantityTagger/configs/";
+	public static final String QuantTaxonomyFile = "QuantityTaxonomy.xml";
+	public static String QuantTaxonomyPath = QuantConfigDirPath+QuantTaxonomyFile;
 	/* Create an exact name match units dictionary consisting of 
 		the full name, 
 		all the baseNames.
@@ -57,7 +61,7 @@ public class QuantityCatalog implements WordFrequency {
 	public Index<String> tokenDict = new IndexImpl<String>();
 
 	MultiValueMap conceptDict = new MultiValueMap();
-	public static String QuantTaxonomyPath = "/mnt/a99/d0/sunita/workspace/QuantityTagger/configs/QuantityTaxonomy.xml";
+	
 	ArrayList<Quantity> taxonomy;
 	public static class IdToUnitMap extends Vector<Unit> {
 		public static final byte ConceptMatch = (byte)'c';
@@ -204,7 +208,7 @@ public class QuantityCatalog implements WordFrequency {
 		addCompoundUnitParts();
 		//System.out.println(Arrays.toString(stats));
 	}
-
+	public List<Quantity> getQuantities() {return taxonomy;}
 	private void addCompoundUnitParts() {
 		for (Quantity q : taxonomy) {
 			for (Unit u : q.getUnits()) {
@@ -244,6 +248,18 @@ public class QuantityCatalog implements WordFrequency {
 			}
 		}
 		return bestMatch;
+	}
+	public static List<EntryWithScore<String>> newList(String concept, double score) {
+		Vector<EntryWithScore<String>> retVal = new Vector<EntryWithScore<String>>();
+		retVal.add(new EntryWithScore<String>(concept, score));
+		return retVal;
+	}
+	@Override
+	public List<EntryWithScore<String>> getConceptScores(String hdr) throws Exception {
+		Quantity quant = bestConceptMatch(hdr);
+		if (quant==null)
+			return null;
+		return newList(quant.getConcept(),1);
 	}
 	public List<EntryWithScore<Unit> >getTopK(String str, String contextStr, double matchThreshold) {
 		return getTopK(str, contextStr, matchThreshold, null);
@@ -616,4 +632,5 @@ public class QuantityCatalog implements WordFrequency {
 			}
 		}
 	}
+	
 }
