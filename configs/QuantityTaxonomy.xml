@@ -46,6 +46,10 @@
       <lemmaset>
       </lemmaset>
     </unit>
+    <unit name="crore" symbol="cr" conversionFactor="= 10000000">
+      <lemmaset>
+      </lemmaset>
+    </unit>
     <unit name="million" symbol="million" conversionFactor="= 1000000">
       <lemmaset>
 	<String frequency="0.7">mil</String>			  
@@ -74,6 +78,7 @@
 	<String>USD</String>
 	<String>dollar</String>
 	<String>US $</String>
+	<String>US dollar</String>
 	<String frequency="0.99">$</String>
       </lemmaset>
     </unit>
@@ -231,7 +236,7 @@
       </lemmaset>
     </unit>
 -->
-    <unit name="Indian rupee" symbol="" conversionFactor="">
+    <unit name="Indian rupee" symbol="rs" conversionFactor="">
       <lemmaset>
 	<String>INR</String>
       </lemmaset>
