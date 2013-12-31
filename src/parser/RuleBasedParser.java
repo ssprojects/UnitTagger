@@ -25,7 +25,6 @@ import catalog.Unit;
 import catalog.WordnetFrequency;
 
 public class RuleBasedParser extends SimpleParser {
-	static final float ThresholdTight = 0.9f;
 	static final float UnitFrequencyThreshold = 0.75f;
 	static final char[] SingleLetterUnits = {'d', 'r'}; // WARNING: keep this sorted at all times.
 	WordnetFrequency wordFreq;
@@ -61,20 +60,7 @@ public class RuleBasedParser extends SimpleParser {
 				if (pHdr.dictMatch==null || pHdr.dictMatch.numHits()==0) {
 					applicableRules.add(name());
 				} else {
-					DocResult res = pHdr.dictMatch;
-					boolean numMatch = false;
-					for (int h = res.numHits()-1; h >= 0; h--) {
-						int id = res.hitDocId(h);
-						byte type = quantityDict.idToUnitMap.getType(id);
-						if (quantityDict.idToUnitMap.getType(id)!=quantityDict.idToUnitMap.ConceptMatch) {
-							float score = res.hitMatch(h);
-							String matchToken = pHdr.tokens.get(res.hitPosition(h));
-							if (score < ThresholdTight && (matchToken.equals("number") || matchToken.equals("#") || Character.isDigit(matchToken.charAt(0)))) continue;
-							numMatch = true;
-							break;
-						}
-					}
-					if (!numMatch)
+					if (pHdr.setRealMatches(quantityDict) == 0)
 						applicableRules.add(name());
 				}
 			}
@@ -146,7 +132,7 @@ public class RuleBasedParser extends SimpleParser {
 					if (quantityDict.idToUnitMap.getType(id)!=quantityDict.idToUnitMap.ConceptMatch) {
 						Unit unit =  quantityDict.idToUnitMap.get(res.hitDocId(h));
 						float score = res.hitMatch(h);
-						if (score < ThresholdTight) continue;
+						if (score < ParseState.ThresholdTight) continue;
 						if (pHdr.conceptsFound.containsKey(unit.getParentQuantity().getConcept())) {
 							if (matchId >= 0) {
 								return null;
@@ -184,6 +170,18 @@ public class RuleBasedParser extends SimpleParser {
 				return units;
 			}
 			return null;
+		}
+	}
+	public class NumberCount extends IsUrl {
+		public List<EntryWithScore<Unit>> apply(String hdr, ParseState pHdr, List<String> applicableRules) {
+			hdr = hdr.toLowerCase();
+			if (!hdr.contains("number") && !hdr.contains("count")) return null;
+			pHdr.setDictMatch(quantityDict);
+			if (pHdr.setRealMatches(quantityDict) > 0) return null;
+			applicableRules.add(name());
+			List<EntryWithScore<Unit>> units = new Vector<EntryWithScore<Unit>>();
+			units.add(new UnitSpan(quantityDict.multipleOneUnit(),1,0,pHdr.tokens.size()));
+			return units;
 		}
 	}
 	public class YearUnit extends IsUrl {
@@ -368,6 +366,7 @@ public class RuleBasedParser extends SimpleParser {
 		wordFreq = new WordnetFrequency(elem);
 		rules = new Vector<RuleBasedParser.Rule>();
 		rules.add(new IsUrl());
+		rules.add(new NumberCount());
 		rules.add(new NoUnit());
 		rules.add(new NoUnitPatterns());
 		rules.add(new PercentSymbolMatch());
@@ -385,7 +384,7 @@ public class RuleBasedParser extends SimpleParser {
 	}
 	public static void main(String args[])  throws Exception {
 		List<String> vec = new Vector<String>();
-		List<? extends EntryWithScore<Unit>> unitsR = new RuleBasedParser(null,null).parseHeaderExplain("mass in kilogram", vec, 1, null);
+		List<? extends EntryWithScore<Unit>> unitsR = new RuleBasedParser(null,null).parseHeaderExplain("Concorde year of crash", vec, 1, null);
 		//				"
 		System.out.println(unitsR);
 		System.out.println(Arrays.toString(vec.toArray()));

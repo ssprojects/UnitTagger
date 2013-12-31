@@ -5,6 +5,7 @@ import gnu.trove.TObjectIntHashMap;
 import iitb.shared.EntryWithScore;
 import iitb.shared.SignatureSetIndex.DocResult;
 
+import java.util.BitSet;
 import java.util.List;
 import java.util.Vector;
 
@@ -14,6 +15,7 @@ import catalog.Unit;
 import catalog.WordnetFrequency;
 
 public class ParseState {
+	static final float ThresholdTight = 0.9f;
 	String hdr;
 	public DocResult dictMatch;
 	TIntArrayList brackets;
@@ -23,6 +25,7 @@ public class ParseState {
 	Vector<EntryWithScore<String[]> > freqVector;
 	float freq=Float.NEGATIVE_INFINITY;
 	TIntArrayList altUnitMatches;
+	BitSet realMatches;
 	public ParseState(String hdr) {
 		this.hdr= hdr;
 	}
@@ -38,6 +41,23 @@ public class ParseState {
 			dictMatch = quantityDict.subSequenceMatch(tokens, 0.7f,true);
 		}
 		return dictMatch;
+	}
+	public int setRealMatches(QuantityCatalog quantityDict) {
+		if (realMatches != null) return realMatches.cardinality();
+		setDictMatch(quantityDict);
+		DocResult res = dictMatch;
+		realMatches = new BitSet();
+		for (int h = res.numHits()-1; h >= 0; h--) {
+			int id = res.hitDocId(h);
+			byte type = quantityDict.idToUnitMap.getType(id);
+			if (quantityDict.idToUnitMap.getType(id)!=quantityDict.idToUnitMap.ConceptMatch) {
+				float score = res.hitMatch(h);
+				String matchToken = tokens.get(res.hitPosition(h));
+				if (score < ThresholdTight && (matchToken.equals("number") || matchToken.equals("#") || Character.isDigit(matchToken.charAt(0)))) continue;
+				realMatches.set(h);
+			}
+		}
+		return realMatches.cardinality();
 	}
 	public TObjectIntHashMap<String> setConceptsFound(QuantityCatalog quantityDict) {
 		if (conceptsFound != null) return conceptsFound;
@@ -64,7 +84,7 @@ public class ParseState {
 			if (quantityDict.idToUnitMap.getType(id)!=quantityDict.idToUnitMap.ConceptMatch) {
 				Unit unit =  quantityDict.idToUnitMap.get(res.hitDocId(h));
 				float score = res.hitMatch(h);
-				if (score < RuleBasedParser.ThresholdTight) continue;
+				if (score < ThresholdTight) continue;
 				if (maxScore < score) {
 					maxScore = score;
 					matchId = h;
@@ -110,7 +130,7 @@ public class ParseState {
 			if (quantityDict.idToUnitMap.getType(id)!=quantityDict.idToUnitMap.ConceptMatch) {
 				Unit unit =  quantityDict.idToUnitMap.get(res.hitDocId(h));
 				float score = res.hitMatch(h);
-				if (score < RuleBasedParser.ThresholdTight) continue;
+				if (score < ThresholdTight) continue;
 				if (maxScore < score) {
 					maxScore = score;
 					matchId = h;

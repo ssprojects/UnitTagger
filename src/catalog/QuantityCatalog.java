@@ -249,17 +249,17 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores {
 		}
 		return bestMatch;
 	}
-	public static List<EntryWithScore<String>> newList(String concept, double score) {
-		Vector<EntryWithScore<String>> retVal = new Vector<EntryWithScore<String>>();
-		retVal.add(new EntryWithScore<String>(concept, score));
+	public static List<EntryWithScore<Quantity>> newList(Quantity concept, double score) {
+		Vector<EntryWithScore<Quantity>> retVal = new Vector<EntryWithScore<Quantity>>();
+		retVal.add(new EntryWithScore<Quantity>(concept, score));
 		return retVal;
 	}
 	@Override
-	public List<EntryWithScore<String>> getConceptScores(String hdr) throws Exception {
+	public List<EntryWithScore<Quantity>> getConceptScores(String hdr) throws Exception {
 		Quantity quant = bestConceptMatch(hdr);
 		if (quant==null)
 			return null;
-		return newList(quant.getConcept(),1);
+		return newList(quant,1);
 	}
 	public List<EntryWithScore<Unit> >getTopK(String str, String contextStr, double matchThreshold) {
 		return getTopK(str, contextStr, matchThreshold, null);
@@ -631,6 +631,9 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores {
 				System.out.println("Mistake for "+tests[i][0]+ " predicted "+ (matches != null?matches.get(0).getKey().getBaseName():""));
 			}
 		}
+	}
+	public Unit multipleOneUnit() {
+		return getUnitFromBaseName("");
 	}
 	
 }

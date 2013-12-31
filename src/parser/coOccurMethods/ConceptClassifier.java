@@ -56,6 +56,8 @@ import catalog.WordnetFrequency;
 public class ConceptClassifier implements ConceptTypeScores {
 	private static final int FreqCutOff = 10;
 	public static final String ClassifierFile = "conceptClassifier";
+	private static final double UndecidedScore = 0.3;
+	public static final double MinScore = 0.01;
 	public static String[][] ignoredConcepts = {{"percent","%"}};
 	static Hashtable<String,String[]> ignoredConceptsHash=new Hashtable<String,String[]>();
 
@@ -72,8 +74,9 @@ public class ConceptClassifier implements ConceptTypeScores {
 	private RuleBasedParser parser;
 	CFGParser4Header cfgparser;
 	SparseInstance emptyInst;
-
+	QuantityCatalog quantDict;
 	public ConceptClassifier(QuantityCatalog quantDict) throws IOException, ParserConfigurationException, SAXException, SecurityException, IllegalArgumentException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+		this.quantDict = quantDict;
 		this.concepts = quantDict.getQuantities();
 		parser = new RuleBasedParser(null, quantDict);
 		cfgparser = new CFGParser4Header(null,quantDict);
@@ -273,21 +276,18 @@ public class ConceptClassifier implements ConceptTypeScores {
 	 * @see parser.coOccurMethods.ConceptTypeScores#getConceptScores(java.lang.String)
 	 */
 	@Override
-	public List<EntryWithScore<String>> getConceptScores(String hdr) throws Exception {
+	public List<EntryWithScore<Quantity>> getConceptScores(String hdr) throws Exception {
 		return getConceptScores(hdr, null);
 	}
 	// concept, score map.
-	public List<EntryWithScore<String>> getConceptScores(String hdr, String predLabel[]) throws Exception {
-		List<EntryWithScore<String>> conceptScore = null;
+	public List<EntryWithScore<Quantity>> getConceptScores(String hdr, String predLabel[]) throws Exception {
+		List<EntryWithScore<Quantity>> conceptScore = null;
 		ParseState[] hdrMatches = new ParseState[1];
 		Vector<String> explanation = new Vector<String>();
 		List<? extends EntryWithScore<Unit>> units = parser.parseHeaderExplain(hdr, explanation, 0, hdrMatches);
 
 		if (units!=null&&units.size()==1&&explanation.size()==1) {
-			String concept = units.get(0).getKey().getParentQuantity().getConcept();
-			conceptScore = new Vector();
-			conceptScore.add(new EntryWithScore<String>(concept, 1));
-			return conceptScore;
+			return QuantityCatalog.newList(units.get(0).getKey().getParentQuantity(),1);
 		}
 		/*
 		for (int t = tokens.size()-1; t >= 0; t--) {
@@ -316,20 +316,42 @@ public class ConceptClassifier implements ConceptTypeScores {
 				predLabel[0] = getClassString(classId);
 			}
 			for (int i = 0; i < dist.length; i++) {
-				if (dist[i] > 1e-2) {
+				if (dist[i] > MinScore) {
 					if (conceptScore == null) 
-						conceptScore = new Vector<EntryWithScore<String>>();
-					conceptScore.add(new EntryWithScore<String>(getClassString(i),dist[i]));
+						conceptScore = new Vector<EntryWithScore<Quantity>>();
+					conceptScore.add(new EntryWithScore<Quantity>(getClassQuant(i),dist[i]));
 				}
 			}
 		}
 		if (conceptScore != null) {
 			Collections.sort(conceptScore);
+			if (conceptScore.size()==0 || conceptScore.get(0).getScore() < UndecidedScore) {
+				Quantity multQuant = quantDict.multipleOneUnit().getParentQuantity();
+				boolean multPresent = false;
+				
+				for (EntryWithScore<Quantity> entry : conceptScore) {
+					if (entry.getKey()==multQuant) {
+						entry.setScore(Math.max(entry.getScore(), UndecidedScore));
+						multPresent = true;
+						break;
+					}
+				}
+				if (!multPresent) {
+					conceptScore.add(new EntryWithScore<Quantity>(multQuant, UndecidedScore));
+					for (EntryWithScore<Quantity> entry : conceptScore) {
+						entry.setScore(entry.getScore()*(1-UndecidedScore));
+					}
+				}
+				Collections.sort(conceptScore);
+			}
 		}
 		return conceptScore;
 	}
 	private String getClassString(int i) {
 		return concepts.get(i).getConcept();
+	}
+	private Quantity getClassQuant(int i) {
+		return concepts.get(i);
 	}
 	/**
 	 * @param args
@@ -344,7 +366,7 @@ public class ConceptClassifier implements ConceptTypeScores {
 		};
 		QuantityCatalog quantDict = new QuantityCatalog((Element)null);
 
-
+		/*
 		ConceptClassifier classifier = new ConceptClassifier(quantDict);
 		Co_occurrenceStatistics coOccur = new Co_occurrenceStatistics(quantDict);
 		Vector<String> explanation = new Vector<String>();
@@ -368,17 +390,17 @@ public class ConceptClassifier implements ConceptTypeScores {
 			}
 		}
 		classifier.makeClassifier();
-
-		//ConceptClassifier classifier = new ConceptClassifier(quantDict,ClassifierFile);
+	*/
+		ConceptClassifier classifier = new ConceptClassifier(quantDict,ClassifierFile);
 		String conceptTests[] = {"distance from sun","net worth","year of first flight","weight", "pressure", "record low", "size", "volume","bandwidth","capacity"};
 		for (String hdr : conceptTests) {
 			System.out.print(hdr);
 			List<String> tokens = QuantityCatalog.getTokens(hdr);
-			List<EntryWithScore<String>> scores = classifier.getConceptScores(hdr);
+			List<EntryWithScore<Quantity>> scores = classifier.getConceptScores(hdr);
 			if (scores != null) {
-				for (Iterator<EntryWithScore<String>> iter = scores.iterator(); iter.hasNext();) {
-					EntryWithScore<String> entry = iter.next();
-					System.out.print(" "+entry.getKey()+ " "+entry.getScore());
+				for (Iterator<EntryWithScore<Quantity>> iter = scores.iterator(); iter.hasNext();) {
+					EntryWithScore<Quantity> entry = iter.next();
+					System.out.print(" "+entry.getKey().getConcept()+ " "+entry.getScore());
 				}
 				System.out.println();
 				/*
