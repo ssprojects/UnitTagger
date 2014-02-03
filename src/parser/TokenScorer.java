@@ -341,6 +341,7 @@ public class TokenScorer implements ConditionalLexicon {
 				}
 			}
 			float totalScores[] = coOcurStats.getCo_occurScores((context==null?hdrToks:context.tokens), units);
+			if (totalScores!=null) {
 			// the total contribution from co-occurrence statistics is now available.
 			// now add the winning units in each slots.
 			for (int start = 0; start < hdrToks.size(); start++) {
@@ -386,6 +387,7 @@ public class TokenScorer implements ConditionalLexicon {
 						}
 					}
 				}
+			}
 			}
 		}
 
@@ -854,6 +856,10 @@ public class TokenScorer implements ConditionalLexicon {
 				//	if (someUnitInside(start,split-1, multUnitState) || someUnitInside(unitStart,end, multUnitState)) {
 				//		return NegInfty;
 				//	}
+				// at least make sure that for single word units the candidate units are of the same type.
+				if (end-unitStart == 0 && split-1-start == 0 && noMatchingUnit(sortedUnits[start][split-1][unitState],sortedUnits[unitStart][end][unitState])) {
+					return NegInfty;
+				}
 			}
 			float totalFractionUnk=0;
 			for (int child = 0; child <= 1; child++) {
@@ -888,6 +894,18 @@ public class TokenScorer implements ConditionalLexicon {
 		return 0;
 	}
 
+	private boolean noMatchingUnit(Vector<UnitFeatures> vector, Vector<UnitFeatures> vector2) {
+		if ((vector == null || vector.size()==0) ||  (vector2==null || vector2.size()==0)) {
+			return true;
+		}
+		for (UnitFeatures unit1 : vector) {
+			for (UnitFeatures unit2 : vector2) {
+				if (unit1.getKey().getParentQuantity().sameConcept(unit2.getKey().getParentQuantity()))
+					return false;
+			}
+		}
+		return true;
+	}
 	private boolean hasDelim(int start, int end) {
 		return !(hdr.toLowerCase().contains(hdrToks.get(start)+ " "+hdrToks.get(end)));
 	}

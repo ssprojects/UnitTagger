@@ -4,6 +4,8 @@ import iitb.shared.EntryWithScore;
 
 import java.util.List;
 
+import parser.UnitSpan;
+
 import catalog.Unit;
 import catalog.UnitPair;
 import catalog.UnitPair.OpType;
@@ -51,5 +53,12 @@ public class Utils {
 			}
 		}
 		return false;
+	}
+	public static void printExtractedUnits(List<? extends EntryWithScore<Unit>> unitsR, boolean printScore) {
+		if (unitsR==null) return;
+		for (EntryWithScore<Unit> unit : unitsR) {
+			UnitSpan unitSpan = (UnitSpan) unit;
+			System.out.println(unit.getKey().getName()+ " " +(printScore?unit.getScore():"")+ " "+unitSpan.start()+ " "+unitSpan.end());
+		}
 	}
 }

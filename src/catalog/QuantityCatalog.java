@@ -89,7 +89,7 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores {
 	
 	SignatureSetImpl<String> signSet;
 	Analyzer analyzer;
-	public static String impDelims = "£$#\\/%\\(\\)\\[";
+	public static String impDelims = "£$#\\/%\\(\\)\\['";
 	// 17/7/2013: remove - because words like year-end and ten-year were getting marked as year.
 	public static String delims =impDelims +  "!#&'\\*\\+,\\.:;\\<=\\>\\?@\\^\\_\\`\\|~ \t\\]\\{\\}";//NumberUnitParser.numberUnitDelims+"|\\p{Punct})";//)";
 	public static List<String> getTokens(String name) {
@@ -112,8 +112,11 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores {
 		//return Arrays.asList(name.toLowerCase().split(delims));
 		Vector<String> toks = new Vector<String>();
 		StringTokenizer textTok = new StringTokenizer(name, delims, true);
+		boolean apos=false;
 		while (textTok.hasMoreTokens()) {
 			String tokStr=textTok.nextToken();
+			if (tokStr.equalsIgnoreCase("s") && apos) 
+				continue;
 			int tpos;
 			if (specialTokens != null && (tpos = ArrayUtils.find(specialTokens, tokStr)) >= 0) {
 				if (specialTokenPosition !=null) {
@@ -123,6 +126,12 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores {
 			}
 			if (delims.indexOf(tokStr)==-1 || impDelims.indexOf(tokStr)!=-1) {	 
 				char ch = tokStr.charAt(0);
+				if (ch=='\'') {
+					apos=true;
+					continue;
+				} else {
+					apos=false;
+				}
 				if (ch=='(' || ch == ')' || ch=='[' || ch == ']') {
 					if (brackets != null) {
 						if (ch=='(' || ch=='[')

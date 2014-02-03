@@ -53,10 +53,10 @@ import catalog.QuantityCatalog;
 import catalog.Unit;
 import catalog.WordnetFrequency;
 
-public class ConceptClassifier implements ConceptTypeScores {
+public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores {
 	private static final int FreqCutOff = 10;
 	public static final String ClassifierFile = "conceptClassifier";
-	private static final double UndecidedScore = 0.3;
+	public static final double UndecidedScore = 0.3;
 	public static final double MinScore = 0.01;
 	public static String[][] ignoredConcepts = {{"percent","%"}};
 	static Hashtable<String,String[]> ignoredConceptsHash=new Hashtable<String,String[]>();
@@ -75,12 +75,18 @@ public class ConceptClassifier implements ConceptTypeScores {
 	CFGParser4Header cfgparser;
 	SparseInstance emptyInst;
 	QuantityCatalog quantDict;
-	public ConceptClassifier(QuantityCatalog quantDict) throws IOException, ParserConfigurationException, SAXException, SecurityException, IllegalArgumentException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+	public ConceptClassifier(QuantityCatalog quantDict) throws Exception {
+		this(quantDict,true);
+	}
+	public ConceptClassifier(QuantityCatalog quantDict, boolean trainMode) throws Exception {
 		this.quantDict = quantDict;
 		this.concepts = quantDict.getQuantities();
 		parser = new RuleBasedParser(null, quantDict);
-		cfgparser = new CFGParser4Header(null,quantDict);
+		if (trainMode) cfgparser = new CFGParser4Header(null,quantDict);
 		init();
+	}
+	public ConceptClassifier(Co_occurrenceStatistics coOccurStats) throws Exception {
+		this(coOccurStats.quantityDict,null);
 	}
 	private void init() {
 		for (int i = 0; i < ignoredConcepts.length; i++) {
@@ -89,7 +95,10 @@ public class ConceptClassifier implements ConceptTypeScores {
 		}
 	}
 	public ConceptClassifier(QuantityCatalog quantDict, String loadFile) throws Exception {
-		this(quantDict);
+		this(quantDict,false);
+		if (loadFile==null) {
+			loadFile = QuantityCatalog.QuantConfigDirPath+ConceptClassifier.ClassifierFile;
+		}
 		myclassifier = (MyClassifier) weka.core.SerializationHelper.read(loadFile);
 		myclassifier.classifier.setDoNotReplaceMissingValues(true);
 		emptyInst = new SparseInstance(myclassifier.wordIdMap.size());
@@ -281,7 +290,6 @@ public class ConceptClassifier implements ConceptTypeScores {
 	}
 	// concept, score map.
 	public List<EntryWithScore<Quantity>> getConceptScores(String hdr, String predLabel[]) throws Exception {
-		List<EntryWithScore<Quantity>> conceptScore = null;
 		ParseState[] hdrMatches = new ParseState[1];
 		Vector<String> explanation = new Vector<String>();
 		List<? extends EntryWithScore<Unit>> units = parser.parseHeaderExplain(hdr, explanation, 0, hdrMatches);
@@ -297,8 +305,11 @@ public class ConceptClassifier implements ConceptTypeScores {
 			}
 		}
 		 */
-		List<String> tokens = hdrMatches[0].tokens;
+		return getConceptScores(hdrMatches[0].tokens,predLabel);
+	}
+	public List<EntryWithScore<Quantity>> getConceptScores(List<String> tokens, String predLabel[]) throws Exception {
 		SparseInstance inst = null;
+		List<EntryWithScore<Quantity>> conceptScore = null;
 		for (int t = tokens.size()-1; t >= 0; t--) {
 			String tok = tokens.get(t);
 			int id = myclassifier.wordIdMap.get(tok);
@@ -353,6 +364,35 @@ public class ConceptClassifier implements ConceptTypeScores {
 	private Quantity getClassQuant(int i) {
 		return concepts.get(i);
 	}
+	@Override
+	public float[] getCo_occurScores(List<String> hdrToks, StringMap<Unit> units) {
+		List<EntryWithScore<Quantity>> scores=null;
+		try {
+			scores = getConceptScores(hdrToks,null);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (scores == null || scores.size()==0) return null;
+		float totalScores[] = new float[units.size()];
+		for (int i = 0; i < totalScores.length; i++) {
+			Quantity q = units.get(i).getParentQuantity();
+			for (int j = 0; j < scores.size(); j++) {
+				if (q == scores.get(j).getKey()) {
+					totalScores[i] = (float) scores.get(j).getScore();
+				}
+			}
+		}
+		return totalScores;
+	}
+	@Override
+	public boolean adjustFrequency() {
+		return true;
+	}
+	@Override
+	public float freqAdjustedScore(float freq, float f) {
+		return freq*f;
+	}
 	/**
 	 * @param args
 	 * @throws Exception 
@@ -391,8 +431,8 @@ public class ConceptClassifier implements ConceptTypeScores {
 		}
 		classifier.makeClassifier();
 	*/
-		ConceptClassifier classifier = new ConceptClassifier(quantDict,ClassifierFile);
-		String conceptTests[] = {"distance from sun","net worth","year of first flight","weight", "pressure", "record low", "size", "volume","bandwidth","capacity"};
+		ConceptClassifier classifier = new ConceptClassifier(quantDict,QuantityCatalog.QuantConfigDirPath+ConceptClassifier.ClassifierFile);
+		String conceptTests[] = {"area code", "forest area", "Urban Area Population", "area 1000 sq km", "area", "area sq", "area km", "CO2 emissions", "distance from sun","net worth","year of first flight","weight", "pressure", "record low", "size", "volume","bandwidth","capacity"};
 		for (String hdr : conceptTests) {
 			System.out.print(hdr);
 			List<String> tokens = QuantityCatalog.getTokens(hdr);
@@ -417,4 +457,5 @@ public class ConceptClassifier implements ConceptTypeScores {
 		}
 
 	}
+	
 }

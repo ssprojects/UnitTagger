@@ -26,6 +26,8 @@ import org.xml.sax.SAXException;
 import parser.CFGParser4Header.EnumIndex.Tags;
 import parser.cfgTrainer.FeatureVector;
 import parser.coOccurMethods.Co_occurrenceScores;
+import parser.coOccurMethods.ConceptClassifier;
+import parser.coOccurMethods.LogisticUnitGivenWords;
 import parser.coOccurMethods.PrUnitGivenWord;
 import catalog.Co_occurrenceStatistics;
 import catalog.QuantityCatalog;
@@ -543,7 +545,7 @@ public class CFGParser4Header extends RuleBasedParser {
 				new EntryWithScore<String>("PercentUnkInUnit",-2),
 				new EntryWithScore<String>("PercenUnkInUnitThreshold",0.5),
 				new EntryWithScore<String>("CU2Bias",0.06),
-				new EntryWithScore<String>("MultBias",0.2), // 27 Dec 2013, increasing to allow $m to be parsed preferentially as dollar million instead of dollar|meter
+				new EntryWithScore<String>("MultBias",0.29), // 27 Dec 2013, increasing to allow $m to be parsed preferentially as dollar million instead of dollar|meter
 				new EntryWithScore<String>("UL_Cont", -2) /* units lists cannot be contiguous */
 		};
 		/* 8 Nov 2013: Multbias should be less than unit bias because other new units get defined in the presence of a mult.
@@ -612,10 +614,10 @@ public class CFGParser4Header extends RuleBasedParser {
 			this.tg = tag;
 		}
 	}
-	public CFGParser4Header(Element options) throws IOException, ParserConfigurationException, SAXException, SecurityException, IllegalArgumentException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+	public CFGParser4Header(Element options) throws Exception {
 		this(options,null);
 	}
-	public CFGParser4Header(Element options, QuantityCatalog quantMatcher) throws IOException, ParserConfigurationException, SAXException, SecurityException, IllegalArgumentException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+	public CFGParser4Header(Element options, QuantityCatalog quantMatcher) throws Exception {
 		super(options,quantMatcher);
 		//index.add(Lexicon.BOUNDARY_TAG);
 		EnumIndex tagIndex = new EnumIndex();
@@ -640,7 +642,7 @@ public class CFGParser4Header extends RuleBasedParser {
 		if (options != null && options.hasAttribute("co-occur-class")) {
 			coOccurMethod = (Co_occurrenceScores) iitb.shared.Utils.makeClassGivenArgs("parser.coOccurMethods." + options.getAttribute("co-occur-class"), new Class[]{Co_occurrenceStatistics.class}, new Object[]{coOccurStats});
 		} else {
-			coOccurMethod = new PrUnitGivenWord(coOccurStats);
+			coOccurMethod = new ConceptClassifier(quantityDict, null);////new LogisticUnitGivenWords(coOccurStats); //new PrUnitGivenWord(coOccurStats);
 		}
 		if (options != null && options.hasAttribute("params")) {
 			params = new Params(options.getAttribute("params"));
@@ -710,7 +712,7 @@ public class CFGParser4Header extends RuleBasedParser {
 			/* 21 Dec 2013: disabling this because the strings like "wealth in billion us$", the 
 			 * second match is "billion|USD" which has a very close score to the correct one.
 			 * 
-			 * if (trees.size() < k) {
+			 */ if (trees.size() < k) {
 				double bestScore = (trees.size()>0?trees.get(0).score():Double.POSITIVE_INFINITY)-Double.MIN_VALUE;
 				List<ScoredObject<Tree>> treesK = parser.getKBestParses(k);
 				for (int r = 0; r < treesK.size(); r++) {
@@ -718,7 +720,7 @@ public class CFGParser4Header extends RuleBasedParser {
 						trees.add(treesK.get(r));
 					}
 				}
-			}*/
+			}
 			for (ScoredObject<Tree> stree : trees) {
 				Tree tree = stree.object();
 				Vector<Tree> unitNodes = new Vector<Tree>();
@@ -764,6 +766,19 @@ public class CFGParser4Header extends RuleBasedParser {
 					logNorm = RobustMath.logSumExp(logNorm, iter.value());
 				}
 				Collections.sort(possibleUnits);
+				// remove subsumed units from the top-k list?
+				for (int ik = possibleUnits.size()-1; ik>0; ik--) {
+					UnitSpan uspan = (UnitSpan) possibleUnits.get(ik);
+					for (int j = ik-1; j >= 0; j--) {
+						UnitSpan uspanj = (UnitSpan) possibleUnits.get(j);
+						if (uspanj.start() <= uspan.start() && uspanj.end() >= uspan.end() 
+								&& uspan.end()-uspan.start() < uspanj.end()-uspanj.start()) {
+							possibleUnits.remove(ik);
+							break;
+						}
+					}
+				}
+				
 				if (possibleUnits.size()>k) {
 					while (possibleUnits.size() > k) {
 						possibleUnits.remove(possibleUnits.size()-1);
@@ -972,26 +987,24 @@ public class CFGParser4Header extends RuleBasedParser {
 		//  
 		//
 		Vector<UnitFeatures> featureList = new Vector();
-		//	List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).getTopKUnits("Sales (£m)",  3, featureList,1);
-		//		List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).parseHeader("Wealth (in " + UnitSpan.StartXML + " $mil "+UnitSpan.EndXML+")",null, 2,null, 
+			List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).getTopKUnits("Revenue ($B)",  3, featureList,1);
+			//	List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).parseHeader("Wealth (in " + UnitSpan.StartXML + " $mil "+UnitSpan.EndXML+")",null, 2,null, 
 		//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}
 		//,{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}}
 		//		new UnitSpan("united states dollar [million]"),	1,featureList);
 
-		List<EntryWithScore<Unit>> unitsR = (List<EntryWithScore<Unit>>) new CFGParser4Header(null).parseHeader("pounds/acre/year", 
-				//	new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.SU_1W.ordinal()},{(short) Tags.Mult.ordinal()}}
-				null
-				,1,1,featureList);
+		//List<EntryWithScore<Unit>> unitsR = (List<EntryWithScore<Unit>>) new CFGParser4Header(null).parseHeader("Profit/(loss) before tax ( £m )", 
+		//			new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.Mult.ordinal()},{(short) Tags.SU_W.ordinal()},{(short) Tags.SU_W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()}}
+			//	null
+				//,1,1,featureList);
 
 		//"billions usd", new short[][]{{(short) Tags.Mult.ordinal()},{(short) Tags.SU.ordinal()}});
 		//Loading g / m ( gr / ft )"); 
 		// Max. 10-min. average sustained wind Km/h
 		// ("fl. oz (US)", new short[][]{{(short) Tags.SU_W.ordinal()},{(short) Tags.SU_W.ordinal()},{(short) Tags.SU_W.ordinal()}}); // getting wrongly matched to kg/L
 		if (unitsR != null) {
-			for (EntryWithScore<Unit> unit : unitsR) {
-				UnitSpan unitSpan = (UnitSpan) unit;
-				System.out.println(unit.getKey().getName()+ " " +unit.getScore()+ " "+unitSpan.start()+ " "+unitSpan.end());
-			}
+			eval.Utils.printExtractedUnits(unitsR,true);
+			
 		}
 	}
 	public double[] getParamsArray() {

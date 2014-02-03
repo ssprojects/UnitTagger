@@ -287,9 +287,7 @@ public class Unit {
 	}
 
 	public boolean sameConcept(Unit toUnit) {
-		if (!this.getBaseName().equalsIgnoreCase(toUnit.getBaseName()) &&
-				getParentQuantity()!=toUnit.getParentQuantity() && 
-				(getParentQuantity() == null || toUnit.getParentQuantity() == null || !getParentQuantity().getConcept().equalsIgnoreCase(toUnit.getParentQuantity().getConcept()))) {
+		if (!this.getBaseName().equalsIgnoreCase(toUnit.getBaseName()) && !Quantity.sameConcept(getParentQuantity(), toUnit.getParentQuantity())) {
 			return false;
 		}
 		return true;

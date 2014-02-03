@@ -27,8 +27,8 @@ import parser.HeaderUnitParser;
 import parser.RuleBasedParser;
 
 public class Test {
-	public static String GroundTruthFile = "/mnt/a99/d0/WWT/workspace/WWT_GroundTruthV2/unitLabel4Headers.xml";
-	public Test(HeaderUnitParser parsers[], String labeledDataFile) throws IOException, ParserConfigurationException, SAXException {
+	public static String GroundTruthFile = "/mnt/a99/d0/sunita/workspace.broken/WWT/expts/out.uniq.0.xml"; // "/mnt/a99/d0/WWT/workspace/WWT_GroundTruthV2/unitLabel4Headers.xml";
+	public Test(HeaderUnitParser parsers[], String labeledDataFile, String paramsFlag) throws IOException, ParserConfigurationException, SAXException {
 		Element elem = XMLConfigs.load(new FileReader(labeledDataFile));
 		NodeList nodeList = elem.getElementsByTagName("r");
 		int len = nodeList.getLength();
@@ -86,9 +86,9 @@ public class Test {
 						}
 					}
 				}
-				*/
+				 */
 				matched=((matchedIndex == 0 || matchedIndex==1) && (extractedUnits == null || extractedUnits.size()<=1));
-				System.out.println(matched + " " + hdr); 
+				if (!matched) {System.out.print(matched + " " + hdr + " "); Utils.printExtractedUnits(extractedUnits,false);} 
 				if (!matched) {
 					//"Extracted from " + parser.getClass().getSimpleName() + " " + extractedUnits);
 					mistakes[p]++;
@@ -110,22 +110,30 @@ public class Test {
 		for (HeaderUnitParser parser : parsers) {
 			float recall = ((float)numMatched[p])/total;
 			float precision =  ((float)numMatched[p])/numPred[p];
-			System.out.println(parser.getClass().getSimpleName() + "  " + mistakes[p]+ " / "+total + " prec="+precision + " recall="+recall + " NoUnitError="+noUnitError[p]+"/"+totalNoUnit);
+			System.out.println(parser.getClass().getSimpleName() + "\t" +  paramsFlag + "\t" +   recall +"\t" + " NoUnitError="+noUnitError[p]+"/"+totalNoUnit);
 			p++;
 		}
 	}
-	public static void main(String args[]) throws IOException, ParserConfigurationException, SAXException, SecurityException, IllegalArgumentException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+	public static void main(String args[]) throws Exception {
 		QuantityCatalog dict = new QuantityCatalog((Element)null);
 		Element emptyElement = XMLConfigs.emptyElement();
-		//emptyElement.setAttribute("co-occur-class", "PrUnitGivenWordNoFreq");
-		//emptyElement.setAttribute("params", "Co_occurStats=0");
-		emptyElement.setAttribute("params", "AfterIN=0,WithinBracket=0,INLANG=0,ContextWord=0");
-		HeaderUnitParser[] parsers = new HeaderUnitParser[]{
-				//new RuleBasedParser(emptyElement, dict), 
-				new FeatureBasedParser(emptyElement, dict),
-				//new CFGParser4Header(emptyElement,dict)
+
+		String coOccurMethods[]={"ConceptClassifier"};//,"PrUnitGivenWord"};//, "PrUnitGivenWordNoFreq","PMIScore","LogisticUnitGivenWords"};
+		String params[]={""};//"AfterIN=0,WithinBracket=0,INLANG=0,ContextWord=0"};
+
+		for (String coOccurMethod : coOccurMethods) {
+			for (String param : params) {
+				emptyElement.setAttribute("co-occur-class", coOccurMethod);
+				//emptyElement.setAttribute("params", "Co_occurStats=0");
+				if (param.length() > 0) emptyElement.setAttribute("params",param);
+				HeaderUnitParser[] parsers = new HeaderUnitParser[]{
+						//new RuleBasedParser(emptyElement, dict), 
+						//new FeatureBasedParser(emptyElement, dict),
+						new CFGParser4Header(emptyElement,dict)
 				};
-		new Test(parsers,GroundTruthFile);
+				new Test(parsers,GroundTruthFile,coOccurMethod+"_"+param);
+			}
+		}
 		//,"/mnt/a99/d0/sunita/workspace.broken/WWT/expts/quant/DictConceptMatch1Unit3");/
 	}
 }

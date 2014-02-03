@@ -175,7 +175,7 @@ public class RuleBasedParser extends SimpleParser {
 	public class NumberCount extends IsUrl {
 		public List<EntryWithScore<Unit>> apply(String hdr, ParseState pHdr, List<String> applicableRules) {
 			hdr = hdr.toLowerCase();
-			if (!hdr.contains("number") && !hdr.contains("count")) return null;
+			if (!hdr.contains("number") && !hdr.contains("count") && !hdr.contains("code")) return null;
 			pHdr.setDictMatch(quantityDict);
 			if (pHdr.setRealMatches(quantityDict) > 0) return null;
 			applicableRules.add(name());

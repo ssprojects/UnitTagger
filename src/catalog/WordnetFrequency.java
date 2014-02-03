@@ -31,7 +31,7 @@ public class WordnetFrequency implements WordFrequency {
 		,"with","on","total","per","no","number","amp","apos","quot","hr","s"};
 	public static HashSet<String> stopWordsHash=new HashSet<String>(Arrays.asList(stopWords));
 	public WordnetFrequency(Element options) {
-		System.out.println("Using "+extractLoadFile(options));
+		//System.out.println("Using "+extractLoadFile(options));
 		System.setProperty("wordnet.database.dir", extractLoadFile(options));
 		database = WordNetDatabase.getFileInstance();
 		Synset syns[] = database.getSynsets(quantitySearchString, SynsetType.NOUN);

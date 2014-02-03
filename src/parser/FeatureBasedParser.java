@@ -22,7 +22,7 @@ import edu.stanford.nlp.ling.HasWord;
 public class FeatureBasedParser extends CFGParser4Header {
 
 	public FeatureBasedParser(Element elem, QuantityCatalog dict)
-			throws IOException, ParserConfigurationException, SAXException, SecurityException, IllegalArgumentException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+			throws Exception {
 		super(elem, dict);
 		// TODO Auto-generated constructor stub
 	}
@@ -37,7 +37,7 @@ public class FeatureBasedParser extends CFGParser4Header {
 	public List<? extends EntryWithScore<Unit>> parseHeader(String hdr, ParseState hdrMatches, int debugLvl, short[][] forcedTags, UnitSpan forcedUnit, int k, Vector<UnitFeatures> featureList) {			
 		hdrMatches = getTokensWithSpan(hdr,null,hdrMatches);
 		if (hdrMatches.tokens.size()==0) return null;
-		List<? extends HasWord> sentence = tokenScorer.cacheScores(hdrMatches,null,debugLvl,featureList != null,null);
+		List<? extends HasWord> sentence = tokenScorer.cacheScores(hdrMatches,null,debugLvl,featureList != null,null, null);
 		
 		
 		/*
