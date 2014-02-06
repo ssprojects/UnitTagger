@@ -33,13 +33,16 @@
     </Synset>
     <typicalUsage>
     </typicalUsage>
-    <unit name="" symbol="" conversionFactor="">
+    <unit name="(SI base unit)" symbol="" conversionFactor="1">
       <lemmaset>
       </lemmaset>
     </unit>
     <unit name="thousand" symbol="thousand" conversionFactor="= 1000">
       <lemmaset>
 	<String>thou</String>			  
+	<String>1000</String>			  
+	<String>000</String>			  
+	<String>ooo</String>			  
       </lemmaset>
     </unit>
     <unit name="lakh" symbol="lakh" conversionFactor="= 100000">
@@ -2409,6 +2412,10 @@
     <unit name="tonne (mts unit)" symbol="t" conversionFactor="= 1 000 kg">
       <lemmaset>
 	<String>tones</String>
+	<String frequency="0.7">ton</String>
+	<String frequency="0.7">tons</String>
+	<String>metric ton</String>
+	<String>metric tons</String>
       </lemmaset>
     </unit>
     <unit name="kiloton" symbol="kt" conversionFactor="= 1 000 000 kg">
