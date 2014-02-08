@@ -21,15 +21,19 @@ import edu.stanford.nlp.parser.lexparser.Lexicon;
 import edu.stanford.nlp.trees.Tree;
 
 public class CFGParser4Text extends CFGParser4Header {
-	public CFGParser4Text(Element options) throws IOException,
-			ParserConfigurationException, SAXException {
+	public CFGParser4Text(Element options) throws Exception {
 		super(options);
-		// TODO Auto-generated constructor stub
+		initParams();
+		
+	}
+	private void initParams() {
+		params.contextDiffThreshold=4; // need a larger threshold for context word match for text data.
 	}
 	public static String QuantityToken="qqqq";
 	public CFGParser4Text(Element options, QuantityCatalog quantMatcher)
-			throws IOException, ParserConfigurationException, SAXException {
+			throws Exception {
 		super(options, quantMatcher);
+		initParams();
 	}
 	// put the grammar before BU.
 	public static String textGrammar=
@@ -83,7 +87,7 @@ public class CFGParser4Text extends CFGParser4Header {
 	public static void main(String args[]) throws Exception {
 		Vector<UnitFeatures> featureList = new Vector();
 		Vector<String> explanation = new Vector<String>();
-		List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeaderExplain("by $qqqq per litre", explanation,1,null); 
+		List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeaderExplain("speed of light is qqqq km/s", explanation,1,null); 
 		/*List<EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeader("year qqqq billion kilowatt hour",	null
 				//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.Q.ordinal()},{(short) Tags.Mult.ordinal()},{(short) Tags.SU.ordinal()}
 				//,{(short) Tags.SU.ordinal()}}
@@ -94,6 +98,8 @@ public class CFGParser4Text extends CFGParser4Header {
 				System.out.println(unit.getKey().getName()+ " " +unit.getScore());
 			}
 			if (explanation.size() > 0) System.out.println(explanation.get(0));
+		} else {
+			System.out.println("No unit found");
 		}
 		
 	}

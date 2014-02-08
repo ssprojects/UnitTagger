@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.Vector;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -58,7 +59,7 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 	public static final String ClassifierFile = "conceptClassifier";
 	public static final double UndecidedScore = 0.3;
 	public static final double MinScore = 0.01;
-	public static String[][] ignoredConcepts = {{"percent","%"}};
+	public static String[][] ignoredConcepts = {{"Percent","%"}};
 	static Hashtable<String,String[]> ignoredConceptsHash=new Hashtable<String,String[]>();
 
 	StringMap<String> wordIdMap = new StringMap<String>();
@@ -403,24 +404,27 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 				, "/mnt/a99/d0/sunita/workspace.broken/WWT/expts/quant/SingleUnitAfterIn"
 				, "/mnt/a99/d0/sunita/workspace.broken/WWT/expts/quant/DictConceptMatch1Unit"
 				, "/mnt/a99/d0/sunita/workspace.broken/WWT/expts/quant/SingleUnitWithinBrackets"
+				, "/mnt/a99/d0/sunita/workspace.broken/WWT/expts/quant/PercentSymbolMatch"
 		};
+		float sampleRates[] = {1,1,1,1,0.07f};
 		QuantityCatalog quantDict = new QuantityCatalog((Element)null);
-
-		/*
-		ConceptClassifier classifier = new ConceptClassifier(quantDict);
+	
+	/*	ConceptClassifier classifier = new ConceptClassifier(quantDict);
 		Co_occurrenceStatistics coOccur = new Co_occurrenceStatistics(quantDict);
 		Vector<String> explanation = new Vector<String>();
+		Random random = new Random(1);
 		for (int i = 0; i < paths.length; i++) {
 			for (int j = 0; j < 10; j++) {
 				File file = new File(paths[i]+j);
 				if (!file.exists()) {
-					System.out.println("did not file..."+paths[i]+j);
+					System.out.println("did not find..."+paths[i]+j);
 					continue;
 				}
 				System.out.println("reading..."+paths[i]+j);
 				BufferedReader reader = new BufferedReader(new FileReader(file));
 				String line;
 				while ((line = reader.readLine())!= null) {
+					if (random.nextDouble()>sampleRates[i]) continue;
 					line = line.trim();
 					if (!line.startsWith("<h>")) continue;
 					String hdr = line.substring(3,line.indexOf("</h>")).trim();
@@ -431,8 +435,8 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 		}
 		classifier.makeClassifier();
 	*/
-		ConceptClassifier classifier = new ConceptClassifier(quantDict,QuantityCatalog.QuantConfigDirPath+ConceptClassifier.ClassifierFile);
-		String conceptTests[] = {"area code", "forest area", "Urban Area Population", "area 1000 sq km", "area", "area sq", "area km", "CO2 emissions", "distance from sun","net worth","year of first flight","weight", "pressure", "record low", "size", "volume","bandwidth","capacity"};
+		ConceptClassifier classifier = new ConceptClassifier(quantDict,QuantityCatalog.QuantConfigDirPath+ConceptClassifier.ClassifierFile); //+".withPercent"
+		String conceptTests[] = {"corporate income tax rate", "area code", "forest area", "Urban Area Population", "area 1000 sq km", "area", "area sq", "area km", "CO2 emissions", "distance from sun","net worth","year of first flight","weight", "pressure", "record low", "size", "volume","bandwidth","capacity"};
 		for (String hdr : conceptTests) {
 			System.out.print(hdr);
 			List<String> tokens = QuantityCatalog.getTokens(hdr);
@@ -457,5 +461,5 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 		}
 
 	}
-	
+
 }

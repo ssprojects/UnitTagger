@@ -175,6 +175,12 @@ public class RuleBasedParser extends SimpleParser {
 	public class NumberCount extends IsUrl {
 		public List<EntryWithScore<Unit>> apply(String hdr, ParseState pHdr, List<String> applicableRules) {
 			hdr = hdr.toLowerCase();
+			if (hdr.toLowerCase().endsWith("tax rate")) {
+				applicableRules.add(name());
+				List<EntryWithScore<Unit>> units = new Vector<EntryWithScore<Unit>>();
+				units.add(new UnitSpan(quantityDict.getUnitFromBaseName("percent"),1,-1,-1));
+				return units;
+			}
 			if (!hdr.contains("number") && !hdr.contains("count") && !hdr.contains("code")) return null;
 			pHdr.setDictMatch(quantityDict);
 			if (pHdr.setRealMatches(quantityDict) > 0) return null;

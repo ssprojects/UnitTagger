@@ -51,7 +51,6 @@ public class TokenScorer implements ConditionalLexicon {
 	private static final float NegInfty = -100;
 	private static final float ScoreEps = 0.01f;
 	boolean disableNewUnits = true;
-
 	private DocResult dictMatches;
 	private List<Token> sentence;
 	protected List<String> hdrToks;
@@ -75,8 +74,7 @@ public class TokenScorer implements ConditionalLexicon {
 		return unitObj;
 	}
 	private float matchFeatureValue(int len) {
-		if (len==1) return 0;
-		if (len==2) return 1;
+		if (len<=3) return len-1;
 		return (float) Math.pow(10, len-1);
 	}
 	private float defaultFeatureScore(int start, int end, UnitFeatures unitObj) {
@@ -250,7 +248,7 @@ public class TokenScorer implements ConditionalLexicon {
 				for (int hp = contextDictMatch.numHits()-1; hp >= 0; hp--) {
 					int idp = contextDictMatch.hitDocId(hp);
 					if (matcher.idToUnitMap.getType(idp) != matcher.idToUnitMap.ConceptMatch) continue;
-					if (context == null) if (contextDictMatch.hitEndPosition(hp) >= start || start - contextDictMatch.hitEndPosition(hp) > 2) continue;
+					if (context == null) if (contextDictMatch.hitEndPosition(hp) >= start || start - contextDictMatch.hitEndPosition(hp) > params.contextDiffThreshold) continue;
 					if (matcher.idToUnitMap.get(idp).getParentQuantity()==unit.getParentQuantity()) {
 						bestScore = Math.max(bestScore,contextDictMatch.hitMatch(hp));
 					}

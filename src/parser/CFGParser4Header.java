@@ -522,6 +522,7 @@ public class CFGParser4Header extends RuleBasedParser {
 
 	 */
 	public static class Params {
+		public int contextDiffThreshold = 2;
 		public enum FTypes {ContextWord,UnitBias,DictMatchWeight,
 			SINGLELetter,INLANG, MatchLength, Co_occurStats,Subsumed,
 			WithinBracket,AfterIN,
