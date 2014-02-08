@@ -70,6 +70,10 @@
 	<String>bn</String>
       </lemmaset>
     </unit>
+      <unit name="trillion" symbol="trillion" conversionFactor="= 1000000000000">
+      <lemmaset>
+      </lemmaset>
+    </unit>
   </concept>
   <concept name="Currency">
     <Synset>
@@ -3990,6 +3994,20 @@
       <lemmaset>
 	<String>rads</String>
       </lemmaset>
+    </unit>
+  </concept>
+  <concept name="fuel consumption">
+    <Synset>
+      <String>Length per Volume</String>
+    </Synset>
+    <unit name="kilometre per litre (SI Unit)" symbol="km/l;kmpl" conversionFactor="1">
+      <lemmaset>
+	<String>kilometer per liter</String>
+      </lemmaset>
+    </unit>
+    <unit name="miles per gallon" symbol="mpg" conversionFactor="= 0.425114 km/l">
+      <lemmaset>
+	</lemmaset>
     </unit>
   </concept>
   <!--
