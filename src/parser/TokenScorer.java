@@ -68,12 +68,14 @@ public class TokenScorer implements ConditionalLexicon {
 	private float scores[][][];
 	//	protected Unit bestUnit[][][];
 	int lastMatch[] = new int[1];
+	int numMatch[] = new int[1];
 	public UnitFeatures newUnit(Unit newUnit, int start, int end) {
 		UnitFeatures unitObj = new UnitFeatures(newUnit, 0,start,end);
 		unitObj.setScore(defaultFeatureScore(start, end, trainMode?unitObj:null));
 		return unitObj;
 	}
 	private float matchFeatureValue(int len) {
+		// 8 feb 2014 do not make this less than 3 because common units like km/s will get uncessarily penalized.
 		if (len<=3) return len-1;
 		return (float) Math.pow(10, len-1);
 	}
@@ -219,17 +221,18 @@ public class TokenScorer implements ConditionalLexicon {
 			UnitFeatures unitObject  = new UnitFeatures(unit, 0,start,end);
 			if (matcher.idToUnitMap.getType(id) != matcher.idToUnitMap.ConceptMatch) {
 				maxMatchLen = Math.max(maxMatchLen, res.hitLength(h));
+				List<String> unitToks = matcher.idToUnitMap.getTokens(id);
+				int startM = getMaximalTokens(res.hitMatch(h), unitToks,hdrToks,start,end,lastMatch,numMatch);
+				int endM=lastMatch[0];
 				//Quantity concept = matcher.idToUnitMap.getConcept(id);
-				score = (float) (score*params.weights[FTypes.DictMatchWeight.ordinal()]);
-				registerFeatureInfo(start, end, state, FTypes.DictMatchWeight, res.hitMatch(h), unit.getName(), trainMode?unitObject:null);
+				// 27/2/2014: increasing dictionary match based on the number of actual tokens that matched --- otherwise travels km/s is getting tagged as km.
+				score = (float) (score*params.weights[FTypes.DictMatchWeight.ordinal()]*numMatch[0]);
+				registerFeatureInfo(start, end, state, FTypes.DictMatchWeight, res.hitMatch(h)*numMatch[0], unit.getName(), trainMode?unitObject:null);
 				score += unitBias;
 				registerFeatureInfo(start, end, state, FTypes.UnitBias, 1, unit.getName(), trainMode?unitObject:null);
 				score += matchFeatureValue(res.hitLength(h))*params.weights[FTypes.MatchLength.ordinal()];
 				registerFeatureInfo(start, end, state, FTypes.MatchLength, matchFeatureValue(res.hitLength(h)), unit.getName(), trainMode?unitObject:null);
-				List<String> unitToks = matcher.idToUnitMap.getTokens(id);
-
-				int startM = getMaximalTokens(res.hitMatch(h), unitToks,hdrToks,start,end,lastMatch);
-				int endM=lastMatch[0];
+				
 				if (startM==endM && hdrToks.get(startM).length()==1 && Character.isLetterOrDigit(hdrToks.get(startM).charAt(0))) {
 					score += params.weights[FTypes.SINGLELetter.ordinal()];
 					registerFeatureInfo(start, end, state, FTypes.SINGLELetter, 1, unit.getName(), trainMode?unitObject:null);
@@ -653,18 +656,26 @@ public class TokenScorer implements ConditionalLexicon {
 		return false;
 	}
 	private int getMaximalTokens(float score, List<String> unitToks,
-			List<String> hdrToks2, int start, int end, int[] lastMatch2) {
+			List<String> hdrToks2, int start, int end, int[] lastMatch2, int[] numMatches) {
 		lastMatch2[0]=end;
-		if (score > 1 - Float.MIN_VALUE)
-			return start;
+		//if (score > 1 - Float.MIN_VALUE)
+		//	return start;
 		for (; start <= end; start++) {
 			if (unitToks.contains(hdrToks2.get(start)))
 				break;
 		}
 		for (;start <= end; end--) {
-			if (unitToks.contains(hdrToks2.get(end)))
-				return start;
+			if (unitToks.contains(hdrToks2.get(end))) {
+				break;
+			}
 			lastMatch2[0]=end-1;
+		}
+		if (numMatches != null) {
+			numMatches[0] = 0;
+			for (int i = start; i <= lastMatch2[0]; i++) {
+				if (unitToks.contains(hdrToks2.get(i)))
+					numMatches[0]++;
+			}
 		}
 		assert(start <= lastMatch2[0]);
 		return start;

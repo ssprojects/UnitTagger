@@ -22,17 +22,17 @@ import catalog.QuantityCatalog;
 import catalog.Unit;
 
 import parser.CFGParser4Header;
+import parser.CFGParser4Text;
 import parser.FeatureBasedParser;
 import parser.HeaderUnitParser;
 import parser.RuleBasedParser;
 
 public class Test {
-	public static String GroundTruthFile = "/mnt/a99/d0/sunita/workspace.broken/WWT/expts/out.uniq.0.xml"; // "/mnt/a99/d0/WWT/workspace/WWT_GroundTruthV2/unitLabel4Headers.xml";
-	public Test(HeaderUnitParser parsers[], String labeledDataFile, String paramsFlag) throws IOException, ParserConfigurationException, SAXException {
+	public static String GroundTruthFile = "/mnt/a99/d0/WWT/workspace/WWT_GroundTruthV2/unitLabel4Text.xml"; //"/mnt/a99/d0/sunita/workspace.broken/WWT/expts/out.uniq.0.xml"; // 
+	public Test(HeaderUnitParser parsers[], String labeledDataFile, String paramsFlag, QuantityCatalog dict) throws Exception {
 		Element elem = XMLConfigs.load(new FileReader(labeledDataFile));
 		NodeList nodeList = elem.getElementsByTagName("r");
 		int len = nodeList.getLength();
-
 		int total = 0;
 		int totalNoUnit = 0;
 		int mistakes[] = new int[parsers.length];
@@ -51,7 +51,16 @@ public class Test {
 			if (unitList != null && unitList.getLength()>0) {
 				trueUnits = new HashSet<String>();
 				for (int u = 0; u < unitList.getLength();u++) {
-					trueUnits.add(unitList.item(u).getTextContent().toLowerCase());
+					String trueUnit = unitList.item(u).getTextContent();
+					if (trueUnit.length() > 0) {
+						List<EntryWithScore<Unit>> retVal = dict.getTopK(trueUnit, "", 0.8);
+						if (retVal == null || retVal.size()<1) {
+							throw new Exception("Could not find the correct match in the catalog for "+trueUnit);
+						} else {
+							trueUnit = retVal.get(0).getKey().getBaseName();
+						}
+					}
+					trueUnits.add(trueUnit.toLowerCase());
 					if (u > 0) trueUnitsString.concat("|");
 					//System.out.println(unitList.item(u).getTextContent());
 					trueUnitsString += unitList.item(u).getTextContent().toLowerCase();
@@ -129,9 +138,9 @@ public class Test {
 				HeaderUnitParser[] parsers = new HeaderUnitParser[]{
 						//new RuleBasedParser(emptyElement, dict), 
 						//new FeatureBasedParser(emptyElement, dict),
-						new CFGParser4Header(emptyElement,dict)
+						new CFGParser4Text(emptyElement,dict)
 				};
-				new Test(parsers,GroundTruthFile,coOccurMethod+"_"+param);
+				new Test(parsers,GroundTruthFile,coOccurMethod+"_"+param, dict);
 			}
 		}
 		//,"/mnt/a99/d0/sunita/workspace.broken/WWT/expts/quant/DictConceptMatch1Unit3");/

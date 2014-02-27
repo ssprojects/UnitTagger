@@ -80,12 +80,14 @@ public class WordnetFrequency implements WordFrequency {
 						System.out.println("");
 						String[] wordForms= synsets[i].getWordForms();
 						SynsetType type = synsets[i].getType();
+						int cnt = 0;
 						for(int j=0;j<wordForms.length;j++){
 							System.out.println(wordForms[j]+" [" + synsets[i].getDefinition() + "] " + synsets[i].getTagCount(wordForms[j]));
+							cnt += synsets[i].getTagCount(wordForms[j]);
 						}
 						if (synsets[i] instanceof NounSynset) {
 							NounSynset nsyn = (NounSynset) synsets[i];
-							System.out.println("Descendant of Quantity " + isUnit(nsyn)+ " "+isUnitDefn(nsyn));
+							System.out.println("Descendant of Quantity " + isUnit(nsyn)+ " "+isUnitDefn(nsyn) + " "+cnt);
 						}
 						
 					}
@@ -108,7 +110,7 @@ public class WordnetFrequency implements WordFrequency {
 	 */
 	public static void main(String[] args) {
 		//args = HeaderSegmenter.WordSymbols;
-		args = new String[]{"lb"};
+		args = new String[]{"last"};
 		WordnetFrequency wordFreq = new WordnetFrequency(null);
 		List<EntryWithScore<String[]>> matches = new Vector<EntryWithScore<String[]>>();
 		wordFreq.getRelativeFrequency(args[0], matches);

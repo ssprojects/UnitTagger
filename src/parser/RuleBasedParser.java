@@ -302,6 +302,9 @@ public class RuleBasedParser extends SimpleParser {
 		ParseState hdrToks = new ParseState(hdr);
 		if (hdrMatches != null && hdrMatches.length > 0) hdrMatches[0] = hdrToks;
 		List<EntryWithScore<Unit> > unitsToRet = null;
+		if (applicableRules==null) {
+			applicableRules = new Vector<String>();
+		}
 		for (Rule rule: rules) {
 			int sz = applicableRules.size();
 			List<EntryWithScore<Unit>> units = rule.apply(hdr, hdrToks, applicableRules);

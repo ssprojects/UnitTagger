@@ -87,17 +87,18 @@ public class CFGParser4Text extends CFGParser4Header {
 	public static void main(String args[]) throws Exception {
 		Vector<UnitFeatures> featureList = new Vector();
 		Vector<String> explanation = new Vector<String>();
-		List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeaderExplain("speed of light is qqqq km/s", explanation,1,null); 
-		/*List<EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeader("year qqqq billion kilowatt hour",	null
-				//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.Q.ordinal()},{(short) Tags.Mult.ordinal()},{(short) Tags.SU.ordinal()}
-				//,{(short) Tags.SU.ordinal()}}
+		List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeader("travels qqqq km/s the",
+				new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.Q.ordinal()},{(short) Tags.SU_W.ordinal()},{(short) Tags.Op.ordinal()},{(short) Tags.SU_W.ordinal()} ,{(short) Tags.W.ordinal()}}
+//				null
+				,1,1,featureList); 
+	
+		/*List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeader("year qqqq billion kilowatt hour",	
+				new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.Q.ordinal()},{(short) Tags.Mult.ordinal()},{(short) Tags.SU_W.ordinal()}
+				,{(short) Tags.SU_W.ordinal()}}
 				,1);
 		*/
 		if (unitsR != null) {
-			for (EntryWithScore<Unit> unit : unitsR) {
-				System.out.println(unit.getKey().getName()+ " " +unit.getScore());
-			}
-			if (explanation.size() > 0) System.out.println(explanation.get(0));
+				eval.Utils.printExtractedUnits(unitsR,true);
 		} else {
 			System.out.println("No unit found");
 		}
