@@ -47,6 +47,7 @@
     </unit>
     <unit name="lakh" symbol="lakh" conversionFactor="= 100000">
       <lemmaset>
+	<String>lac</String>			  
       </lemmaset>
     </unit>
     <unit name="crore" symbol="cr" conversionFactor="= 10000000">
@@ -1299,6 +1300,7 @@
     <unit name="nanometer" symbol="nm" conversionFactor="≡ 1×10−9 m">
       <lemmaset>
 	<String>nanometers</String>
+	<String>nanometre</String>
       </lemmaset>
     </unit>
     <unit name="nautical league" symbol="NL; nl" conversionFactor="= 5556 m">
@@ -1680,6 +1682,11 @@
     <unit name="cubic metre (SI unit)" symbol="m3" conversionFactor="≡ 1 m3">
       <lemmaset>
 	<String>m 3</String>
+      </lemmaset>
+    </unit>
+    <unit name="cubic kilometre" symbol="km3" conversionFactor="≡ 1000000000 m3">
+      <lemmaset>
+	<String>km 3</String>
       </lemmaset>
     </unit>
     <unit name="cubic centimetre" symbol="cc" conversionFactor="≡ 1000000 m3">
@@ -2700,6 +2707,11 @@
 	<String frequency="0.1">s</String>
       </lemmaset>
     </unit>
+    <unit name="millisecond" symbol="ms" conversionFactor="= 0.001">
+      <lemmaset>
+	<String>milli second</String>
+      </lemmaset>
+    </unit>
     <unit name="shake" symbol=" " conversionFactor="= 10 ns">
       <lemmaset>
       </lemmaset>
@@ -3079,6 +3091,10 @@
 	</unit>
     -->
     <unit name="bar" symbol="bar" conversionFactor="≡ 105 Pa">
+      <lemmaset>
+      </lemmaset>
+    </unit>
+    <unit name="millibar" symbol="mbar;mb" conversionFactor="≡ 105 Pa">
       <lemmaset>
       </lemmaset>
     </unit>
