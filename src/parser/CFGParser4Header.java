@@ -128,7 +128,7 @@ public class CFGParser4Header extends RuleBasedParser {
 				{(short) Tags.SU_1W.ordinal(),(short) Tags.SU_W.ordinal(),(short) Tags.W.ordinal(),(short) Tags.IN.ordinal()},
 				{(short) Tags.W.ordinal(),(short) Tags.OF.ordinal()},
 				{(short) Tags.W.ordinal(), (short) Tags.Op.ordinal()},
-				{(short) Tags.PER.ordinal(),(short) Tags.SU_1W.ordinal(),(short)Tags.W.ordinal()},
+				{(short) Tags.PER.ordinal(),(short) Tags.SU_1W.ordinal(),(short)Tags.W.ordinal(), (short) Tags.Op.ordinal()},
 				{(short) Tags.W.ordinal(), (short) Tags.Mult.ordinal(),(short) Tags.Number.ordinal()},
 				{(short) Tags.Q.ordinal()},
 				{(short) Tags.Boundary.ordinal()}
