@@ -53,7 +53,7 @@ public class Test {
 				for (int u = 0; u < unitList.getLength();u++) {
 					String trueUnit = unitList.item(u).getTextContent();
 					if (trueUnit.length() > 0) {
-						List<EntryWithScore<Unit>> retVal = dict.getTopK(trueUnit, "", 0.8);
+						List<EntryWithScore<Unit>> retVal = dict.getTopK(trueUnit, "", QuantityCatalog.MinMatchThreshold);
 						if (retVal == null || retVal.size()<1) {
 							throw new Exception("Could not find the correct match in the catalog for "+trueUnit);
 						} else {

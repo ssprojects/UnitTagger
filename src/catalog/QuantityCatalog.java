@@ -41,7 +41,7 @@ import parser.coOccurMethods.ConceptTypeScores;
 /* sunita: Sep 8, 2012 */
 public class QuantityCatalog implements WordFrequency, ConceptTypeScores {
 	private static final double MinContextOverlap = 0.5;
-	private static final double MinMatchThreshold = 0.5;
+	public static final double MinMatchThreshold = 0.5;
 	public static String QuantConfigDirPath =  "/mnt/a99/d0/WWT/workspace/WWT_GroundTruthV2/";
 	public static final String QuantTaxonomyFile = "QuantityTaxonomy.xml";
 	public static String QuantTaxonomyPath = QuantConfigDirPath+QuantTaxonomyFile;
@@ -594,6 +594,7 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores {
 	
 	public static void main(String args[]) throws Exception {
 		String tests[][] = {
+				{"meter","","metre"},
 				{"sq.km.","Area","square kilometre"},
 				{"million Km", "", "kilometre [million]"},
 				{"$mil", "net worth", "united states dollar [million]"},
