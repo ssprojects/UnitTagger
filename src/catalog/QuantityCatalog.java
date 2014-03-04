@@ -42,7 +42,7 @@ import parser.coOccurMethods.ConceptTypeScores;
 public class QuantityCatalog implements WordFrequency, ConceptTypeScores {
 	private static final double MinContextOverlap = 0.5;
 	private static final double MinMatchThreshold = 0.5;
-	public static String QuantConfigDirPath =  "/mnt/a99/d0/sunita/workspace/QuantityTagger/configs/";
+	public static String QuantConfigDirPath =  "/mnt/a99/d0/WWT/workspace/WWT_GroundTruthV2/";
 	public static final String QuantTaxonomyFile = "QuantityTaxonomy.xml";
 	public static String QuantTaxonomyPath = QuantConfigDirPath+QuantTaxonomyFile;
 	/* Create an exact name match units dictionary consisting of 
