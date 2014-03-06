@@ -110,7 +110,7 @@ public class WordnetFrequency implements WordFrequency {
 	 */
 	public static void main(String[] args) {
 		//args = HeaderSegmenter.WordSymbols;
-		args = new String[]{"last"};
+		args = new String[]{"%"};
 		WordnetFrequency wordFreq = new WordnetFrequency(null);
 		List<EntryWithScore<String[]>> matches = new Vector<EntryWithScore<String[]>>();
 		wordFreq.getRelativeFrequency(args[0], matches);

@@ -99,6 +99,7 @@ public class TokenScorer implements ConditionalLexicon {
 	int debugLvl;
 	private boolean trainMode;
 	ParseState context;
+	List<String> contextTokens;
 	UnitSpan forcedUnit;
 	String hdr;
 	public TokenScorer(StateIndex stateIndex, EnumIndex tagIndex, QuantityCatalog matcher, 
@@ -123,6 +124,9 @@ public class TokenScorer implements ConditionalLexicon {
 		hdrState.setConceptsFound(matcher);
 		if (forcedUnit != null) {
 			initForcedUnitState(forcedUnit);
+		}
+		if (context != null) {
+			contextTokens = context.setTokens();
 		}
 		return fillScoreArrays(debugLvl,trainMode);
 	}
@@ -341,7 +345,7 @@ public class TokenScorer implements ConditionalLexicon {
 					}
 				}
 			}
-			float totalScores[] = coOcurStats.getCo_occurScores((context==null?hdrToks:context.tokens), units);
+			float totalScores[] = coOcurStats.getCo_occurScores((context==null?hdrToks:contextTokens), units);
 			if (totalScores!=null) {
 			// the total contribution from co-occurrence statistics is now available.
 			// now add the winning units in each slots.

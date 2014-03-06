@@ -29,11 +29,12 @@ public class ParseState {
 	public ParseState(String hdr) {
 		this.hdr= hdr;
 	}
-	public void setTokens() {
+	public List<String> setTokens() {
 		if (tokens==null) {
 			brackets = new TIntArrayList();
 			tokens = QuantityCatalog.getTokens(hdr,brackets);
 		}
+		return tokens;
 	}
 	public DocResult setDictMatch(QuantityCatalog quantityDict) {
 		if (dictMatch==null) {
