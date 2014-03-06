@@ -63,7 +63,7 @@ public class Test {
 					trueUnits.add(trueUnit.toLowerCase());
 					if (u > 0) trueUnitsString.concat("|");
 					//System.out.println(unitList.item(u).getTextContent());
-					trueUnitsString += unitList.item(u).getTextContent().toLowerCase();
+					trueUnitsString += trueUnit;
 				}
 			}
 			int p = -1;
