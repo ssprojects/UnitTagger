@@ -247,7 +247,7 @@ public class CFGParser4Header extends RuleBasedParser {
 		public StateIndex(EnumIndex tagIndex) {
 			this.tagIndex = tagIndex;
 		}
-		public enum States {ROOT,ROOT_,Junk,Junk_U,Sep_U,IN_U,U, UL,IN_Mult,Mult_OF,BU,CU2,Sep_SU,SU_MW,SU,PER_SU,Junk_QU,Q_U,SU_Q,BU_Q,CU2_Q};// W, Mult, IN, OF, Op,Boundary};
+		public enum States {ROOT,ROOT_,Junk,Junk_U,Sep_U,IN_U,U, UL,IN_Mult,Mult_OF,BU,CU2,Sep_SU,SU_MW,SU,PER_SU,Junk_QU,Q_U,SU_Q,BU_Q,CU2_Q,Q_Junk,W_Op_U,Rep_QU,Op_U};// W, Mult, IN, OF, Op,Boundary};
 		@Override
 		public Iterator<String> iterator() {
 			return null;

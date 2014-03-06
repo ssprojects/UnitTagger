@@ -48,6 +48,17 @@ public class CFGParser4Text extends CFGParser4Header {
         "Junk ::= Junk W 1f"+ "\n" +
         "Junk ::= W 1f"+ "\n" +
         
+        "Q_U ::= Q_Junk Q_U 1f"+ "\n"+  //for cases like "2 and 5 m","4 +- 6 m"
+        "Q_Junk ::= Q Junk 1f"+"\n"+
+        
+        "Q_U := Q W_Op_U 1f"+"\n"+ 
+        "W_Op_U := Op_U 1f"+"\n"+  	  //for cases like 31 per thousand
+        "W_Op_U := W Op_U 1f"+"\n"+   //for cases like 22123 parts per billion
+        "Op_U := PER SU 1f"+"\n"+
+        
+        "Q_U ::= Q_U Rep_QU 1f"+"\n"+  //for cases like 4 m (5 feet), between 3 m and 4 m, 
+        "Rep_QU ::= W Q_U 1f"+"\n"+
+        
         "Q_U ::- Q U 1f" +    "\n" + //Quantity followed by a unit.
         "Q_U ::- SU_Q 1f" +    "\n" +                // a units followed by a quantity e.g. "$500"
         "Q_U ::- Q 1f" + "\n" +                    // unitless and multiplier-less quantity e.g. Population of India is 1,200,000
@@ -87,8 +98,19 @@ public class CFGParser4Text extends CFGParser4Header {
 	public static void main(String args[]) throws Exception {
 		Vector<UnitFeatures> featureList = new Vector();
 		Vector<String> explanation = new Vector<String>();
-		List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeader("travels qqqq km/s the",
-				new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.Q.ordinal()},{(short) Tags.SU_W.ordinal()},{(short) Tags.Op.ordinal()},{(short) Tags.SU_W.ordinal()} ,{(short) Tags.W.ordinal()}}
+		
+		List<? extends EntryWithScore<Unit>> unitsS = new CFGParser4Text(null).parseHeader("angels passing qqqq percent of speed of light", null, 1,1, featureList);
+		
+		if (unitsS != null) {
+			eval.Utils.printExtractedUnits(unitsS,true);
+		} else {
+			System.out.println("No unit found");
+		}
+		System.out.println("----------");
+		
+		
+		List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeader("angels passing qqqq percent of speed of light",
+				new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.Q.ordinal()},{(short) Tags.SU_W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()}}
 //				null
 				,1,1,featureList); 
 	
@@ -102,6 +124,5 @@ public class CFGParser4Text extends CFGParser4Header {
 		} else {
 			System.out.println("No unit found");
 		}
-		
 	}
 }
