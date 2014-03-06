@@ -55,6 +55,7 @@ public class CFGParser4Text extends CFGParser4Header {
         "W_Op_U := Op_U 1f"+"\n"+  	  //for cases like 31 per thousand
         "W_Op_U := W Op_U 1f"+"\n"+   //for cases like 22123 parts per billion
         "Op_U := PER SU 1f"+"\n"+
+        "Op_U := PER Mult 1f"+"\n"+
         
         "Q_U ::= Q_U Rep_QU 1f"+"\n"+  //for cases like 4 m (5 feet), between 3 m and 4 m, 
         "Rep_QU ::= W Q_U 1f"+"\n"+
@@ -99,7 +100,8 @@ public class CFGParser4Text extends CFGParser4Header {
 		Vector<UnitFeatures> featureList = new Vector();
 		Vector<String> explanation = new Vector<String>();
 		
-		List<? extends EntryWithScore<Unit>> unitsS = new CFGParser4Text(null).parseHeader("angels passing qqqq percent of speed of light", null, 1,1, featureList);
+		String hdr = "chances are qqqq per thousand";
+		List<? extends EntryWithScore<Unit>> unitsS = new CFGParser4Text(null).parseHeader(hdr, null, 1,1, featureList);
 		
 		if (unitsS != null) {
 			eval.Utils.printExtractedUnits(unitsS,true);
@@ -109,9 +111,9 @@ public class CFGParser4Text extends CFGParser4Header {
 		System.out.println("----------");
 		
 		
-		List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeader("angels passing qqqq percent of speed of light",
-				new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.Q.ordinal()},{(short) Tags.SU_W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()}}
-//				null
+		List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeader(hdr,
+				new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.Q.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.Mult.ordinal()}}
+				//null
 				,1,1,featureList); 
 	
 		/*List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeader("year qqqq billion kilowatt hour",	

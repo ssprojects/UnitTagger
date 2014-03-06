@@ -856,7 +856,7 @@ public class CFGParser4Header extends RuleBasedParser {
 	UnitFeatures tmpEntry = new UnitFeatures(null, 0,0,0);
 	private void getUnit(Tree unitTree, List<String> hdrToks,List<UnitFeatures> bestUnitsVec,String hdr) {
 		bestUnitsVec.clear();
-		Tree bestUTree = getSubTree(unitTree,new String[]{"BU_Q", "BU","SU"});
+		Tree bestUTree = getSubTree(unitTree,new String[]{"BU_Q", "BU","SU", "Op_U"});
 		Tree multTree = getSubTree(unitTree,new String[]{"Mult"});
 
 		if (bestUTree != null) {

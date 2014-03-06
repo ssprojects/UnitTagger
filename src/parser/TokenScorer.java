@@ -247,7 +247,7 @@ public class TokenScorer implements ConditionalLexicon {
 					registerFeatureInfo(start, end, state, FTypes.INLANG, (1-freq), unit.getName(), trainMode?unitObject:null);
 				}
 				float bestScore = 0;
-				DocResult contextDictMatch = (context==null?res:context.dictMatch);
+				DocResult contextDictMatch = (context==null || context.dictMatch==null?res:context.dictMatch);
 				for (int hp = contextDictMatch.numHits()-1; hp >= 0; hp--) {
 					int idp = contextDictMatch.hitDocId(hp);
 					if (matcher.idToUnitMap.getType(idp) != matcher.idToUnitMap.ConceptMatch) continue;
