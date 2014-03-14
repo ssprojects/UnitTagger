@@ -126,7 +126,8 @@ public class TokenScorer implements ConditionalLexicon {
 			initForcedUnitState(forcedUnit);
 		}
 		if (context != null) {
-			contextTokens = context.setTokens();
+			 context.setTokens();
+			 contextTokens = context.tokens;
 		}
 		return fillScoreArrays(debugLvl,trainMode);
 	}
@@ -853,7 +854,16 @@ public class TokenScorer implements ConditionalLexicon {
 			}
 			if (fvec!=null) addLexFeatures(fvec, start, end, unitState);
 			return multBias + getLexScore(start, end, unitState);
-		} else if (stateIndex.isState(States.UL, rule.parent)) {
+		}  else if (stateIndex.isState(StateIndex.States.Op_U, rule.parent)) {
+			float perMultBias = 0;
+			// adding this to prevent million metre being marked as a list of two units.
+			if (stateIndex.isMultUnit(rule.rightChild)) {
+				if (fvec!=null) fvec.add(FTypes.PerMult.ordinal(), 1);
+				perMultBias = (float) params.weights[FTypes.PerMult.ordinal()];
+			}
+			if (fvec!=null) addLexFeatures(fvec, start, end, unitState);
+			return perMultBias + getLexScore(start, end, unitState);
+		}else if (stateIndex.isState(States.UL, rule.parent)) {
 			float score = 0;
 			// penalize unknown words in intervening units
 			//
