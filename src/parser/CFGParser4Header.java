@@ -527,7 +527,7 @@ public class CFGParser4Header extends RuleBasedParser {
 			SINGLELetter,INLANG, MatchLength, Co_occurStats,Subsumed,
 			WithinBracket,AfterIN,
 			SymbolDictMatchThreshold,LemmaDictMatchThreshold,
-			PercentUnkInUnit,PercenUnkInUnitThreshold, CU2Bias, MultBias,UL_Cont}
+			PercentUnkInUnit,PercenUnkInUnitThreshold, CU2Bias, MultBias,UL_Cont,PerMult}
 		public static final int LargeWeight = 10000;;
 		double[] weights=null;
 		EntryWithScore<String> weightsIndexed[] = new EntryWithScore[]{
@@ -547,7 +547,8 @@ public class CFGParser4Header extends RuleBasedParser {
 				new EntryWithScore<String>("PercenUnkInUnitThreshold",0.5),
 				new EntryWithScore<String>("CU2Bias",0.06),
 				new EntryWithScore<String>("MultBias",0.29), // 27 Dec 2013, increasing to allow $m to be parsed preferentially as dollar million instead of dollar|meter
-				new EntryWithScore<String>("UL_Cont", -2) /* units lists cannot be contiguous */
+				new EntryWithScore<String>("UL_Cont", -2), /* units lists cannot be contiguous */
+				new EntryWithScore<String>("PerMult",0.4)
 		};
 		/* 8 Nov 2013: Multbias should be less than unit bias because other new units get defined in the presence of a mult.
 		 * e.g. population (million) adds population as a new unit.
@@ -858,13 +859,22 @@ public class CFGParser4Header extends RuleBasedParser {
 		bestUnitsVec.clear();
 		Tree bestUTree = getSubTree(unitTree,new String[]{"BU_Q", "BU","SU", "Op_U"});
 		Tree multTree = getSubTree(unitTree,new String[]{"Mult"});
-
 		if (bestUTree != null) {
 			Vector<UnitFeatures> bestUnits[] = tokenScorer.sortedUnits[bestUTree.getSpan().getSource()][bestUTree.getSpan().getTarget()];
-			//float scoreArr[] = tokenScorer.scores[bestUTree.getSpan().getSource()][bestUTree.getSpan().getTarget()];
-
-			// a new compound unit.
-			if (bestUTree.getChild(0).label().value().startsWith("CU2")&&tokenScorer.dictionaryMatch(bestUTree.getSpan().getSource(),bestUTree.getSpan().getTarget()) < 0.9) {
+			if(bestUTree.getChild(0).label().value().startsWith("PER") && tokenScorer.dictionaryMatch(bestUTree.getSpan().getTarget(), bestUTree.getSpan().getTarget()) < 0.9){
+				System.out.println("work in progress");
+				getUnit(bestUTree.getChild(1), hdrToks,bestUnitsBase,hdr);
+				Unit unit1 = this.quantityDict.multipleOneUnit();
+				int start = bestUTree.getSpan().getSource();
+				int endP = bestUTree.getSpan().getTarget();
+				for (int a1 = 0; a1 < bestUnitsBase.size(); a1++) {
+					Unit unit2 = bestUnitsBase.get(a1).getKey();
+					bestUnitsVec.add(new UnitFeatures(quantityDict.newUnit(unit1,unit2,UnitPair.OpType.Ratio),bestUnitsBase.get(a1).getScore(), 
+							bestUnitsBase.get(a1), null,start,endP));
+					multTree = null; //reset multTree, because here multiplier is part of unit.
+				}
+			}
+			else if (bestUTree.getChild(0).label().value().startsWith("CU2")&&tokenScorer.dictionaryMatch(bestUTree.getSpan().getSource(),bestUTree.getSpan().getTarget()) < 0.9) {
 				Vector<Tree> simpleUnits = new Vector<Tree>();
 				getUnitNodes(bestUTree, simpleUnits, StateIndex.States.SU.name());
 				if (simpleUnits.size()<2) {
