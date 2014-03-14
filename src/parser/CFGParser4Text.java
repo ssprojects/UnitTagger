@@ -58,7 +58,8 @@ public class CFGParser4Text extends CFGParser4Header {
         "Op_U := PER Mult 1f"+"\n"+
         
         "Q_U ::= Q_U Rep_QU 1f"+"\n"+  //for cases like 4 m (5 feet), between 3 m and 4 m, 
-        "Rep_QU ::= W Q_U 1f"+"\n"+
+        "Rep_QU ::= W Q_U 1f"+"\n"+        
+        "Rep_QU ::= Q_U 1f"+"\n"+
         
         "Q_U ::- Q U 1f" +    "\n" + //Quantity followed by a unit.
         "Q_U ::- SU_Q 1f" +    "\n" +                // a units followed by a quantity e.g. "$500"
