@@ -91,7 +91,7 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores {
 	Analyzer analyzer;
 	public static String impDelims = "£$#\\/%\\(\\)\\['";
 	// 17/7/2013: remove - because words like year-end and ten-year were getting marked as year.
-	public static String delims =impDelims +  "!#&'\\*\\+,\\.:;\\<=\\>\\?@\\^\\_\\`\\|~ \t\\]\\{\\}";//NumberUnitParser.numberUnitDelims+"|\\p{Punct})";//)";
+	public static String delims =impDelims +  "-!#&'\\*\\+,\\.:;\\<=\\>\\?@\\^\\_\\`\\|~ \t\\]\\{\\}";//NumberUnitParser.numberUnitDelims+"|\\p{Punct})";//)";
 	public static List<String> getTokens(String name) {
 		return getTokens(name,null);
 	}
