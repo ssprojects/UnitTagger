@@ -12,6 +12,7 @@ import java.util.Vector;
 import catalog.Quantity;
 import catalog.QuantityCatalog;
 import catalog.Unit;
+import catalog.WordFrequency;
 import catalog.WordnetFrequency;
 
 public class ParseState {
@@ -159,7 +160,7 @@ public class ParseState {
 		}
 		return matchId;
 	}
-	public float setWordFrequency(QuantityCatalog quantityDict, WordnetFrequency wordFreq) {
+	public float setWordFrequency(QuantityCatalog quantityDict, WordFrequency wordFreq) {
 		if (!Float.isInfinite(freq)) return freq;
 		freqVector = new Vector<EntryWithScore<String[]>>();
 		Unit unit = quantityDict.idToUnitMap.get(dictMatch.hitDocId(singleUnitMatch));
