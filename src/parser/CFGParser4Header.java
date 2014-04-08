@@ -546,7 +546,7 @@ public class CFGParser4Header extends RuleBasedParser {
 				new EntryWithScore<String>("PercentUnkInUnit",-2),
 				new EntryWithScore<String>("PercenUnkInUnitThreshold",0.5),
 				new EntryWithScore<String>("CU2Bias",0.06),
-				new EntryWithScore<String>("MultBias",0.29), // 27 Dec 2013, increasing to allow $m to be parsed preferentially as dollar million instead of dollar|meter
+				new EntryWithScore<String>("MultBias",0), // 27 Dec 2013, increasing to allow $m to be parsed preferentially as dollar million instead of dollar|meter
 				new EntryWithScore<String>("UL_Cont", -2), /* units lists cannot be contiguous */
 				new EntryWithScore<String>("PerMult",0.4)
 		};
