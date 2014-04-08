@@ -377,10 +377,11 @@ public class RuleBasedParser extends SimpleParser {
 		super(elem, dict);
 		
 		if (elem != null && XMLConfigs.getElementAttributeBoolean(elem, "disable-wordnet", false)){	
+			wordFreq = new WordnetFrequency(elem);
+		}
+		else{
 			wordFreq = new WordFrequencyImpl();
 		}
-		else
-			wordFreq = new WordnetFrequency(elem);
 		
 		rules = new Vector<RuleBasedParser.Rule>();
 		rules.add(new IsUrl());
