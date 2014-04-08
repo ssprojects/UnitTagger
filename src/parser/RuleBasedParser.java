@@ -4,6 +4,7 @@ import gnu.trove.TIntArrayList;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 import iitb.shared.EntryWithScore;
+import iitb.shared.XMLConfigs;
 import iitb.shared.SignatureSetIndex.DocResult;
 
 import java.io.IOException;
@@ -22,12 +23,14 @@ import org.xml.sax.SAXException;
 
 import catalog.QuantityCatalog;
 import catalog.Unit;
+import catalog.WordFrequency;
+import catalog.WordFrequencyImpl;
 import catalog.WordnetFrequency;
 
 public class RuleBasedParser extends SimpleParser {
 	static final float UnitFrequencyThreshold = 0.75f;
 	static final char[] SingleLetterUnits = {'d', 'r'}; // WARNING: keep this sorted at all times.
-	WordnetFrequency wordFreq;
+	WordFrequency wordFreq;
 	public interface Rule {
 		List<EntryWithScore<Unit>> apply(String hdr, ParseState pHdr, List<String> applicableRules);
 		String name();
@@ -372,7 +375,13 @@ public class RuleBasedParser extends SimpleParser {
 	public RuleBasedParser(Element elem, QuantityCatalog dict)
 	throws IOException, ParserConfigurationException, SAXException {
 		super(elem, dict);
-		wordFreq = new WordnetFrequency(elem);
+		
+		if (elem != null && XMLConfigs.getElementAttributeBoolean(elem, "disable-wordnet", false)){	
+			wordFreq = new WordFrequencyImpl();
+		}
+		else
+			wordFreq = new WordnetFrequency(elem);
+		
 		rules = new Vector<RuleBasedParser.Rule>();
 		rules.add(new IsUrl());
 		rules.add(new NumberCount());
