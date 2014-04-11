@@ -93,8 +93,8 @@ public class Trainer4FeatureBased extends Trainer{
 						if (trueFeatures != null) System.out.println(trueFeatures.getKey().getBaseName() + " "+trueFeatures.getFeatureVector());
 						System.out.println(featureList.get(i).getKey().getBaseName() + " "+predFeatures);
 
-						Instance instance = new Instance(attributes.size());
-						Instance instanceNeg = new Instance(attributes.size());
+						Instance instance = null;//new Instance(attributes.size());
+						Instance instanceNeg = null;//new Instance(attributes.size());
 						for (int f = 0; f < attributes.size()-1; f++) {
 							float val = (trueFeatures == null?0:trueFeatures.getFeatureVector().get(f)) - predFeatures.get(f);
 							instance.setValue(f,val);
@@ -126,7 +126,7 @@ public class Trainer4FeatureBased extends Trainer{
 			}
 			classifier.buildClassifier(dataset);
 			System.out.println(classifier.toString());
-			double [][] coeff = classifier.
+			double [][] coeff = classifier.coefficients();
 			for (int i = 1; i < coeff.length; i++) {
 				System.out.print((i > 1?",":"") + "{\""+dataset.attribute(i-1).name() + "\",\""+(-coeff[i][0])+ "\"}");
 			}

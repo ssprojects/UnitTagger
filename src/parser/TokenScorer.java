@@ -76,7 +76,8 @@ public class TokenScorer implements ConditionalLexicon {
 	}
 	private float matchFeatureValue(int len) {
 		// 8 feb 2014 do not make this less than 3 because common units like km/s will get uncessarily penalized.
-		if (len<=3) return len-1;
+		// 11 apr, increased to 4 to allow units like pound per square inch
+		if (len<=4) return len-1;
 		return (float) Math.pow(10, len-1);
 	}
 	private float defaultFeatureScore(int start, int end, UnitFeatures unitObj) {
@@ -471,7 +472,8 @@ public class TokenScorer implements ConditionalLexicon {
 			}
 			for (int state = 0; state <=1; state++) {
 				if (someUnitInside(start,end,multUnitState) || someUnitInside(start,end,unitState)) {
-					if (sentence.get(start).tag==Tags.IN && end > start) {
+					if (end > start && (sentence.get(start).tag==Tags.IN || sentence.get(start).tag==Tags.Q)) {
+						// capture patterns like 10 meter (33 feet)
 						scores[start+1][end][lexScore+state] += bscore;
 						registerFeatureInfo(start+1,end,state,FTypes.WithinBracket,1,null, (UnitFeatures)null);
 					} else {
@@ -814,9 +816,12 @@ public class TokenScorer implements ConditionalLexicon {
 		}
 		if (stateIndex.isCU2(rule.parent)) {
 			// ensure that the two children are from different parts of the unit taxonomy.
-			if (start > split-1) 
+			if (start > split-1 || split+1 > end) 
 				return NegInfty;
-			Unit bestUnitL = getUnit(start,split-1,unitState); // OP symbol at split
+			if (stateIndex.isState(States.CU2, rule.parent) && noMatchingUnit(sortedUnits[start][split-1][unitState],sortedUnits[split+1][end][unitState],false)) {
+				return NegInfty;
+			}
+			/*Unit bestUnitL = getUnit(start,split-1,unitState); // OP symbol at split
 			if (split+1 > end) 
 				return NegInfty;
 			Unit bestUnitR = getUnit(split+1,end,unitState);
@@ -824,6 +829,7 @@ public class TokenScorer implements ConditionalLexicon {
 				if (bestUnitL.getParentQuantity() == bestUnitR.getParentQuantity()) 
 					return NegInfty;
 			}
+			*/
 			// 16/7/2013: added so that units like MJ/l have a slight bias to be compound units instead of alternatives.
 			if (fvec!=null) {fvec.add(FTypes.CU2Bias.ordinal(),1f); addLexFeatures(fvec,start,end,unitState);}
 			return (float) (params.weights[FTypes.CU2Bias.ordinal()] + getLexScore(start,end, unitState));
@@ -880,7 +886,7 @@ public class TokenScorer implements ConditionalLexicon {
 				//		return NegInfty;
 				//	}
 				// at least make sure that for single word units the candidate units are of the same type.
-				if (end-unitStart == 0 && split-1-start == 0 && noMatchingUnit(sortedUnits[start][split-1][unitState],sortedUnits[unitStart][end][unitState])) {
+				if (end-unitStart == 0 && split-1-start == 0 && noMatchingUnit(sortedUnits[start][split-1][unitState],sortedUnits[unitStart][end][unitState],true)) {
 					return NegInfty;
 				}
 			}
@@ -917,13 +923,13 @@ public class TokenScorer implements ConditionalLexicon {
 		return 0;
 	}
 
-	private boolean noMatchingUnit(Vector<UnitFeatures> vector, Vector<UnitFeatures> vector2) {
+	private boolean noMatchingUnit(Vector<UnitFeatures> vector, Vector<UnitFeatures> vector2, boolean noMatch) {
 		if ((vector == null || vector.size()==0) ||  (vector2==null || vector2.size()==0)) {
 			return true;
 		}
 		for (UnitFeatures unit1 : vector) {
 			for (UnitFeatures unit2 : vector2) {
-				if (unit1.getKey().getParentQuantity().sameConcept(unit2.getKey().getParentQuantity()))
+				if (noMatch == unit1.getKey().getParentQuantity().sameConcept(unit2.getKey().getParentQuantity()))
 					return false;
 			}
 		}

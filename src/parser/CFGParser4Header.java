@@ -126,7 +126,7 @@ public class CFGParser4Header extends RuleBasedParser {
 				{(short) Tags.SU_1W.ordinal(),(short) Tags.SU_W.ordinal(),(short) Tags.W.ordinal()},
 				{(short) Tags.SU_1W.ordinal(),(short) Tags.SU_W.ordinal(),(short) Tags.W.ordinal(),(short) Tags.Mult.ordinal()},
 				{(short) Tags.SU_1W.ordinal(),(short) Tags.SU_W.ordinal(),(short) Tags.W.ordinal(),(short) Tags.IN.ordinal()},
-				{(short) Tags.W.ordinal(),(short) Tags.OF.ordinal()},
+				{(short) Tags.W.ordinal(),(short) Tags.SU_W.ordinal(),(short) Tags.OF.ordinal()},
 				{(short) Tags.W.ordinal(), (short) Tags.Op.ordinal()},
 				{(short) Tags.PER.ordinal(),(short) Tags.SU_1W.ordinal(),(short)Tags.W.ordinal(), (short) Tags.Op.ordinal()},
 				{(short) Tags.W.ordinal(), (short) Tags.Mult.ordinal(),(short) Tags.Number.ordinal()},
@@ -545,7 +545,7 @@ public class CFGParser4Header extends RuleBasedParser {
 				new EntryWithScore<String>("LemmaDictMatchThreshold",-0.9),
 				new EntryWithScore<String>("PercentUnkInUnit",-2),
 				new EntryWithScore<String>("PercenUnkInUnitThreshold",0.5),
-				new EntryWithScore<String>("CU2Bias",0.06),
+				new EntryWithScore<String>("CU2Bias",0.25), // increasing from 0.06 to 0.2 to allow ton/s to be marked correctly. 
 				new EntryWithScore<String>("MultBias",0), // 27 Dec 2013, increasing to allow $m to be parsed preferentially as dollar million instead of dollar|meter
 				new EntryWithScore<String>("UL_Cont", -2), /* units lists cannot be contiguous */
 				new EntryWithScore<String>("PerMult",0.4)
@@ -638,10 +638,10 @@ public class CFGParser4Header extends RuleBasedParser {
 		}
 		ug.purgeRules();
 		Index<String> wordIndex = new WordIndex(this.quantityDict.tokenDict);
-		coOccurStats = new Co_occurrenceStatistics(options, quantityDict);
-
+		
 		Co_occurrenceScores coOccurMethod = null;
 		if (options != null && options.hasAttribute("co-occur-class")) {
+			coOccurStats = new Co_occurrenceStatistics(options, quantityDict);
 			coOccurMethod = (Co_occurrenceScores) iitb.shared.Utils.makeClassGivenArgs("parser.coOccurMethods." + options.getAttribute("co-occur-class"), new Class[]{Co_occurrenceStatistics.class}, new Object[]{coOccurStats});
 		} else {
 			coOccurMethod = new ConceptClassifier(quantityDict, null);////new LogisticUnitGivenWords(coOccurStats); //new PrUnitGivenWord(coOccurStats);
