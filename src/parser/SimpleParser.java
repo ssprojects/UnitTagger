@@ -13,7 +13,6 @@ import java.util.Vector;
 import javax.xml.parsers.ParserConfigurationException;
 
 
-import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 

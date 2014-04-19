@@ -27,11 +27,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.collections.map.AbstractMapDecorator;
 import org.apache.commons.collections.map.MultiValueMap;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.analysis.tokenattributes.TermAttribute;
-import org.apache.lucene.util.Version;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
@@ -88,7 +83,7 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores {
 	public IdToUnitMap idToUnitMap = new IdToUnitMap();
 	
 	SignatureSetImpl<String> signSet;
-	Analyzer analyzer;
+	//Analyzer analyzer;
 	public static String impDelims = "£$#\\/%\\(\\)\\['";
 	// 17/7/2013: remove - because words like year-end and ten-year were getting marked as year.
 	public static String delims =impDelims +  "-!#&'\\*\\+,\\.:;\\<=\\>\\?@\\^\\_\\`\\|~ \t\\]\\{\\}";//NumberUnitParser.numberUnitDelims+"|\\p{Punct})";//)";
@@ -163,7 +158,7 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores {
 		this(QuantityReader.loadQuantityTaxonomy((elem != null && elem.hasAttribute("quantity-taxonomy"))?elem.getAttribute("quantity-taxonomy"):QuantTaxonomyPath));
 	}
 	public QuantityCatalog(ArrayList<Quantity> taxonomy) throws IOException {
-		analyzer =  new StandardAnalyzer(Version.LUCENE_33);
+		//analyzer =  new StandardAnalyzer(Version.LUCENE_33);
 		this.taxonomy=taxonomy;
 		signSet = new SignatureSetImpl<String>(null);
 		int stats[] = new int[10];
@@ -379,11 +374,14 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores {
 			}
 		}
 		if (part1Index > 0 && entries==null) {
+			signSet.toSignSet(getTokens(str));
+			/*
 			try {
 				signSet.toSignSet(getTokens(str, null, analyzer, false));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			*/
 			int numTokensToMatch = (int) (signSet.size()*matchThreshold);
 			if (numTokensToMatch > 0) {
 				Result result = tokenDict.findMatches(signSet, numTokensToMatch);
@@ -399,16 +397,11 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores {
 		}
 		return entries;
 	}
+	/*
 	public static List<String> getTokens(String s, String field, Analyzer analyzer, boolean prefixField) throws IOException {
 		List<String> result = (List<String>) new ArrayList<String>();
         if(s == null) { s = ""; }
         TokenStream stream = analyzer.tokenStream(field, new StringReader(s));
-        /*Token token = new Token();
-        while((token = stream.next(token))!=null) {
-        	String t = new String(token.termBuffer(), 0, token.termLength());
-            result.add(!prefixField ? t : field + ":" + t);
-        }
-        */
         while(stream.incrementToken()) {
         	String t = ((TermAttribute) stream.getAttribute(org.apache.lucene.analysis.tokenattributes.TermAttribute.class)).term();
             result.add(!prefixField ? t : field + ":" + t);
@@ -416,7 +409,7 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores {
         stream.close();
         return result;
     }
-
+	*/
 	//TODO:
 	private int similarity(String concept, String str) {
 		return 1;

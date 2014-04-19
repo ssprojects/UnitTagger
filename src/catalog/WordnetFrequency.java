@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.w3c.dom.Element;
 
 import edu.smu.tspell.wordnet.NounSynset;
