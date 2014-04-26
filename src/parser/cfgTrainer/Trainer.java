@@ -80,7 +80,7 @@ public class Trainer implements ConstraintsGenerator {
 	public Trainer() {
 		// TODO Auto-generated constructor stub
 	}
-	protected int unitsMatchedIndex(String trueUnits,
+	public static int unitsMatchedIndex(String trueUnits,
 			List<? extends EntryWithScore<Unit>> extractedUnits) {
 		if ((trueUnits==null || trueUnits.length()==0) && (extractedUnits==null || extractedUnits.size()==0)) {
 			return 0;

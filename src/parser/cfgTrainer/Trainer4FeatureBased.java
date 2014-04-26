@@ -18,7 +18,6 @@ import parser.FeatureBasedParser;
 import parser.RuleBasedParser;
 import parser.UnitFeatures;
 import parser.UnitSpan;
-import structlearner.StructTrainer;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.core.FastVector;
@@ -29,7 +28,7 @@ import catalog.QuantityCatalog;
 import catalog.Unit;
 import eval.Test;
 
-public class Trainer4FeatureBased extends Trainer{
+public class Trainer4FeatureBased {
 	Vector<TrainingInstance> trainSet;
 	CFGParser4Header parser;
 	public static int k = 3;
@@ -74,12 +73,12 @@ public class Trainer4FeatureBased extends Trainer{
 
 			List<? extends EntryWithScore<Unit>> extractedUnits = ruleParser.parseHeaderExplain(hdr, applicableRules,0,null);
 			if (applicableRules.size()==1) {
-				if (unitsMatchedIndex(trueUnits,extractedUnits)>=0) continue;
+				if (Trainer.unitsMatchedIndex(trueUnits,extractedUnits)>=0) continue;
 				System.out.println("Mistake in rule-based extractor for "+hdr+trueUnits+ " "+extractedUnits);
 			} else {
 				Vector<UnitFeatures> featureList = new Vector();//
 				extractedUnits = parser.parseHeader(hdr, null,1,null,null, 5, featureList);
-				int index = unitsMatchedIndex(trueUnits, featureList);
+				int index = Trainer.unitsMatchedIndex(trueUnits, featureList);
 				if (featureList.size() > 0 && (trueUnits.length()==0 || index > 0)) {
 					UnitFeatures trueFeatures = (index >0)?featureList.get(index-1):null;
 					System.out.println(hdr);
