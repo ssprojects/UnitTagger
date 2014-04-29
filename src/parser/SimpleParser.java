@@ -12,7 +12,6 @@ import java.util.Vector;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
@@ -22,12 +21,9 @@ import catalog.QuantityCatalog;
 import catalog.QuantityReader;
 import catalog.Unit;
 import catalog.UnitMultPair;
-
 import parser.CFGParser4Header;
-
 import edu.stanford.nlp.util.IntPair;
-
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import iitb.shared.ArrayAsList;
 import iitb.shared.EntryWithScore;
 import iitb.shared.Timer;

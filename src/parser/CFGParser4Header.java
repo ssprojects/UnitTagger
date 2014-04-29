@@ -1,34 +1,29 @@
 package parser;
 
-import gnu.trove.TObjectFloatHashMap;
-import gnu.trove.TObjectFloatIterator;
+import gnu.trove.iterator.TObjectFloatIterator;
+import gnu.trove.map.hash.TObjectFloatHashMap;
 import iitb.shared.EntryWithScore;
-import iitb.shared.IntFloatPair;
 import iitb.shared.RobustMath;
+import iitb.shared.XMLConfigs;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.Writer;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.lang.NotImplementedException;
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 import parser.CFGParser4Header.EnumIndex.Tags;
 import parser.cfgTrainer.FeatureVector;
 import parser.coOccurMethods.Co_occurrenceScores;
 import parser.coOccurMethods.ConceptClassifier;
-import parser.coOccurMethods.LogisticUnitGivenWords;
-import parser.coOccurMethods.PrUnitGivenWord;
 import catalog.Co_occurrenceStatistics;
 import catalog.QuantityCatalog;
 import catalog.Unit;
@@ -48,7 +43,6 @@ import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.ScoredObject;
 import edu.stanford.nlp.util.StringUtils;
-import eval.Utils;
 
 public class CFGParser4Header extends RuleBasedParser {
 	protected Co_occurrenceStatistics coOccurStats;
@@ -166,7 +160,7 @@ public class CFGParser4Header extends RuleBasedParser {
 		@Override
 		public int indexOf(String o, boolean add) {
 			if (!add) return indexOf(o);
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
@@ -180,7 +174,7 @@ public class CFGParser4Header extends RuleBasedParser {
 
 		@Override
 		public Collection<String> objects(int[] indices) {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
@@ -191,22 +185,22 @@ public class CFGParser4Header extends RuleBasedParser {
 
 		@Override
 		public void lock() {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
 		public void unlock() {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
 		public void saveToWriter(Writer out) throws IOException {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
 		public void saveToFilename(String s) {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
@@ -223,22 +217,22 @@ public class CFGParser4Header extends RuleBasedParser {
 
 		@Override
 		public <T> T[] toArray(T[] a) {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
 		public boolean add(String e) {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
 		public boolean addAll(Collection<? extends String> c) {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
 		public void clear() {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 	}
@@ -277,7 +271,7 @@ public class CFGParser4Header extends RuleBasedParser {
 		@Override
 		public int indexOf(String o, boolean add) {
 			if (!add || contains(o)) return indexOf(o);
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
@@ -300,7 +294,7 @@ public class CFGParser4Header extends RuleBasedParser {
 
 		@Override
 		public Collection<String> objects(int[] indices) {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
@@ -311,43 +305,43 @@ public class CFGParser4Header extends RuleBasedParser {
 
 		@Override
 		public void lock() {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
 		public void unlock() {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
 		public void saveToWriter(Writer out) throws IOException {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
 		public void saveToFilename(String s) {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 
 		@Override
 		public <T> T[] toArray(T[] a) {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
 		public boolean add(String e) {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
 		public boolean addAll(Collection<? extends String> c) {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
 		public void clear() {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 		public boolean isState(States state, int stateId) {
 			return (stateId < tagIndex.size()?false:(state.ordinal()+tagIndex.size())==stateId);
@@ -380,7 +374,7 @@ public class CFGParser4Header extends RuleBasedParser {
 
 		@Override
 		public int size() {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
@@ -406,17 +400,17 @@ public class CFGParser4Header extends RuleBasedParser {
 			int id = index.indexOf(o);
 			if (id >= 0) return id+1;
 			if (!add) return -1;
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
 		public List<String> objectsList() {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
 		public Collection<String> objects(int[] indices) {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
@@ -427,22 +421,22 @@ public class CFGParser4Header extends RuleBasedParser {
 
 		@Override
 		public void lock() {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
 		public void unlock() {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
 		public void saveToWriter(Writer out) throws IOException {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
 		public void saveToFilename(String s) {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
@@ -452,22 +446,22 @@ public class CFGParser4Header extends RuleBasedParser {
 
 		@Override
 		public <T> T[] toArray(T[] a) {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
 		public boolean add(String e) {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
 		public boolean addAll(Collection<? extends String> c) {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 		@Override
 		public void clear() {
-			throw new NotImplementedException();
+			throw new NotImplementedException("");
 		}
 
 	}
@@ -732,7 +726,7 @@ public class CFGParser4Header extends RuleBasedParser {
 				if (debugLvl > 0) System.out.println(tree + " " + tree.score()+ " "+treeScore);
 				FeatureVector treeFeatureVector=null;
 				if (featureList!=null) {treeFeatureVector = extractTreeFeatureVector(tree, 0,tmpFVec.clear());}
-				if (unitNodes.size() > 2) throw new NotImplementedException();
+				if (unitNodes.size() > 2) throw new NotImplementedException(hdr);
 				if (unitNodes.size()==0) continue;
 				Tree unitTree = unitNodes.get(0);
 				getUnit(unitTree,hdrToks,bestUnits,hdr);
@@ -998,7 +992,7 @@ public class CFGParser4Header extends RuleBasedParser {
 		//  
 		//
 		Vector<UnitFeatures> featureList = new Vector();
-			List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).getTopKUnits("Revenue ($B)",  3, featureList,1);
+			List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Header(XMLConfigs.load(new FileReader("configs/configs.xml"))).getTopKUnits("Revenue ($B)",  3, featureList,1);
 			//	List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).parseHeader("Wealth (in " + UnitSpan.StartXML + " $mil "+UnitSpan.EndXML+")",null, 2,null, 
 		//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}
 		//,{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}}

@@ -1,8 +1,6 @@
 package parser;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.list.array.TIntArrayList;
 import iitb.shared.EntryWithScore;
 import iitb.shared.XMLConfigs;
 import iitb.shared.SignatureSetIndex.DocResult;

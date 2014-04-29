@@ -1,9 +1,7 @@
 package parser.coOccurMethods;
 
 import edu.stanford.nlp.util.Pair;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TObjectFloatHashMap;
-import gnu.trove.TObjectFloatIterator;
+import gnu.trove.list.array.TIntArrayList;
 import iitb.shared.EntryWithScore;
 import iitb.shared.StringMap;
 import iitb.shared.XMLConfigs;
@@ -35,7 +33,6 @@ import parser.CFGParser4Header;
 import parser.ParseState;
 import parser.RuleBasedParser;
 import parser.UnitSpan;
-
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
@@ -47,7 +44,6 @@ import weka.core.Instances;
 import weka.core.OptionHandler;
 import weka.core.SparseInstance;
 import weka.core.TechnicalInformationHandler;
-
 import catalog.Co_occurrenceStatistics;
 import catalog.Quantity;
 import catalog.QuantityCatalog;

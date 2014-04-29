@@ -2,10 +2,8 @@ package catalog;
 
 import edu.stanford.nlp.io.EncodingPrintWriter.out;
 import edu.stanford.nlp.util.Pair;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectIntIterator;
-import gnu.trove.TObjectLongHashMap;
+import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import iitb.shared.EntryWithScore;
 import iitb.shared.StringIntPair;
 import iitb.shared.XMLConfigs;

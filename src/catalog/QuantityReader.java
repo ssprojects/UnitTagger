@@ -1,6 +1,7 @@
 package catalog;
 
-import gnu.trove.TFloatArrayList;
+
+import gnu.trove.list.array.TFloatArrayList;
 
 import java.io.File;
 import java.io.FileNotFoundException;

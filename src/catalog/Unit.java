@@ -1,6 +1,6 @@
 package catalog;
 
-import gnu.trove.TFloatArrayList;
+import gnu.trove.list.array.TFloatArrayList;
 
 import java.util.ArrayList;
 import java.util.Arrays;

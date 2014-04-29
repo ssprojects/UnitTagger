@@ -35,7 +35,7 @@ public class UnitPair extends Unit {
 	}
 	@Override
 	public ArrayList<String> getLemmas() {
-		throw new NotImplementedException();
+		throw new NotImplementedException("");
 	}
 	@Override
 	public Quantity getParentQuantity() {
@@ -46,11 +46,11 @@ public class UnitPair extends Unit {
 		return getBaseName();//unit1.toString()  + OpString[op.ordinal()]+unit2.toString();
 	}
 	public String[] getBaseNames() {
-		throw new NotImplementedException();
+		throw new NotImplementedException("");
 	}
 	@Override
 	public String[] getBaseSymbols() {
-		throw new NotImplementedException();
+		throw new NotImplementedException("");
 	}
 	@Override
 	public double getMultiplier() {

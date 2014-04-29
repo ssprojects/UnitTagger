@@ -22,16 +22,13 @@ import parser.HeaderUnitParser;
 import parser.RuleBasedParser;
 import parser.UnitFeatures;
 import parser.UnitSpan;
-import structlearner.ConstraintsGenerator;
-import iitb.CRF.DataSequence;
-import structlearner.StructTrainer;
-import structlearner.StructTrainer.Constraint;
-import structlearner.StructTrainer.LossScaler;
 import catalog.QuantityCatalog;
 import catalog.Unit;
 import eval.Test;
 
-public class Trainer implements ConstraintsGenerator {
+
+public class Trainer {
+/*implements ConstraintsGenerator {
 	Vector<TrainingInstance> trainSet;
 	CFGParser4Header parser;
 	public static int k = 3;
@@ -80,29 +77,7 @@ public class Trainer implements ConstraintsGenerator {
 	public Trainer() {
 		// TODO Auto-generated constructor stub
 	}
-	public static int unitsMatchedIndex(String trueUnits,
-			List<? extends EntryWithScore<Unit>> extractedUnits) {
-		if ((trueUnits==null || trueUnits.length()==0) && (extractedUnits==null || extractedUnits.size()==0)) {
-			return 0;
-		} else {
-			if (trueUnits != null && extractedUnits != null && trueUnits.length() > 0 && extractedUnits.size()>0) {
-				float maxScore = Float.NEGATIVE_INFINITY;
-				int matchedId = -1;
-				for (int p = extractedUnits.size()-1; p >= 0; p--) {
-					EntryWithScore<Unit> unitScore = extractedUnits.get(p);
-					Unit unit = unitScore.getKey();
-					if (trueUnits.equals(unit.getBaseName().toLowerCase()) || trueUnits.equals(unit.getName())) {
-						if (matchedId == -1 || maxScore < unitScore.getScore()) {
-							matchedId = p+1;
-							maxScore = (float) unitScore.getScore();
-						}
-					}
-				}
-				return matchedId;
-			}
-		}
-		return -1;
-	}
+	
 	public static void main(String args[]) throws Exception {
 		new Trainer(Test.GroundTruthFile);
 	}
@@ -142,5 +117,29 @@ public class Trainer implements ConstraintsGenerator {
 	@Override
 	public int instanceCount() {
 		return trainSet.size();
+	}
+	*/
+	public static int unitsMatchedIndex(String trueUnits,
+			List<? extends EntryWithScore<Unit>> extractedUnits) {
+		if ((trueUnits==null || trueUnits.length()==0) && (extractedUnits==null || extractedUnits.size()==0)) {
+			return 0;
+		} else {
+			if (trueUnits != null && extractedUnits != null && trueUnits.length() > 0 && extractedUnits.size()>0) {
+				float maxScore = Float.NEGATIVE_INFINITY;
+				int matchedId = -1;
+				for (int p = extractedUnits.size()-1; p >= 0; p--) {
+					EntryWithScore<Unit> unitScore = extractedUnits.get(p);
+					Unit unit = unitScore.getKey();
+					if (trueUnits.equals(unit.getBaseName().toLowerCase()) || trueUnits.equals(unit.getName())) {
+						if (matchedId == -1 || maxScore < unitScore.getScore()) {
+							matchedId = p+1;
+							maxScore = (float) unitScore.getScore();
+						}
+					}
+				}
+				return matchedId;
+			}
+		}
+		return -1;
 	}
 }

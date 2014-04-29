@@ -8,9 +8,9 @@ import edu.stanford.nlp.parser.lexparser.UnaryRule;
 import edu.stanford.nlp.parser.lexparser.UnknownWordModel;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.Index;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TObjectFloatHashMap;
-import gnu.trove.TObjectFloatIterator;
+import gnu.trove.iterator.TObjectFloatIterator;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TObjectFloatHashMap;
 import iitb.shared.EntryWithScore;
 import iitb.shared.StringMap;
 import iitb.shared.SignatureSetIndex.DocResult;
@@ -725,61 +725,61 @@ public class TokenScorer implements ConditionalLexicon {
 	public int numRules() {
 		// TODO Auto-generated method stub
 		//return 0;
-		throw new NotImplementedException();
+		throw new NotImplementedException("");
 	}
 
 	@Override
 	public void initializeTraining(double numTrees) {
 		// TODO Auto-generated method stub
-		throw new NotImplementedException();
+		throw new NotImplementedException("");
 	}
 
 	@Override
 	public void train(Collection<Tree> trees) {
 		// TODO Auto-generated method stub
-		throw new NotImplementedException();
+		throw new NotImplementedException("");
 	}
 
 	@Override
 	public void train(Collection<Tree> trees, double weight) {
 		// TODO Auto-generated method stub
-		throw new NotImplementedException();
+		throw new NotImplementedException("");
 	}
 
 	@Override
 	public void train(Collection<Tree> trees, Collection<Tree> rawTrees) {
 		// TODO Auto-generated method stub
-		throw new NotImplementedException();
+		throw new NotImplementedException("");
 	}
 
 	@Override
 	public void train(Tree tree, double weight) {
 		// TODO Auto-generated method stub
-		throw new NotImplementedException();
+		throw new NotImplementedException("");
 	}
 
 	@Override
 	public void train(List<TaggedWord> sentence, double weight) {
 		// TODO Auto-generated method stub
-		throw new NotImplementedException();
+		throw new NotImplementedException("");
 	}
 
 	@Override
 	public void train(TaggedWord tw, int loc, double weight) {
 		// TODO Auto-generated method stub
-		throw new NotImplementedException();
+		throw new NotImplementedException("");
 	}
 
 	@Override
 	public void trainUnannotated(List<TaggedWord> sentence, double weight) {
 		// TODO Auto-generated method stub
-		throw new NotImplementedException();
+		throw new NotImplementedException("");
 	}
 
 	@Override
 	public void finishTraining() {
 		// TODO Auto-generated method stub
-		throw new NotImplementedException();
+		throw new NotImplementedException("");
 	}
 
 	@Override
@@ -981,26 +981,26 @@ public class TokenScorer implements ConditionalLexicon {
 	@Override
 	public void writeData(Writer w) throws IOException {
 		// TODO Auto-generated method stub
-		throw new NotImplementedException();
+		throw new NotImplementedException("");
 	}
 
 	@Override
 	public void readData(BufferedReader in) throws IOException {
 		// TODO Auto-generated method stub
-		throw new NotImplementedException();
+		throw new NotImplementedException("");
 	}
 
 	@Override
 	public UnknownWordModel getUnknownWordModel() {
 		// TODO Auto-generated method stub
 		//return null;
-		throw new NotImplementedException();
+		throw new NotImplementedException("");
 	}
 
 	@Override
 	public void setUnknownWordModel(UnknownWordModel uwm) {
 		// TODO Auto-generated method stub
-		throw new NotImplementedException();
+		throw new NotImplementedException("");
 	}
 	public double dictionaryMatch(int source, int target) {
 		// TODO Auto-generated method stub
@@ -1008,6 +1008,9 @@ public class TokenScorer implements ConditionalLexicon {
 	}
 	public static void main(String args[]) {
 
+	}
+	public void incrementTreesRead(double weight) {
+		throw new UnsupportedOperationException();
 	}
 
 }

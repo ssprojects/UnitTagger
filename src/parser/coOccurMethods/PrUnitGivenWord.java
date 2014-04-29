@@ -2,7 +2,6 @@ package parser.coOccurMethods;
 
 import java.util.List;
 
-import gnu.trove.TObjectFloatHashMap;
 import iitb.shared.StringMap;
 import catalog.Co_occurrenceStatistics;
 import catalog.QuantityCatalog;
