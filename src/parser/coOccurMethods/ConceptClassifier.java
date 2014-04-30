@@ -44,6 +44,8 @@ import weka.core.Instances;
 import weka.core.OptionHandler;
 import weka.core.SparseInstance;
 import weka.core.TechnicalInformationHandler;
+import weka.core.converters.ArffLoader;
+import weka.core.converters.ArffLoader.ArffReader;
 import catalog.Co_occurrenceStatistics;
 import catalog.Quantity;
 import catalog.QuantityCatalog;
@@ -73,12 +75,12 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 	SparseInstance emptyInst;
 	QuantityCatalog quantDict;
 	public ConceptClassifier(QuantityCatalog quantDict) throws Exception {
-		this(quantDict,true);
+		this(null,quantDict,true);
 	}
-	public ConceptClassifier(QuantityCatalog quantDict, boolean trainMode) throws Exception {
+	public ConceptClassifier(Element configs, QuantityCatalog quantDict, boolean trainMode) throws Exception {
 		this.quantDict = quantDict;
 		this.concepts = quantDict.getQuantities();
-		parser = new RuleBasedParser(null, quantDict);
+		parser = new RuleBasedParser(configs, quantDict);
 		if (trainMode) cfgparser = new CFGParser4Header(null,quantDict);
 		init();
 	}
@@ -92,7 +94,11 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 		}
 	}
 	public ConceptClassifier(QuantityCatalog quantDict, String loadFile) throws Exception {
-		this(quantDict,false);
+		this(null,quantDict,loadFile);
+	}
+	public ConceptClassifier(Element configs, QuantityCatalog quantDict,
+			String loadFile) throws Exception {
+		this(configs,quantDict,false);
 		if (loadFile==null) {
 			loadFile = QuantityCatalog.QuantConfigDirPath+ConceptClassifier.ClassifierFile;
 		}
@@ -124,16 +130,9 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 		StringMap<String> wordIdMap = new StringMap<String>();
 
 	}
-	public void makeClassifier() throws Exception {
-		myclassifier = new MyClassifier();
-		for (int i = 0; i < wordIdMap.size(); i++) {
-			if (featureSelected(i)) {
-				myclassifier.wordIdMap.add(wordIdMap.get(i));
-			}
-		}
-		int numFs = myclassifier.wordIdMap.size();
+	private Instances formInstances() {
 		Instances dataset = emptyDataset(); 
-
+		int numFs = myclassifier.wordIdMap.size();
 		emptyInst = new SparseInstance(numFs);
 		for(int f = 0; f < numFs; f++)
 			emptyInst.setValue(f, 0);
@@ -152,6 +151,16 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 				dataset.add(inst);
 			}
 		}
+		return dataset;
+	}
+	public void makeClassifier(String trainFile) throws Exception {
+		myclassifier = new MyClassifier();
+		for (int i = 0; i < wordIdMap.size(); i++) {
+			if (featureSelected(i)) {
+				myclassifier.wordIdMap.add(wordIdMap.get(i));
+			}
+		}
+		Instances dataset = trainFile==null?formInstances():readTrainFile(myclassifier,trainFile);
 		LibLINEAR classifier = new LibLINEAR();
 		classifier.setDoNotReplaceMissingValues(true);
 		myclassifier.classifier = classifier;
@@ -170,6 +179,7 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 		}
 		classifier.buildClassifier(dataset);
 		System.out.println(classifier.toString());
+
 		weka.core.SerializationHelper.write(ClassifierFile, myclassifier);
 		if (hdrs != null) {
 			Evaluation eval = new Evaluation(dataset);
@@ -183,6 +193,16 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 				}
 			}
 		}
+	}
+	private Instances readTrainFile(MyClassifier myclassifier, String trainFile) throws IOException {
+		BufferedReader reader = new BufferedReader(new FileReader(trainFile));
+		ArffReader arff = new ArffReader(reader);
+		Instances data = arff.getData();
+		data.setClassIndex(data.numAttributes() - 1);
+		for (int i = 0; i < data.numAttributes()-1; i++) {
+			myclassifier.wordIdMap.add(data.attribute(i).name());
+		}
+		return data;
 	}
 	private Instances emptyDataset() {
 		int numFs = myclassifier.wordIdMap.size();
@@ -336,7 +356,7 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 			if (conceptScore.size()==0 || conceptScore.get(0).getScore() < UndecidedScore) {
 				Quantity multQuant = quantDict.multipleOneUnit().getParentQuantity();
 				boolean multPresent = false;
-				
+
 				for (EntryWithScore<Quantity> entry : conceptScore) {
 					if (entry.getKey()==multQuant) {
 						entry.setScore(Math.max(entry.getScore(), UndecidedScore));
@@ -404,8 +424,12 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 		};
 		float sampleRates[] = {1,1,1,1,0.07f};
 		QuantityCatalog quantDict = new QuantityCatalog((Element)null);
-	
-	/*	ConceptClassifier classifier = new ConceptClassifier(quantDict);
+		ConceptClassifier classifier = null;
+		if (args.length > 0 && args[0].equalsIgnoreCase("train")) {
+			classifier = new ConceptClassifier(XMLConfigs.load(new FileReader("configs/configs.xml")),quantDict,false);
+			classifier.makeClassifier(QuantityCatalog.QuantConfigDirPath+ConceptClassifier.ClassifierFile+".arff");
+		}
+		/*	ConceptClassifier classifier = new ConceptClassifier(quantDict);
 		Co_occurrenceStatistics coOccur = new Co_occurrenceStatistics(quantDict);
 		Vector<String> explanation = new Vector<String>();
 		Random random = new Random(1);
@@ -430,8 +454,11 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 			}
 		}
 		classifier.makeClassifier();
-	*/
-		ConceptClassifier classifier = new ConceptClassifier(quantDict,QuantityCatalog.QuantConfigDirPath+ConceptClassifier.ClassifierFile); //+".withPercent"
+		 */
+		else {
+			classifier = new ConceptClassifier(XMLConfigs.load(new FileReader("configs/configs.xml")), quantDict,
+					QuantityCatalog.QuantConfigDirPath+ConceptClassifier.ClassifierFile); //+".withPercent"
+		}
 		String conceptTests[] = {"corporate income tax rate", "area code", "forest area", "Urban Area Population", "area 1000 sq km", "area", "area sq", "area km", "CO2 emissions", "distance from sun","net worth","year of first flight","weight", "pressure", "record low", "size", "volume","bandwidth","capacity"};
 		for (String hdr : conceptTests) {
 			System.out.print(hdr);
