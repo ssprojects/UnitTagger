@@ -1,5 +1,6 @@
 package parser.coOccurMethods;
 
+import de.bwaldvogel.liblinear.Linear;
 import edu.stanford.nlp.util.Pair;
 import gnu.trove.list.array.TIntArrayList;
 import iitb.shared.EntryWithScore;
@@ -104,10 +105,14 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 		}
 		myclassifier = (MyClassifier) weka.core.SerializationHelper.read(loadFile);
 		myclassifier.classifier.setDoNotReplaceMissingValues(true);
+		formEmptyInstance(emptyDataset());
+		
+	}
+	private void formEmptyInstance(Instances dataset) {
 		emptyInst = new SparseInstance(myclassifier.wordIdMap.size());
 		for(int f = 0; f < emptyInst.numAttributes(); f++)
 			emptyInst.setValue(f, 0);
-		emptyInst.setDataset(emptyDataset());
+		emptyInst.setDataset(dataset);
 	}
 	public static class MySparseInstance extends SparseInstance {
 		@Override
@@ -133,9 +138,7 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 	private Instances formInstances() {
 		Instances dataset = emptyDataset(); 
 		int numFs = myclassifier.wordIdMap.size();
-		emptyInst = new SparseInstance(numFs);
-		for(int f = 0; f < numFs; f++)
-			emptyInst.setValue(f, 0);
+		formEmptyInstance(dataset);
 		offsets.add(featureIds.size());
 		int numInsts = instClassLabels.size();
 		for (int i = 0; i < numInsts; i++) {
@@ -202,6 +205,7 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 		for (int i = 0; i < data.numAttributes()-1; i++) {
 			myclassifier.wordIdMap.add(data.attribute(i).name());
 		}
+		formEmptyInstance(data);
 		return data;
 	}
 	private Instances emptyDataset() {
@@ -415,6 +419,7 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
+		Linear.resetRandom();
 		String paths[]={
 				"/mnt/a99/d0/sunita/workspace.broken/WWT/expts/quant/statParsed"
 				, "/mnt/a99/d0/sunita/workspace.broken/WWT/expts/quant/SingleUnitAfterIn"
