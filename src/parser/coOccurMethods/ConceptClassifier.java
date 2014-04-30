@@ -136,6 +136,11 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 
 	}
 	private Instances formInstances() {
+		for (int i = 0; i < wordIdMap.size(); i++) {
+			if (featureSelected(i)) {
+				myclassifier.wordIdMap.add(wordIdMap.get(i));
+			}
+		}
 		Instances dataset = emptyDataset(); 
 		int numFs = myclassifier.wordIdMap.size();
 		formEmptyInstance(dataset);
@@ -158,11 +163,6 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 	}
 	public void makeClassifier(String trainFile) throws Exception {
 		myclassifier = new MyClassifier();
-		for (int i = 0; i < wordIdMap.size(); i++) {
-			if (featureSelected(i)) {
-				myclassifier.wordIdMap.add(wordIdMap.get(i));
-			}
-		}
 		Instances dataset = trainFile==null?formInstances():readTrainFile(myclassifier,trainFile);
 		LibLINEAR classifier = new LibLINEAR();
 		classifier.setDoNotReplaceMissingValues(true);
@@ -342,6 +342,7 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 			inst.setValue(id, 1);
 		}
 		if (inst != null) {
+			//System.out.println(inst.toString());
 			double dist[] = myclassifier.classifier.distributionForInstance(inst);
 			if (predLabel != null) {
 				int classId = (int) myclassifier.classifier.classifyInstance(inst);
