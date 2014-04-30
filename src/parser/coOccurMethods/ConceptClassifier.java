@@ -76,12 +76,13 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 	SparseInstance emptyInst;
 	QuantityCatalog quantDict;
 	public ConceptClassifier(QuantityCatalog quantDict) throws Exception {
-		this(null,quantDict,true);
+		this(null,quantDict,true,null);
 	}
-	public ConceptClassifier(Element configs, QuantityCatalog quantDict, boolean trainMode) throws Exception {
+	public ConceptClassifier(Element configs, QuantityCatalog quantDict, boolean trainMode, RuleBasedParser parser) throws Exception {
 		this.quantDict = quantDict;
 		this.concepts = quantDict.getQuantities();
-		parser = new RuleBasedParser(configs, quantDict);
+		this.parser = parser;
+		if (parser == null) parser = new RuleBasedParser(configs, quantDict);
 		if (trainMode) cfgparser = new CFGParser4Header(null,quantDict);
 		init();
 	}
@@ -95,11 +96,11 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 		}
 	}
 	public ConceptClassifier(QuantityCatalog quantDict, String loadFile) throws Exception {
-		this(null,quantDict,loadFile);
+		this(null,quantDict,null,loadFile);
 	}
-	public ConceptClassifier(Element configs, QuantityCatalog quantDict,
+	public ConceptClassifier(Element configs, QuantityCatalog quantDict, RuleBasedParser parser,
 			String loadFile) throws Exception {
-		this(configs,quantDict,false);
+		this(configs,quantDict,false,parser);
 		if (loadFile==null) {
 			loadFile = QuantityCatalog.QuantConfigDirPath+ConceptClassifier.ClassifierFile;
 		}
@@ -432,7 +433,7 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 		QuantityCatalog quantDict = new QuantityCatalog((Element)null);
 		ConceptClassifier classifier = null;
 		if (args.length > 0 && args[0].equalsIgnoreCase("train")) {
-			classifier = new ConceptClassifier(XMLConfigs.load(new FileReader("configs/configs.xml")),quantDict,false);
+			classifier = new ConceptClassifier(XMLConfigs.load(new FileReader("configs/configs.xml")),quantDict,false,null);
 			classifier.makeClassifier(QuantityCatalog.QuantConfigDirPath+ConceptClassifier.ClassifierFile+".arff");
 		}
 		/*	ConceptClassifier classifier = new ConceptClassifier(quantDict);
@@ -462,7 +463,7 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 		classifier.makeClassifier();
 		 */
 		else {
-			classifier = new ConceptClassifier(XMLConfigs.load(new FileReader("configs/configs.xml")), quantDict,
+			classifier = new ConceptClassifier(XMLConfigs.load(new FileReader("configs/configs.xml")), quantDict,null,
 					QuantityCatalog.QuantConfigDirPath+ConceptClassifier.ClassifierFile); //+".withPercent"
 		}
 		String conceptTests[] = {"corporate income tax rate", "area code", "forest area", "Urban Area Population", "area 1000 sq km", "area", "area sq", "area km", "CO2 emissions", "distance from sun","net worth","year of first flight","weight", "pressure", "record low", "size", "volume","bandwidth","capacity"};

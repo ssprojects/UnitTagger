@@ -638,7 +638,7 @@ public class CFGParser4Header extends RuleBasedParser {
 			coOccurStats = new Co_occurrenceStatistics(options, quantityDict);
 			coOccurMethod = (Co_occurrenceScores) iitb.shared.Utils.makeClassGivenArgs("parser.coOccurMethods." + options.getAttribute("co-occur-class"), new Class[]{Co_occurrenceStatistics.class}, new Object[]{coOccurStats});
 		} else {
-			coOccurMethod = new ConceptClassifier(quantityDict, null);////new LogisticUnitGivenWords(coOccurStats); //new PrUnitGivenWord(coOccurStats);
+			coOccurMethod = new ConceptClassifier(options,quantityDict, this,null);////new LogisticUnitGivenWords(coOccurStats); //new PrUnitGivenWord(coOccurStats);
 		}
 		if (options != null && options.hasAttribute("params")) {
 			params = new Params(options.getAttribute("params"));
