@@ -4,8 +4,10 @@ package catalog;
 import gnu.trove.list.array.TFloatArrayList;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -28,13 +30,14 @@ import org.xml.sax.SAXException;
  * 
  */
 public class QuantityReader {
-
-	public static ArrayList<Quantity> loadQuantityTaxonomy(String path) throws ParserConfigurationException, IOException, SAXException
+	public static ArrayList<Quantity> loadQuantityTaxonomy(String path) throws ParserConfigurationException, IOException, SAXException {
+	return loadQuantityTaxonomy(new FileInputStream(new File(path)));
+	}	
+	public static ArrayList<Quantity> loadQuantityTaxonomy(InputStream is) throws ParserConfigurationException, IOException, SAXException
 	{
-		File fXmlFile = new File(path);
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document doc =  dBuilder.parse(fXmlFile);
+		Document doc =  dBuilder.parse(is);
 		NodeList nList = doc.getElementsByTagName("concept");
 
 		ArrayList<Quantity> qList=new ArrayList<Quantity>();

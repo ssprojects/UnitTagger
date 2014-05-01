@@ -9,9 +9,11 @@ import iitb.shared.XMLConfigs;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -101,10 +103,13 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 	public ConceptClassifier(Element configs, QuantityCatalog quantDict, RuleBasedParser parser,
 			String loadFile) throws Exception {
 		this(configs,quantDict,false,parser);
+		InputStream istr=null;
 		if (loadFile==null) {
-			loadFile = QuantityCatalog.QuantConfigDirPath+ConceptClassifier.ClassifierFile;
+			istr = ClassLoader.class.getResourceAsStream("/"+ConceptClassifier.ClassifierFile);
+		} else {
+			istr = new FileInputStream(loadFile);
 		}
-		myclassifier = (MyClassifier) weka.core.SerializationHelper.read(loadFile);
+		myclassifier = (MyClassifier) weka.core.SerializationHelper.read(istr);
 		myclassifier.classifier.setDoNotReplaceMissingValues(true);
 		formEmptyInstance(emptyDataset());
 		

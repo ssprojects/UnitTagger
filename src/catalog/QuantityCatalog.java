@@ -10,7 +10,9 @@ import iitb.shared.SignatureSetIndex.IndexImpl;
 import iitb.shared.SignatureSetIndex.Result;
 import iitb.shared.SignatureSetIndex.SignatureSetImpl;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -154,7 +156,10 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores {
 		return toks;
 	}
 	public QuantityCatalog(Element elem) throws IOException, ParserConfigurationException, SAXException {
-		this(QuantityReader.loadQuantityTaxonomy((elem != null && elem.hasAttribute("quantity-taxonomy"))?elem.getAttribute("quantity-taxonomy"):QuantTaxonomyPath));
+		this(QuantityReader.loadQuantityTaxonomy((elem != null && elem.hasAttribute("quantity-taxonomy"))?new FileInputStream(elem.getAttribute("quantity-taxonomy")):getRelativePath()));
+	}
+	private static InputStream getRelativePath() {
+		return ClassLoader.class.getResourceAsStream("/"+QuantTaxonomyFile);
 	}
 	public QuantityCatalog(ArrayList<Quantity> taxonomy) throws IOException {
 		//analyzer =  new StandardAnalyzer(Version.LUCENE_33);
@@ -605,7 +610,7 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores {
 				{"h", "decay, half-life", "hour"},
 				{"km²","","square kilometre"}
 		};
-		QuantityCatalog matcher = new QuantityCatalog(QuantityReader.loadQuantityTaxonomy(QuantTaxonomyPath));
+		QuantityCatalog matcher = new QuantityCatalog((Element)null);//QuantityReader.loadQuantityTaxonomy(QuantTaxonomyPath));
 		String unitName = "kilometre/hour"; // "United States Dollar [billion]";
 		Unit parsedUnit = matcher.getUnitFromBaseName(unitName);
 		if (!parsedUnit.getBaseName().equalsIgnoreCase(unitName) && !parsedUnit.getBaseName(1).equalsIgnoreCase(unitName))

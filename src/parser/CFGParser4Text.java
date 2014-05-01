@@ -97,11 +97,23 @@ public class CFGParser4Text extends CFGParser4Header {
 			getUnitNodes(tree,unitNodes,StateIndex.States.Q_U.name());
 		}
 	}
+	public List<? extends EntryWithScore<Unit>> getTopKUnits(String hdr, int numberStart, int numberEnd, int k, int debugLvl) {
+		String hdrQQ = hdr.substring(0,numberStart).replaceAll(QuantityToken, "") 
+		+ QuantityToken + hdr.substring(numberEnd+1).replaceAll(QuantityToken, ""); 
+		return parseHeader(hdrQQ, null, debugLvl, k, null);
+	}
+	public List<? extends EntryWithScore<Unit>> getTopKUnits(String taggedHdr, String tag, int k, int debugLvl) {
+		String hdrQQ = taggedHdr.substring(0,taggedHdr.indexOf("<"+tag+">")).replaceAll(QuantityToken, "") 
+		+ QuantityToken + taggedHdr.substring(taggedHdr.indexOf("</"+tag+">")+tag.length()+3).replaceAll(QuantityToken, ""); 
+		return parseHeader(hdrQQ, null, debugLvl, k, null);
+	}
 	public static void main(String args[]) throws Exception {
 		Vector<UnitFeatures> featureList = new Vector();
 		Vector<String> explanation = new Vector<String>();
 		
 		String hdr = "chances are qqqq per thousand";
+		//new CFGParser4Text(null).getTopKUnits(hdr, 12, 15, 1, 1);
+		new CFGParser4Text(null).getTopKUnits("chances are <b>1000</b> per thousand", "b", 1, 1);
 		List<? extends EntryWithScore<Unit>> unitsS = new CFGParser4Text(null).parseHeader(hdr, null, 1,1, featureList);
 		
 		if (unitsS != null) {

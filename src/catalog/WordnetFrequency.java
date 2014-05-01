@@ -3,13 +3,18 @@ package catalog;
 import iitb.shared.EntryWithScore;
 import iitb.shared.XMLConfigs;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import edu.smu.tspell.wordnet.NounSynset;
 import edu.smu.tspell.wordnet.Synset;
@@ -29,7 +34,10 @@ public class WordnetFrequency implements WordFrequency {
 	static String stopWords[] = new String[]{"in","are","at","a","from","of","to","the","for","and","all","st"
 		,"with","on","total","per","no","number","amp","apos","quot","hr","s"};
 	public static HashSet<String> stopWordsHash=new HashSet<String>(Arrays.asList(stopWords));
-	public WordnetFrequency(Element options) {
+	public WordnetFrequency(Element options) throws ParserConfigurationException, SAXException, IOException {
+		if (options==null) {
+			options = XMLConfigs.load(new InputSource(ClassLoader.class.getResourceAsStream("/configs.xml")));
+		}
 		//System.out.println("Using "+extractLoadFile(options));
 		System.setProperty("wordnet.database.dir", extractLoadFile(options));
 		database = WordNetDatabase.getFileInstance();
@@ -106,8 +114,11 @@ public class WordnetFrequency implements WordFrequency {
 	}
 	/**
 	 * @param args
+	 * @throws IOException 
+	 * @throws SAXException 
+	 * @throws ParserConfigurationException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException {
 		//args = HeaderSegmenter.WordSymbols;
 		args = new String[]{"second"};
 		WordnetFrequency wordFreq = new WordnetFrequency(null);

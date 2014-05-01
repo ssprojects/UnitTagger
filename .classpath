@@ -2,9 +2,10 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="lib" path="/home/sunita/admin/workspace/libs/shared.jar"/>
 	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?project=QuantityTagger&amp;ivyXmlPath=ivy.xml&amp;confs=*"/>
-	<classpathentry kind="lib" path="/home/sunita/admin/workspace/libs/jaws-bin.jar"/>
-	<classpathentry kind="lib" path="/home/sunita/admin/workspace/libs/LibLINEAR.jar"/>
+	<classpathentry kind="lib" path="/mnt/a99/d0/WWT/library/liblinear-weka-master/dist/LibLINEAR/LibLINEAR.jar"/>
+	<classpathentry kind="lib" path="/mnt/a99/d0/WWT/wwt_jars/jaws-bin.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Shared"/>
+	<classpathentry kind="lib" path="configs"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
