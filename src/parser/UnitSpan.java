@@ -1,5 +1,7 @@
 package parser;
 
+import java.io.Serializable;
+
 import iitb.shared.EntryWithScore;
 import parser.CFGParser4Header.EnumIndex.Tags;
 import parser.CFGParser4Header.StateIndex.States;
@@ -8,7 +10,7 @@ import catalog.Unit;
 import catalog.UnitPair;
 import catalog.UnitPair.OpType;
 
-public class UnitSpan extends EntryWithScore<Unit> {
+public class UnitSpan extends EntryWithScore<Unit> implements Serializable {
 	public static String StartXML="_UnitS_"; //"<ut>";
 	public static String EndXML= "_UnitE_"; // "</ut>";
 	public static String StartString=" unittokenstart ";

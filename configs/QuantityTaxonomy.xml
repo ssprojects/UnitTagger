@@ -357,6 +357,12 @@
 	<String>PKR</String>
       </lemmaset>
     </unit>
+    <unit name="Chinese yuan;renminbi" symbol="¥; 元" conversionFactor="">
+      <lemmaset>
+	<String>CNY</String>
+	<String>RMB</String>
+      </lemmaset>
+    </unit>
 
 <!--
     <unit name="Cape Verdean escudo" symbol="Esc; $" conversionFactor="">
@@ -375,11 +381,6 @@
       <lemmaset>
 	<String frequency="0.0001">$</String>
 	<String>CLP</String>
-      </lemmaset>
-    </unit>
-    <unit name="Chinese yuan" symbol="¥; 元" conversionFactor="">
-      <lemmaset>
-	<String>CNY</String>
       </lemmaset>
     </unit>
     <unit name="Colombian peso" symbol="$" conversionFactor="">

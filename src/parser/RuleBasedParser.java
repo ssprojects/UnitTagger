@@ -371,7 +371,7 @@ public class RuleBasedParser extends SimpleParser {
 		return hdrMatches;
 	}
 	public RuleBasedParser(Element elem, QuantityCatalog dict)
-	throws IOException, ParserConfigurationException, SAXException {
+	throws Exception {
 		super(elem, dict);
 		
 		if (elem != null && XMLConfigs.getElementAttributeBoolean(elem, "disable-wordnet", false)){	

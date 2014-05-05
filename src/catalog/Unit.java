@@ -2,6 +2,7 @@ package catalog;
 
 import gnu.trove.list.array.TFloatArrayList;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.Vector;
  * @author chander Changed package, access-specifiers and overrode toString() method.
  * 
  */
-public class Unit {
+public class Unit implements Serializable {
 	private String name;
 	String baseNames[]; // separate out the synonyms, remove the paranthesis 
 	Unit firstBaseNameParts[];

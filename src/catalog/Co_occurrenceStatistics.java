@@ -46,7 +46,7 @@ public class Co_occurrenceStatistics {
 	TObjectIntHashMap<String> wordFreqs = new TObjectIntHashMap<String>();
 	TObjectIntHashMap<String> unitsFreqs = new TObjectIntHashMap<String>();
 	private ConceptTypeScores conceptClassifier;
-	public Co_occurrenceStatistics(QuantityCatalog dict) throws IOException, ParserConfigurationException, SAXException {
+	public Co_occurrenceStatistics(QuantityCatalog dict) throws Exception {
 		this(dict,null);
 		parser = new RuleBasedParser(null, dict);
 	}

@@ -111,7 +111,7 @@ public class CFGParser4Text extends CFGParser4Header {
 		Vector<UnitFeatures> featureList = new Vector();
 		Vector<String> explanation = new Vector<String>();
 		
-		String hdr = "chances are qqqq per thousand";
+		String hdr = "My understanding is that in 2005 Chinas GDP was qqqq trillion RNB and its CO2 emissions were1600 TTCE ";
 		//new CFGParser4Text(null).getTopKUnits(hdr, 12, 15, 1, 1);
 		new CFGParser4Text(null).getTopKUnits("chances are <b>1000</b> per thousand", "b", 1, 1);
 		List<? extends EntryWithScore<Unit>> unitsS = new CFGParser4Text(null).parseHeader(hdr, null, 1,1, featureList);

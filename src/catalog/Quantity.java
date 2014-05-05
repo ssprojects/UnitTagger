@@ -1,5 +1,6 @@
 package catalog;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 
@@ -9,7 +10,7 @@ import java.util.ArrayList;
  * @author chander Changed package and access-specifiers.
  * @author Many changes as part of an overhaul.
  */
-public class Quantity {
+public class Quantity implements Serializable {
 	private String concept;
 	private ArrayList<String> synsets;
 	private ArrayList<String> typicalUsage;

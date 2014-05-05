@@ -22,6 +22,9 @@ import catalog.QuantityReader;
 import catalog.Unit;
 import catalog.UnitMultPair;
 import parser.CFGParser4Header;
+import parser.coOccurMethods.ConceptClassifier;
+import parser.coOccurMethods.ConceptTypeScores;
+import parser.coOccurMethods.ConceptTypeScores.ConceptClassifierTypes;
 import edu.stanford.nlp.util.IntPair;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import iitb.shared.ArrayAsList;
@@ -29,23 +32,34 @@ import iitb.shared.EntryWithScore;
 import iitb.shared.Timer;
 import iitb.shared.SignatureSetIndex.DocResult;
 
-public class SimpleParser implements HeaderUnitParser{
+public class SimpleParser implements HeaderUnitParser, ConceptTypeScores{
 	private static final float Unit1Score = 0.5f;
 	private static final float WordSymbolScore = 0.5f;
 	public static String[] WordSymbols = {"in","sl","no","are","Ch","per","point", "at","line","league","sheet","weber","shed","last","french","a","hand","mark","number","length","time","us","standard","from","natural","mass"};
 	public static float ThresholdWithConcept=0.7f;
 	public static float Threshold=0.9f;
-	CFGParser4Header parser;
 	static HashSet<String> wordSymbolsHash=new HashSet<String>(Arrays.asList(WordSymbols));
 	boolean debug;
 	Element options;
+	public ConceptClassifierTypes conceptTypeScorer=ConceptClassifierTypes.classifier;
+	ConceptTypeScores conceptClassifier;
 	protected QuantityCatalog quantityDict;
-	public SimpleParser(Element elem, QuantityCatalog dict) throws IOException, ParserConfigurationException, SAXException {
+	public SimpleParser(Element elem, QuantityCatalog dict) throws Exception {
 		this.options = elem;
 		if (dict==null) 
 			dict = new QuantityCatalog(elem);
 		quantityDict = dict;
 		
+		if (elem != null && elem.hasAttribute("ConceptTypeScorer")) {
+			conceptTypeScorer = ConceptClassifierTypes.valueOf(elem.getAttribute("ConceptTypeScorer"));
+		}
+		if (conceptTypeScorer==ConceptClassifierTypes.classifier) {
+			conceptClassifier = new ConceptClassifier(elem,quantityDict,this,null);
+		} else if (conceptTypeScorer==ConceptClassifierTypes.perfectMatch) {
+			conceptClassifier = quantityDict;
+		} else {
+		}
+		System.out.println("Using concept classifier "+conceptClassifier.getClass().getName());
 	}
 	
 	/* (non-Javadoc)
@@ -138,7 +152,6 @@ public class SimpleParser implements HeaderUnitParser{
 			conceptStr += " Concept= "+res.toString(conceptsFound.get(bestUnit.getParentQuantity().getConcept()), hdrToks);
 		}
 		System.out.println(label + " : " + hdr + " ---> "+bestUnit.getBaseName()+ " maxScore "+ score + " " + res.toString(bestUnitMatch,hdrToks)+conceptStr);
-		
 		//}
 		
 	}
@@ -158,8 +171,13 @@ public class SimpleParser implements HeaderUnitParser{
 	@Override
 	public List<? extends EntryWithScore<Unit>> parseCell(String unitStr,
 			int k, ParseState context) throws IOException {
-		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public List<EntryWithScore<Quantity>> getConceptScores(String hdr)
+			throws Exception {
+		return (conceptClassifier != null?conceptClassifier.getConceptScores(hdr):null);
 	}
 }
 

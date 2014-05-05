@@ -35,6 +35,7 @@ import org.xml.sax.SAXException;
 import parser.CFGParser4Header;
 import parser.ParseState;
 import parser.RuleBasedParser;
+import parser.SimpleParser;
 import parser.UnitSpan;
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Classifier;
@@ -73,14 +74,14 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 	List<Quantity> concepts;
 	boolean addInst = false;
 	MyClassifier myclassifier = new MyClassifier();
-	private RuleBasedParser parser;
+	private SimpleParser parser;
 	CFGParser4Header cfgparser;
 	SparseInstance emptyInst;
 	QuantityCatalog quantDict;
 	public ConceptClassifier(QuantityCatalog quantDict) throws Exception {
 		this(null,quantDict,true,null);
 	}
-	public ConceptClassifier(Element configs, QuantityCatalog quantDict, boolean trainMode, RuleBasedParser parser) throws Exception {
+	public ConceptClassifier(Element configs, QuantityCatalog quantDict, boolean trainMode, SimpleParser parser) throws Exception {
 		this.quantDict = quantDict;
 		this.concepts = quantDict.getQuantities();
 		this.parser = parser;
@@ -100,7 +101,7 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 	public ConceptClassifier(QuantityCatalog quantDict, String loadFile) throws Exception {
 		this(null,quantDict,null,loadFile);
 	}
-	public ConceptClassifier(Element configs, QuantityCatalog quantDict, RuleBasedParser parser,
+	public ConceptClassifier(Element configs, QuantityCatalog quantDict, SimpleParser parser,
 			String loadFile) throws Exception {
 		this(configs,quantDict,false,parser);
 		InputStream istr=null;
