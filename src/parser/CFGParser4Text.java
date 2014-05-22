@@ -9,6 +9,8 @@ import java.util.Vector;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import numberParse.NumberParser;
+
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
@@ -107,13 +109,25 @@ public class CFGParser4Text extends CFGParser4Header {
 		+ QuantityToken + taggedHdr.substring(taggedHdr.indexOf("</"+tag+">")+tag.length()+3).replaceAll(QuantityToken, ""); 
 		return parseHeader(hdrQQ, null, debugLvl, k, null);
 	}
+	public List<? extends EntryWithScore<Unit>> getTopKUnitsValues(String taggedHdr, String tag, int k, int debugLvl, float[][] values) {
+		int numStart = taggedHdr.indexOf("<"+tag+">");
+		int numEnd[] = new int[1];
+		String prefix = taggedHdr.substring(numStart);
+		values[0] = NumberParser.toFloats(prefix, values[0], numEnd);
+		String hdrQQ = taggedHdr.substring(0,numStart).replaceAll(QuantityToken, "") 
+		+ QuantityToken;
+		String suffix = prefix.substring(numEnd[0]);
+		hdrQQ += suffix.substring(suffix.indexOf("</"+tag+">")+tag.length()+3).replaceAll(QuantityToken, "");
+		return parseHeader(hdrQQ, null, debugLvl, k, null);
+	}
 	public static void main(String args[]) throws Exception {
 		Vector<UnitFeatures> featureList = new Vector();
 		Vector<String> explanation = new Vector<String>();
 		
 		String hdr = "My understanding is that in 2005 Chinas GDP was qqqq trillion RNB and its CO2 emissions were1600 TTCE ";
 		//new CFGParser4Text(null).getTopKUnits(hdr, 12, 15, 1, 1);
-		new CFGParser4Text(null).getTopKUnits("chances are <b>1000</b> per thousand", "b", 1, 1);
+		float values[][] = new float[1][1];
+		new CFGParser4Text(null).getTopKUnitsValues("chances are <b>1000</b> per thousand", "b", 1, 1,values);
 		List<? extends EntryWithScore<Unit>> unitsS = new CFGParser4Text(null).parseHeader(hdr, null, 1,1, featureList);
 		
 		if (unitsS != null) {
@@ -140,4 +154,5 @@ public class CFGParser4Text extends CFGParser4Header {
 			System.out.println("No unit found");
 		}
 	}
+	
 }
