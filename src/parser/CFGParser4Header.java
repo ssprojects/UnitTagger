@@ -552,7 +552,7 @@ public class CFGParser4Header extends RuleBasedParser {
 		/* 8 Nov 2013: Multbias should be less than unit bias because other new units get defined in the presence of a mult.
 		 * e.g. population (million) adds population as a new unit.
 		 * 
-		 */
+		 */ 
 		String[][] learnedParams = null;// {{"ContextWord","3.202180785484943"},{"UnitBias","-105.3380056184916"},{"DictMatchWeight","83.61666183286786"},{"SINGLELetter","-9.866035985021725"},{"INLANG","-2.2194842396084"},{"MatchLength","-0.07966785895890988"},{"Co_occurStats","2.464134767464041"},{"Subsumed","-3.618467285251402"},{"WithinBracket","20.862932392986586"},{"AfterIN","11.400342284896563"}};
 		public Params(){
 			weights = new double[FTypes.values().length];

@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
+import numberParse.NumberParser;
+
 
 /**
  *
@@ -134,7 +136,7 @@ public class Unit implements Serializable {
 		for (int c = 0; c < cf.length(); c++) {
 			char ch = cf.charAt(c);
 			if (Character.isDigit(ch) || ch=='.' || ch=='-' || ch=='+') {
-				return parseDecimalExpression(cf.substring(c));
+				return NumberParser.parseDecimalExpression(cf.substring(c));
 			}
 		}
 		return "";
@@ -221,65 +223,6 @@ public class Unit implements Serializable {
 	public List<String> getLemmaTokens(int l) {
 		return lemmaTokens.get(l);
 	}
-	// parse strings of the form  "~ 1.729 994 044×103"
-	public static String parseDecimalExpression(String doubleStr) {
-		String vstr = "";
-		// look for the first character that can be part of a digit.
-		for (int c = 0; c < doubleStr.length(); c++) {
-			char ch = doubleStr.charAt(c);
-			if (Character.isDigit(ch) || ch=='.' || ch=='-' || ch=='+') {
-				vstr = doubleStr.substring(c);
-				break;
-			}
-		}
-		if (vstr=="") return "";
-		doubleStr = vstr;
-		// look for the first character that may not be part of the mantissa.
-		String remStr = "";
-		if (doubleStr.length() > 0) {
-			// remove the space until the first non-digit is seen.
-			for (int c = 1; c < doubleStr.length(); c++) {
-				char ch = doubleStr.charAt(c);
-				if (!(Character.isDigit(ch) || ch==',' || ch=='.' || ch=='-' || ch=='+' || ch==' ' || ch=='e' || ch=='E' )) {
-					remStr  = doubleStr.substring(c);
-					doubleStr = doubleStr.substring(0,c);
-					break;
-				}
-			}
-
-
-			String parts[] = doubleStr.split(" ");
-			doubleStr = "";
-			for (int i = 0; i < parts.length; i++) {
-				doubleStr += parts[i];
-			}
-			remStr = remStr.trim();
-
-			if (remStr.startsWith("±")) {
-				for (int c = 1; c < remStr.length(); c++) {
-					char ch = remStr.charAt(c);
-					if (!(Character.isDigit(ch)  || ch==',' || ch=='.' || ch==' ' )) {
-						remStr  = remStr.substring(c);
-						break;
-					}
-				}
-			}
-			if (remStr.startsWith("×10") || remStr.startsWith("× 10")  || remStr.startsWith("x 10")) {
-				int expStart = remStr.indexOf("10") + 2;
-				int expEnd = expStart+1;
-				for (; expEnd < remStr.length() && Character.isDigit(remStr.charAt(expEnd));expEnd++) {
-				}
-				if (Character.isDigit(remStr.charAt(expEnd-1))) {
-					doubleStr += "E"+remStr.substring(expStart,expEnd).trim().replace('−', '-');
-				}
-			}
-		}
-		if (doubleStr.endsWith(".") || doubleStr.endsWith(",")) {
-			doubleStr = doubleStr.substring(0,doubleStr.length()-1);
-		}
-		return doubleStr;
-	}
-
 	public void setCompoundUnitParts(Unit unit1, Unit unit2) {
 		firstBaseNameParts = new Unit[]{unit1,unit2};
 	}
