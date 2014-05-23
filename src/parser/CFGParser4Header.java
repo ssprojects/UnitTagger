@@ -697,8 +697,11 @@ public class CFGParser4Header extends RuleBasedParser {
 	public List<? extends EntryWithScore<Unit>> parseHeader(String hdr, ParseState hdrMatches, int debugLvl, short[][] forcedTags, UnitSpan forcedUnit, int k, Vector<UnitFeatures> featureList) {	
 		return parseHeader(hdr, hdrMatches, null, debugLvl, forcedTags, forcedUnit, k, featureList);
 	}
-
 	public List<? extends EntryWithScore<Unit>> parseHeader(String hdr, ParseState hdrMatches, ParseState context, int debugLvl, short[][] forcedTags, UnitSpan forcedUnit, int k, Vector<UnitFeatures> featureList) {			
+		return parseHeader(hdr, hdrMatches, null, debugLvl, forcedTags, forcedUnit, k, featureList,0);
+	}
+
+	public List<? extends EntryWithScore<Unit>> parseHeader(String hdr, ParseState hdrMatches, ParseState context, int debugLvl, short[][] forcedTags, UnitSpan forcedUnit, int k, Vector<UnitFeatures> featureList, double minScore) {			
 		if (debugLvl > 0) System.out.println(hdr);
 		if (isURL(hdr)) return null;
 
@@ -717,7 +720,7 @@ public class CFGParser4Header extends RuleBasedParser {
 				double bestScore = (trees.size()>0?trees.get(0).score():Double.POSITIVE_INFINITY)-Double.MIN_VALUE;
 				List<ScoredObject<Tree>> treesK = parser.getKBestParses(k);
 				for (int r = 0; r < treesK.size(); r++) {
-					if (treesK.get(r).score() < bestScore && trees.size() < k) {
+					if (treesK.get(r).score() < bestScore && trees.size() < k && treesK.get(r).score() > minScore) {
 						trees.add(treesK.get(r));
 					}
 				}
@@ -763,7 +766,7 @@ public class CFGParser4Header extends RuleBasedParser {
 				double logNorm = 0;
 				for (TObjectFloatIterator<UnitFeatures> iter = units.iterator(); iter.hasNext();) {
 					iter.advance();
-					if (iter.value() > 0) possibleUnits.add(new UnitSpan(iter.key().getKey(), iter.value(),iter.key().start(),iter.key().end()));
+					if (iter.value() > minScore) possibleUnits.add(new UnitSpan(iter.key().getKey(), iter.value(),iter.key().start(),iter.key().end()));
 					logNorm = RobustMath.logSumExp(logNorm, iter.value());
 				}
 				Collections.sort(possibleUnits);

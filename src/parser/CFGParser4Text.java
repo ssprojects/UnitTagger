@@ -109,14 +109,23 @@ public class CFGParser4Text extends CFGParser4Header {
 		+ QuantityToken + taggedHdr.substring(taggedHdr.indexOf("</"+tag+">")+tag.length()+3).replaceAll(QuantityToken, ""); 
 		return parseHeader(hdrQQ, null, debugLvl, k, null);
 	}
+	public List<? extends EntryWithScore<Unit>> getTopKUnitsValues(String taggedHdr, int numStart, int k, int debugLvl, float[][] values) {
+		int numStartEnd[] = new int[2];
+		String prefix = taggedHdr.substring(numStart);
+		values[0] = NumberParser.toFloats(prefix, values[0], numStartEnd);
+		String hdrQQ = taggedHdr.substring(0,numStart+numStartEnd[0]).replaceAll(QuantityToken, "") 
+		+ QuantityToken
+		+ prefix.substring(numStartEnd[1]).replaceAll(QuantityToken, "");
+		return parseHeader(hdrQQ, null, debugLvl, k, null);
+	}
 	public List<? extends EntryWithScore<Unit>> getTopKUnitsValues(String taggedHdr, String tag, int k, int debugLvl, float[][] values) {
 		int numStart = taggedHdr.indexOf("<"+tag+">");
-		int numEnd[] = new int[1];
-		String prefix = taggedHdr.substring(numStart);
-		values[0] = NumberParser.toFloats(prefix, values[0], numEnd);
-		String hdrQQ = taggedHdr.substring(0,numStart).replaceAll(QuantityToken, "") 
+		int numStartEnd[] = new int[2];
+		String prefix = taggedHdr.substring(numStart+tag.length()+2);
+		values[0] = NumberParser.toFloats(prefix, values[0], numStartEnd);
+		String hdrQQ = taggedHdr.substring(0,numStart).replaceAll(QuantityToken, "") + prefix.substring(0,numStartEnd[0])
 		+ QuantityToken;
-		String suffix = prefix.substring(numEnd[0]);
+		String suffix = prefix.substring(numStartEnd[0]);
 		hdrQQ += suffix.substring(suffix.indexOf("</"+tag+">")+tag.length()+3).replaceAll(QuantityToken, "");
 		return parseHeader(hdrQQ, null, debugLvl, k, null);
 	}
@@ -124,11 +133,11 @@ public class CFGParser4Text extends CFGParser4Header {
 		Vector<UnitFeatures> featureList = new Vector();
 		Vector<String> explanation = new Vector<String>();
 		
-		String hdr = "My understanding is that in 2005 Chinas GDP was qqqq trillion RNB and its CO2 emissions were1600 TTCE ";
+		String hdr = "while Xbox Live transactional top line expanded 17%. Office 365 is key to Microsofts services strategy. The company reported that there are now 4.4 million Office  qqqq  Home subscribers, up nearly 1 million in the quarter. Office 365 revenue on the Commercial side of Microsofts business grew over 100%, compared to the year-ago";
 		//new CFGParser4Text(null).getTopKUnits(hdr, 12, 15, 1, 1);
 		float values[][] = new float[1][1];
-		new CFGParser4Text(null).getTopKUnitsValues("chances are <b>1000</b> per thousand", "b", 1, 1,values);
-		List<? extends EntryWithScore<Unit>> unitsS = new CFGParser4Text(null).parseHeader(hdr, null, 1,1, featureList);
+		//new CFGParser4Text(null).getTopKUnitsValues("chances are <b>1000</b> per thousand", "b", 1, 1,values);
+		List<? extends EntryWithScore<Unit>> unitsS = new CFGParser4Text(null).parseHeader(hdr, null, 1,2, featureList);
 		
 		if (unitsS != null) {
 			eval.Utils.printExtractedUnits(unitsS,true);
@@ -137,22 +146,18 @@ public class CFGParser4Text extends CFGParser4Header {
 		}
 		System.out.println("----------");
 		
-		
+		/*
 		List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeader(hdr,
 				new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.Q.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.Mult.ordinal()}}
 				//null
 				,1,1,featureList); 
 	
-		/*List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeader("year qqqq billion kilowatt hour",	
-				new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.Q.ordinal()},{(short) Tags.Mult.ordinal()},{(short) Tags.SU_W.ordinal()}
-				,{(short) Tags.SU_W.ordinal()}}
-				,1);
-		*/
 		if (unitsR != null) {
 				eval.Utils.printExtractedUnits(unitsR,true);
 		} else {
 			System.out.println("No unit found");
 		}
+		*/
 	}
 	
 }

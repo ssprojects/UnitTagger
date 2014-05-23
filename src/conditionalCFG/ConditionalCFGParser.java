@@ -1645,7 +1645,10 @@ oScore[split][end][br.rightChild] = totR;
       // restoreUnaries(internalTree);
       kBestTrees.add(new ScoredObject<Tree>(internalTree, dHat.get(v).get(i-1).score));
       double score = scoreBinarizedTree(internalTree, 0);
-      assert(Math.abs(score-dHat.get(v).get(i-1).score) < 1e-6);
+      if (Math.abs(score-dHat.get(v).get(i-1).score) > 1e-1) {
+    	  System.out.println(score + " " + dHat.get(v).get(i-1).score);
+    	  assert(false);
+      }
     }
     return kBestTrees;
   }
