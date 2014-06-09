@@ -32,6 +32,7 @@ public class CFGParser4Text extends CFGParser4Header {
 		params.contextDiffThreshold=4; // need a larger threshold for context word match for text data.
 	}
 	public static String QuantityToken="qqqq";
+	public static String WordToken="wwww";
 	public CFGParser4Text(Element options, QuantityCatalog quantMatcher)
 			throws Exception {
 		super(options, quantMatcher);
@@ -76,9 +77,14 @@ public class CFGParser4Text extends CFGParser4Header {
 		"SU_Q ::- SU Q 1f" +    "\n" +
 		"BU_Q ::- CU2_Q 1f" +    "\n" +
 		"CU2_Q ::- SU_Q PER_SU 1f\n" +
-		"CU2_Q ::- SU_Q Sep_SU 1f\n" 
-        ;
-       
+		"CU2_Q ::- SU_Q Sep_SU 1f\n" +
+		
+       "Q_U ::- _WU PureWs_Q 1\n"+  // these rules are for patterns of the form: co2 emissions (kt) in france was qqqq. 
+    "_WU ::- W U 1\n"+              // These should be applied only when none of the previous rules manage to find a unit.
+    "PureWs_Q ::- PureWs Q 1\n"+
+    "PureWs ::- W 1\n"+
+    "PureWs ::- PureWs W 1\n";
+	
 	@Override
 	protected String getGrammar() {
 		return textGrammar + basicUnitGrammar;
@@ -129,11 +135,38 @@ public class CFGParser4Text extends CFGParser4Header {
 		hdrQQ += suffix.substring(suffix.indexOf("</"+tag+">")+tag.length()+3).replaceAll(QuantityToken, "");
 		return parseHeader(hdrQQ, null, debugLvl, k, null);
 	}
+	public List<? extends EntryWithScore<Unit>> parseHeader(String hdr, short[][] forcedTags, int debugLvl, int k, Vector<UnitFeatures> featureList) {
+		List<? extends EntryWithScore<Unit>>  units =  super.parseHeader(hdr, null, debugLvl,forcedTags, null, k, featureList);
+		if (units != null && units.size() > 0) return units;
+		tokenScorer.useExtendedGrammar=true;
+		units = super.parseHeader(hdr, null, debugLvl,forcedTags, null, k, featureList);
+		tokenScorer.useExtendedGrammar = false;
+		return units;
+	}
+	/*
+	 * (non-Javadoc)
+	 * @see parser.RuleBasedParser#filterUselessTokens(java.util.List)
+	 * Remove tokens far off from the numbers by casting them to a word.
+	 */
+	protected void filterUselessTokens(List<String> hdrToks) {
+		int numberTok = -1;
+		for (int i = 0; i < hdrToks.size(); i++) {
+			if (hdrToks.get(i).equals(QuantityToken)) {
+				numberTok = i;
+				break;
+			}
+		}
+		for(int j = Math.max(0, numberTok-params.contextDiffThreshold); j < Math.min(hdrToks.size(), numberTok+params.contextDiffThreshold); j++) {
+			
+		}
+	}
 	public static void main(String args[]) throws Exception {
 		Vector<UnitFeatures> featureList = new Vector();
 		Vector<String> explanation = new Vector<String>();
 		
-		String hdr = "while Xbox Live transactional top line expanded 17%. Office 365 is key to Microsofts services strategy. The company reported that there are now 4.4 million Office  qqqq  Home subscribers, up nearly 1 million in the quarter. Office 365 revenue on the Commercial side of Microsofts business grew over 100%, compared to the year-ago";
+		String hdr = 
+			//" CO2 emissions from natural gas consumption are estimated at 25 million metric tons of carbon or qqqq% of France's total emissions. ";
+		"The value for CO2 emissions from solid fuel consumption (kt) in France was qqqq as of 2009. ";
 		//new CFGParser4Text(null).getTopKUnits(hdr, 12, 15, 1, 1);
 		float values[][] = new float[1][1];
 		//new CFGParser4Text(null).getTopKUnitsValues("chances are <b>1000</b> per thousand", "b", 1, 1,values);

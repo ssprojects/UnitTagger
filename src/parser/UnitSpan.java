@@ -56,4 +56,10 @@ public class UnitSpan extends EntryWithScore<Unit> implements Serializable {
 	public int end() {
 		return span & ((1<<16)-1);
 	}
+	public boolean properSubset(UnitSpan uspan) {
+		if (start() <= uspan.start() && end() >= uspan.end() 
+				&& end()-start() > uspan.end()-uspan.start())
+			return true;
+		return false;
+	}
 }

@@ -13,6 +13,7 @@
       <lemmaset>
 	<String frequency="0.99">%</String>
 	<String>per</String>			  
+	<String>per cent</String>			  
 	<String frequency="0.99">p</String>			  
 	<String frequency="1">percentage</String>			  
       </lemmaset>
@@ -2267,6 +2268,7 @@
     </unit>
     <unit name="carat" symbol="kt" conversionFactor="≈ 205.196 548 333 mg">
       <lemmaset>
+	<String frequency="0.4"> kt</String>
       </lemmaset>
     </unit>
     <unit name="carat (metric)" symbol="ct" conversionFactor="= 200 mg">
@@ -2481,7 +2483,16 @@
     <unit name="kiloton" symbol="kt" conversionFactor="= 1 000 000 kg">
       <lemmaset>
 	<String>kilotonne</String>
+	<String frequency="0.4"> kt</String>
 	<String>TMT</String> <!--Thousand metric tonne -->
+	<String>ktons</String>
+	<String>kton</String>
+      </lemmaset>
+    </unit>
+    <unit name="megaton" symbol="" conversionFactor="= 1 000 000 000 kg">
+      <lemmaset>
+	<String>megatonne</String>
+	<String>mt</String>
       </lemmaset>
     </unit>
     <unit name="wey" symbol=" " conversionFactor="= 114.305 277 24 kg (variants exist)">
@@ -2943,6 +2954,7 @@
       <lemmaset>
 	<String>knots</String>
 	<String>knott</String>
+	<String frequency="0.2"> kt</String>
       </lemmaset>
     </unit>
     <unit name="knot (Admiralty)" symbol="kn" conversionFactor="= 0.514 773 m/s">

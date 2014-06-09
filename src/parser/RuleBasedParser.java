@@ -368,7 +368,11 @@ public class RuleBasedParser extends SimpleParser {
 		hdrMatches = new ParseState(hdr);
 		hdrMatches.tokens = hdrToks;
 		hdrMatches.brackets=brackets;
+		filterUselessTokens(hdrToks);
 		return hdrMatches;
+	}
+	protected void filterUselessTokens(List<String> hdrToks) {
+		;
 	}
 	public RuleBasedParser(Element elem, QuantityCatalog dict)
 	throws Exception {

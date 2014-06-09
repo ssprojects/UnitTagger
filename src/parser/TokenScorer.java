@@ -103,6 +103,7 @@ public class TokenScorer implements ConditionalLexicon {
 	List<String> contextTokens;
 	UnitSpan forcedUnit;
 	String hdr;
+	boolean useExtendedGrammar=false;
 	public TokenScorer(StateIndex stateIndex, EnumIndex tagIndex, QuantityCatalog matcher, 
 			Index<String> wordIndex, WordFrequency wordFreq, Co_occurrenceScores coOcurStats,Params params) {
 		this.tagIndex = tagIndex;
@@ -527,7 +528,7 @@ public class TokenScorer implements ConditionalLexicon {
 
 	private boolean isdigit(String w) {
 		for (int i = 0; i < w.length(); i++)
-			if (!Character.isDigit(w.charAt(i))) return false;
+			if (!Character.isDigit(w.charAt(i)) && w.charAt(i)!='.' && w.charAt(i) != ',') return false;
 		return true;
 	}
 	public void getFrequencies(TObjectFloatHashMap<Unit> unitFreqs, String unitMention) {
@@ -814,6 +815,24 @@ public class TokenScorer implements ConditionalLexicon {
 				return Float.NEGATIVE_INFINITY;
 			}
 		}
+		if (stateIndex.isState(States._WU, rule.parent)) {
+			if (!useExtendedGrammar) return Float.NEGATIVE_INFINITY;
+			if (sentence.get(start).tag==Tags.Number) 
+				return Float.NEGATIVE_INFINITY;
+			return 0;
+		}
+		if (stateIndex.isState(States.PureWs_Q, rule.parent)) {
+			if (!useExtendedGrammar) return Float.NEGATIVE_INFINITY;
+			if (end-start > 5) 
+				return Float.NEGATIVE_INFINITY;
+			for (int p = start; p < end; p++) {
+				if (sentence.get(start).tag==Tags.Number) 
+					return Float.NEGATIVE_INFINITY;
+			}
+			if (fvec!=null) {fvec.add(FTypes.MatchLength.ordinal(),10*(end-start));}
+			return (float) ((end-start)*10*params.weights[FTypes.MatchLength.ordinal()]);
+		}
+		
 		if (stateIndex.isCU2(rule.parent)) {
 			// ensure that the two children are from different parts of the unit taxonomy.
 			if (start > split-1 || split+1 > end) 

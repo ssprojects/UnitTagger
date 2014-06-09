@@ -243,10 +243,11 @@ public class CFGParser4Header extends RuleBasedParser {
 	}
 	public static class StateIndex implements Index<String>  {
 		EnumIndex tagIndex;
+		int junkId=-1;
 		public StateIndex(EnumIndex tagIndex) {
 			this.tagIndex = tagIndex;
 		}
-		public enum States {ROOT,ROOT_,Junk,Junk_U,Sep_U,IN_U,U, UL,IN_Mult,Mult_OF,BU,CU2,Sep_SU,SU_MW,SU,PER_SU,Junk_QU,Q_U,SU_Q,BU_Q,CU2_Q,Q_Junk,W_Op_U,Rep_QU,Op_U};// W, Mult, IN, OF, Op,Boundary};
+		public enum States {ROOT,ROOT_,Junk,Junk_U,Sep_U,IN_U,U, UL,IN_Mult,Mult_OF,BU,CU2,Sep_SU,SU_MW,SU,PER_SU,Junk_QU,Q_U,SU_Q,BU_Q,CU2_Q,Q_Junk,W_Op_U,Rep_QU,Op_U,PureWs_Q,PureWs,_WU};// W, Mult, IN, OF, Op,Boundary};
 		@Override
 		public Iterator<String> iterator() {
 			return null;
@@ -268,9 +269,13 @@ public class CFGParser4Header extends RuleBasedParser {
 		@Override
 		public int indexOf(String o) {
 			try {
-				return States.valueOf(o).ordinal()+tagIndex.size();
-			} catch (IllegalArgumentException e) {
+				if (o.equalsIgnoreCase("junk")) {
+					if (junkId < 0) junkId = States.valueOf(o).ordinal()+tagIndex.size();
+					return junkId;
+				}
 				return tagIndex.indexOf(o);
+			} catch (IllegalArgumentException e) {
+				return States.valueOf(o).ordinal()+tagIndex.size();
 			}
 		}
 		@Override
@@ -770,13 +775,13 @@ public class CFGParser4Header extends RuleBasedParser {
 					logNorm = RobustMath.logSumExp(logNorm, iter.value());
 				}
 				Collections.sort(possibleUnits);
-				// remove subsumed units from the top-k list?
+				// remove subsumed and subsuming units from the top-k list?
 				for (int ik = possibleUnits.size()-1; ik>0; ik--) {
 					UnitSpan uspan = (UnitSpan) possibleUnits.get(ik);
 					for (int j = ik-1; j >= 0; j--) {
 						UnitSpan uspanj = (UnitSpan) possibleUnits.get(j);
-						if (uspanj.start() <= uspan.start() && uspanj.end() >= uspan.end() 
-								&& uspan.end()-uspan.start() < uspanj.end()-uspanj.start()) {
+						if (uspanj.properSubset(uspan) || uspan.properSubset(uspanj))
+						{
 							possibleUnits.remove(ik);
 							break;
 						}
