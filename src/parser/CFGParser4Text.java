@@ -52,6 +52,8 @@ public class CFGParser4Text extends CFGParser4Header {
         "Junk ::= W 1f"+ "\n" +
         
         "Q_U ::= Q_Junk Q_U 1f"+ "\n"+  //for cases like "2 and 5 m","4 +- 6 m"
+        "Q_U ::= Q_Junk N_U 1f"+ "\n"+
+        "N_U ::= Number U 1f"+ "\n"+
         "Q_Junk ::= Q Junk 1f"+"\n"+
         
         "Q_U := Q W_Op_U 1f"+"\n"+ 
@@ -131,8 +133,9 @@ public class CFGParser4Text extends CFGParser4Header {
 		values[0] = NumberParser.toFloats(prefix, values[0], numStartEnd);
 		String hdrQQ = taggedHdr.substring(0,numStart).replaceAll(QuantityToken, "") + prefix.substring(0,numStartEnd[0])
 		+ QuantityToken;
-		String suffix = prefix.substring(numStartEnd[0]);
-		hdrQQ += suffix.substring(suffix.indexOf("</"+tag+">")+tag.length()+3).replaceAll(QuantityToken, "");
+		String suffix = prefix.substring(numStartEnd[1]);
+		int tagIndex = suffix.indexOf("</"+tag+">");
+		hdrQQ += suffix.substring(0, tagIndex) +  " " + suffix.substring(tagIndex+tag.length()+3).replaceAll(QuantityToken, "");
 		return parseHeader(hdrQQ, null, debugLvl, k, null);
 	}
 	public List<? extends EntryWithScore<Unit>> parseHeader(String hdr, short[][] forcedTags, int debugLvl, int k, Vector<UnitFeatures> featureList) {
@@ -165,12 +168,13 @@ public class CFGParser4Text extends CFGParser4Header {
 		Vector<String> explanation = new Vector<String>();
 		
 		String hdr = 
-			//" CO2 emissions from natural gas consumption are estimated at 25 million metric tons of carbon or qqqq% of France's total emissions. ";
-		"The value for CO2 emissions from solid fuel consumption (kt) in France was qqqq as of 2009. ";
+			"Of these qqqq% are endemic";
+		//"The value for CO2 emissions from solid fuel consumption (kt) in France was qqqq as of 2009. ";
+	//		"Land area: 10,579 sq mi (27,400 sq km); total area: 11,100 sq mi (28,748 sq km). Population (2012 est.): qqqq (growth rate: 0.28%); birth rate: 12.38/1000; infant mortality rate: 14.12/1000; life expectancy: 77.59; density per sq mi: 340. Capital";
 		//new CFGParser4Text(null).getTopKUnits(hdr, 12, 15, 1, 1);
 		float values[][] = new float[1][1];
-		//new CFGParser4Text(null).getTopKUnitsValues("chances are <b>1000</b> per thousand", "b", 1, 1,values);
-		List<? extends EntryWithScore<Unit>> unitsS = new CFGParser4Text(null).parseHeader(hdr, null, 1,2, featureList);
+		List<? extends EntryWithScore<Unit>> unitsS = new CFGParser4Text(null).getTopKUnitsValues("of these <b>1.1%</b> are endemic", "b", 1, 1,values);
+		//List<? extends EntryWithScore<Unit>> unitsS = new CFGParser4Text(null).parseHeader(hdr, null, 1,2, featureList);
 		
 		if (unitsS != null) {
 			eval.Utils.printExtractedUnits(unitsS,true);
@@ -179,9 +183,9 @@ public class CFGParser4Text extends CFGParser4Header {
 		}
 		System.out.println("----------");
 		
-		/*
+	
 		List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeader(hdr,
-				new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.Q.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.Mult.ordinal()}}
+				new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.Q.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.Number.ordinal()},{(short) Tags.SU_1W.ordinal()}}
 				//null
 				,1,1,featureList); 
 	
@@ -190,7 +194,7 @@ public class CFGParser4Text extends CFGParser4Header {
 		} else {
 			System.out.println("No unit found");
 		}
-		*/
+		
 	}
 	
 }

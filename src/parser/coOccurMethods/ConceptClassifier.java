@@ -42,6 +42,7 @@ import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.LibLINEAR;
 import weka.classifiers.functions.SMO;
+import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -217,15 +218,15 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 	}
 	private Instances emptyDataset() {
 		int numFs = myclassifier.wordIdMap.size();
-		FastVector attributes = new FastVector(numFs+1);
+		ArrayList<Attribute> attributes = new ArrayList<Attribute>(numFs+1);
 		for (int i = 0; i < numFs; i++) {
-			attributes.addElement(new weka.core.Attribute(myclassifier.wordIdMap.get(i)));
+			attributes.add(new weka.core.Attribute(myclassifier.wordIdMap.get(i)));
 		}
 		FastVector classNames = new FastVector();
 		for (int i = 0; i < concepts.size(); i++) {
 			classNames.addElement(getClassString(i));
 		}
-		attributes.addElement(new weka.core.Attribute("Class",classNames));
+		attributes.add(new weka.core.Attribute("Class",classNames));
 		int numInsts = instClassLabels.size();
 		Instances dataset = new Instances("ConceptClassifer",attributes,numInsts);
 		dataset.setClassIndex(numFs);

@@ -2492,7 +2492,7 @@
     <unit name="megaton" symbol="" conversionFactor="= 1 000 000 000 kg">
       <lemmaset>
 	<String>megatonne</String>
-	<String>mt</String>
+	<String frequency="0.7">mt</String>
       </lemmaset>
     </unit>
     <unit name="wey" symbol=" " conversionFactor="= 114.305 277 24 kg (variants exist)">

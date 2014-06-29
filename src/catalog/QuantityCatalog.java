@@ -587,7 +587,13 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores {
 		}
 		return (float) convValue;
 	}
-	
+	public float convert(float value, List<? extends EntryWithScore<Unit>> fromUnits, Unit toUnit, QuantityCatalog quantDict, boolean success[]) throws Exception {
+		for(EntryWithScore<Unit> fromUnitWScore : fromUnits) {
+			float retval = convert(value, fromUnitWScore.getKey(), toUnit, success);
+			if (success[0]) return retval;
+			}
+		return 0;
+	}
 	
 	public static void main(String args[]) throws Exception {
 		String tests[][] = {

@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -212,6 +213,16 @@ public class TokenScorer implements ConditionalLexicon {
 			}
 		}
 		int maxMatchLen = 0;
+		BitSet quantPositions = new BitSet(hdrToks.size());
+		int targetQuantPos=-1;
+		for (int i = 0; i < hdrToks.size(); i++) {
+			String w = hdrToks.get(i);
+			if (w.equals(CFGParser4Text.QuantityToken)) {
+				targetQuantPos=i;
+			} else if (isdigit(w)) {
+				quantPositions.set(i);
+			}
+		}
 		for (int h = res.numHits()-1; h >= 0; h--) {
 			int id = res.hitDocId(h);
 			float score = res.hitMatch(h);
@@ -219,12 +230,15 @@ public class TokenScorer implements ConditionalLexicon {
 				continue;
 			if (matcher.idToUnitMap.getType(id) == matcher.idToUnitMap.LemmaMatch && score + params.weights[FTypes.LemmaDictMatchThreshold.ordinal()] < 0)
 				continue;
-
+			int start = res.hitPosition(h);
+			int end = res.hitEndPosition(h);
+			if (targetQuantPos >= 0 && closerToAnotherNumber(start,end,targetQuantPos,quantPositions)) {
+				continue;
+			}
 
 			Unit unit = matcher.idToUnitMap.get(id);
 			int state = getUnitState(unit);
-			int start = res.hitPosition(h);
-			int end = res.hitEndPosition(h);
+			
 			UnitFeatures unitObject  = new UnitFeatures(unit, 0,start,end);
 			if (matcher.idToUnitMap.getType(id) != matcher.idToUnitMap.ConceptMatch) {
 				maxMatchLen = Math.max(maxMatchLen, res.hitLength(h));
@@ -453,7 +467,7 @@ public class TokenScorer implements ConditionalLexicon {
 				sentence.add(new Token(EnumIndex.Tags.Q,w));
 			} else if (getUnit(i,i,multUnitState) != null) {
 				sentence.add(new Token(EnumIndex.Tags.Mult, w));
-			} else if (isdigit(w)) {
+			} else if (quantPositions.get(i)) {
 				sentence.add(new Token(EnumIndex.Tags.Number, w));
 			} else {
 				sentence.add(new Token(EnumIndex.Tags.W, w));
@@ -526,10 +540,28 @@ public class TokenScorer implements ConditionalLexicon {
 		return sentence;
 	}
 
+	private boolean closerToAnotherNumber(int start, int end, int targetQuantPos, BitSet quantPositions) {
+		int targetDist = Math.min(Math.abs(targetQuantPos-start), Math.abs(targetQuantPos-end));
+		for (int i = start-1; i >= Math.max(0, start-targetDist-1); i--) {
+			if (quantPositions.get(i))
+				return true;
+		}
+		for (int i = end+1; i < Math.min(end+targetDist-1, quantPositions.length()); i++) {
+			if (quantPositions.get(i))
+				return true;
+		}
+		return false;
+	}
 	private boolean isdigit(String w) {
-		for (int i = 0; i < w.length(); i++)
-			if (!Character.isDigit(w.charAt(i)) && w.charAt(i)!='.' && w.charAt(i) != ',') return false;
-		return true;
+		boolean hasDigit=false;
+		for (int i = 0; i < w.length(); i++) {
+			if (Character.isDigit(w.charAt(i))) {
+				hasDigit = true;
+				continue;
+			}
+			if ((w.charAt(i)!='.' && w.charAt(i) != ','))return false;
+		}
+		return hasDigit;
 	}
 	public void getFrequencies(TObjectFloatHashMap<Unit> unitFreqs, String unitMention) {
 		float freq = 0.01f;
