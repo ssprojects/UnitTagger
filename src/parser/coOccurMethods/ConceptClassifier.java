@@ -86,7 +86,7 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 		this.quantDict = quantDict;
 		this.concepts = quantDict.getQuantities();
 		this.parser = parser;
-		if (parser == null) parser = new RuleBasedParser(configs, quantDict);
+		if (parser == null) this.parser = new RuleBasedParser(configs, quantDict);
 		if (trainMode) cfgparser = new CFGParser4Header(null,quantDict);
 		init();
 	}
