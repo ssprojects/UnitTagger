@@ -437,10 +437,12 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 				, "/mnt/a99/d0/sunita/workspace.broken/WWT/expts/quant/PercentSymbolMatch"
 		};
 		float sampleRates[] = {1,1,1,1,0.07f};
-		QuantityCatalog quantDict = new QuantityCatalog((Element)null);
+		Element elem = XMLConfigs.load(new FileReader("configs/configs.xml"));
+		QuantityCatalog quantDict = new QuantityCatalog(elem);
+		RuleBasedParser parser = new RuleBasedParser(elem, quantDict);
 		ConceptClassifier classifier = null;
 		if (args.length > 0 && args[0].equalsIgnoreCase("train")) {
-			classifier = new ConceptClassifier(XMLConfigs.load(new FileReader("configs/configs.xml")),quantDict,false,null);
+			classifier = new ConceptClassifier(elem,quantDict,false,parser);
 			classifier.makeClassifier(QuantityCatalog.QuantConfigDirPath+ConceptClassifier.ClassifierFile+".arff");
 		}
 		/*	ConceptClassifier classifier = new ConceptClassifier(quantDict);
@@ -470,7 +472,8 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 		classifier.makeClassifier();
 		 */
 		else {
-			classifier = new ConceptClassifier(XMLConfigs.load(new FileReader("configs/configs.xml")), quantDict,null,
+		    
+			classifier = new ConceptClassifier(elem, quantDict,parser,
 					QuantityCatalog.QuantConfigDirPath+ConceptClassifier.ClassifierFile); //+".withPercent"
 		}
 		String conceptTests[] = {"corporate income tax rate", "area code", "forest area", "Urban Area Population", "area 1000 sq km", "area", "area sq", "area km", "CO2 emissions", "distance from sun","net worth","year of first flight","weight", "pressure", "record low", "size", "volume","bandwidth","capacity"};

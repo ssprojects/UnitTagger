@@ -6,6 +6,6 @@
 	<dependency org="net.sf.trove4j" name="trove4j" rev="3.0.3"/>
 	<dependency org="edu.stanford.nlp" name="stanford-parser" rev="3.3.1"/>
 	<dependency org="nz.ac.waikato.cms.weka" name="weka-dev" rev="3.7.10"/>
-	<dependency org="de.bwaldvogel" name="liblinear" rev="1.92"/>
+	<dependency org="de.bwaldvogel" name="liblinear" rev="1.94"/>
     </dependencies>
 </ivy-module>
