@@ -80,7 +80,7 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 	SparseInstance emptyInst;
 	QuantityCatalog quantDict;
 	public ConceptClassifier(QuantityCatalog quantDict) throws Exception {
-		this(null,quantDict,true,null);
+		this(null,quantDict,null,null);
 	}
 	public ConceptClassifier(Element configs, QuantityCatalog quantDict, boolean trainMode, SimpleParser parser) throws Exception {
 		this.quantDict = quantDict;
@@ -473,8 +473,8 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 		 */
 		else {
 		    
-			classifier = new ConceptClassifier(elem, quantDict,parser,
-					QuantityCatalog.QuantConfigDirPath+ConceptClassifier.ClassifierFile); //+".withPercent"
+			classifier = new ConceptClassifier(quantDict); //,parser,
+					//QuantityCatalog.QuantConfigDirPath+ConceptClassifier.ClassifierFile); //+".withPercent"
 		}
 		String conceptTests[] = {"corporate income tax rate", "area code", "forest area", "Urban Area Population", "area 1000 sq km", "area", "area sq", "area km", "CO2 emissions", "distance from sun","net worth","year of first flight","weight", "pressure", "record low", "size", "volume","bandwidth","capacity"};
 		for (String hdr : conceptTests) {
