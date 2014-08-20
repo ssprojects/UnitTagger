@@ -3,6 +3,7 @@ package parser;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -26,13 +27,15 @@ import parser.coOccurMethods.ConceptClassifier;
 import parser.coOccurMethods.ConceptTypeScores;
 import parser.coOccurMethods.ConceptTypeScores.ConceptClassifierTypes;
 import edu.stanford.nlp.util.IntPair;
+
 import gnu.trove.map.hash.TObjectIntHashMap;
+
 import iitb.shared.ArrayAsList;
 import iitb.shared.EntryWithScore;
 import iitb.shared.Timer;
 import iitb.shared.SignatureSetIndex.DocResult;
 
-public class SimpleParser implements HeaderUnitParser, ConceptTypeScores{
+public class SimpleParser implements HeaderUnitParser, ConceptTypeScores, Serializable {
 	private static final float Unit1Score = 0.5f;
 	private static final float WordSymbolScore = 0.5f;
 	public static String[] WordSymbols = {"in","sl","no","are","Ch","per","point", "at","line","league","sheet","weber","shed","last","french","a","hand","mark","number","length","time","us","standard","from","natural","mass"};

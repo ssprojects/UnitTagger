@@ -1,11 +1,13 @@
 package parser;
 
 import gnu.trove.list.array.TIntArrayList;
+
 import iitb.shared.EntryWithScore;
 import iitb.shared.XMLConfigs;
 import iitb.shared.SignatureSetIndex.DocResult;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,7 +31,7 @@ public class RuleBasedParser extends SimpleParser {
 	static final float UnitFrequencyThreshold = 0.75f;
 	static final char[] SingleLetterUnits = {'d', 'r'}; // WARNING: keep this sorted at all times.
 	WordFrequency wordFreq;
-	public interface Rule {
+	public interface Rule extends Serializable {
 		List<EntryWithScore<Unit>> apply(String hdr, ParseState pHdr, List<String> applicableRules);
 		String name();
 		boolean terminal();

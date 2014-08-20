@@ -1,19 +1,24 @@
 package parser.coOccurMethods;
 
 import de.bwaldvogel.liblinear.Linear;
+
 import edu.stanford.nlp.util.Pair;
+
 import gnu.trove.list.array.TIntArrayList;
+
 import iitb.shared.EntryWithScore;
 import iitb.shared.StringMap;
 import iitb.shared.XMLConfigs;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -37,6 +42,7 @@ import parser.ParseState;
 import parser.RuleBasedParser;
 import parser.SimpleParser;
 import parser.UnitSpan;
+
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
@@ -51,13 +57,14 @@ import weka.core.SparseInstance;
 import weka.core.TechnicalInformationHandler;
 import weka.core.converters.ArffLoader;
 import weka.core.converters.ArffLoader.ArffReader;
+
 import catalog.Co_occurrenceStatistics;
 import catalog.Quantity;
 import catalog.QuantityCatalog;
 import catalog.Unit;
 import catalog.WordnetFrequency;
 
-public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores {
+public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores, Serializable {
 	private static final int FreqCutOff = 10;
 	public static final String ClassifierFile = "conceptClassifier";
 	public static final double UndecidedScore = 0.3;
@@ -76,8 +83,8 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 	boolean addInst = false;
 	MyClassifier myclassifier = new MyClassifier();
 	private SimpleParser parser;
-	CFGParser4Header cfgparser;
-	SparseInstance emptyInst;
+	transient CFGParser4Header cfgparser;
+	transient SparseInstance emptyInst;
 	QuantityCatalog quantDict;
 	public ConceptClassifier(QuantityCatalog quantDict) throws Exception {
 		this(null,quantDict,null,null);
@@ -475,6 +482,10 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores 
 		    
 			classifier = new ConceptClassifier(quantDict); //,parser,
 					//QuantityCatalog.QuantConfigDirPath+ConceptClassifier.ClassifierFile); //+".withPercent"
+			 ByteArrayOutputStream bos = new ByteArrayOutputStream() ;
+			    ObjectOutputStream out = new ObjectOutputStream(bos) ;
+			    out.writeObject(classifier);
+			    out.close();
 		}
 		String conceptTests[] = {"corporate income tax rate", "area code", "forest area", "Urban Area Population", "area 1000 sq km", "area", "area sq", "area km", "CO2 emissions", "distance from sun","net worth","year of first flight","weight", "pressure", "record low", "size", "volume","bandwidth","capacity"};
 		for (String hdr : conceptTests) {

@@ -4,6 +4,7 @@ import iitb.shared.EntryWithScore;
 import iitb.shared.XMLConfigs;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -21,14 +22,15 @@ import edu.smu.tspell.wordnet.Synset;
 import edu.smu.tspell.wordnet.SynsetType;
 import edu.smu.tspell.wordnet.WordNetDatabase;
 
-public class WordnetFrequency implements WordFrequency {
+public class WordnetFrequency implements WordFrequency, Serializable {
 	public static String WordNetDictPath="/mnt/b100/d0/library/public_html/wordnet/WordNet-2.1/dict";
 	public static String quantityTypeString = "how much there is of something that you can quantify";
 	public static String quantitySearchString = "quantity";
 	public static String calendarMonth = "calendar month";
-	NounSynset quantSyn, calenderMonthSyn;
-	WordNetDatabase database;
+	transient NounSynset quantSyn, calenderMonthSyn;
+	transient WordNetDatabase database;
 	float stopWordFreq = 0.9f;
+	String wordnetFile=null;
 	// p -- percent as against poise and poncelet.
 	// s is often used as a pluralizer in headers.
 	static String stopWords[] = new String[]{"in","are","at","a","from","of","to","the","for","and","all","st"
@@ -38,14 +40,20 @@ public class WordnetFrequency implements WordFrequency {
 		if (options==null) {
 			options = XMLConfigs.load(new InputSource(ClassLoader.class.getResourceAsStream("/configs.xml")));
 		}
-		//System.out.println("Using "+extractLoadFile(options));
-		System.setProperty("wordnet.database.dir", extractLoadFile(options));
-		database = WordNetDatabase.getFileInstance();
-		Synset syns[] = database.getSynsets(quantitySearchString, SynsetType.NOUN);
-		quantSyn = (NounSynset) syns[0];
-		calenderMonthSyn = (NounSynset) database.getSynsets(calendarMonth, SynsetType.NOUN)[0];
+		wordnetFile =  extractLoadFile(options);
+		loadData();
 	}
-	private static String extractLoadFile(Element elem) {
+	/**
+   * 
+   */
+  private void loadData() {
+    System.setProperty("wordnet.database.dir",wordnetFile);
+    database = WordNetDatabase.getFileInstance();
+    Synset syns[] = database.getSynsets(quantitySearchString, SynsetType.NOUN);
+    quantSyn = (NounSynset) syns[0];
+    calenderMonthSyn = (NounSynset) database.getSynsets(calendarMonth, SynsetType.NOUN)[0];
+  }
+  private static String extractLoadFile(Element elem) {
 		if (elem != null) {
 			Element coOccurElem = XMLConfigs.getElement(elem, "WordNet");
 			if (coOccurElem!=null && coOccurElem.hasAttribute("path")) {

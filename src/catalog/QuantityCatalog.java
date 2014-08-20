@@ -2,6 +2,7 @@ package catalog;
 
 import gnu.trove.list.array.TByteArrayList;
 import gnu.trove.list.array.TIntArrayList;
+
 import iitb.shared.ArrayUtils;
 import iitb.shared.EntryWithScore;
 import iitb.shared.SignatureSetIndex.DocResult;
@@ -13,6 +14,7 @@ import iitb.shared.SignatureSetIndex.SignatureSetImpl;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,8 +28,8 @@ import java.util.Vector;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.collections.map.AbstractMapDecorator;
-import org.apache.commons.collections.map.MultiValueMap;
+import org.apache.commons.collections4.map.AbstractMapDecorator;
+import org.apache.commons.collections4.map.MultiValueMap;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
@@ -35,7 +37,7 @@ import parser.UnitSpan;
 import parser.coOccurMethods.ConceptTypeScores;
 
 /* sunita: Sep 8, 2012 */
-public class QuantityCatalog implements WordFrequency, ConceptTypeScores {
+public class QuantityCatalog implements WordFrequency, ConceptTypeScores, Serializable {
 	private static final double MinContextOverlap = 0.5;
 	public static final double MinMatchThreshold = 0.5;
 	public static String QuantConfigDirPath =  "configs/"; // /mnt/a99/d0/WWT/workspace/WWT_GroundTruthV2/
