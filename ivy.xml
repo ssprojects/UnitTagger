@@ -2,7 +2,7 @@
     <info organisation="iitb" module="UnitTagger"/>
     <dependencies>
         <dependency org="commons-lang" name="commons-lang" rev="2.0"/>
-         <dependency org="commons-collections" name="commons-collections" rev="3.2.1"/>
+         <dependency org="org.apache.commons" name="commons-collections4" rev="4.0"/>
 	<dependency org="net.sf.trove4j" name="trove4j" rev="3.0.3"/>
 	<dependency org="edu.stanford.nlp" name="stanford-parser" rev="3.3.1"/>
 	<dependency org="nz.ac.waikato.cms.weka" name="weka-dev" rev="3.7.10"/>
