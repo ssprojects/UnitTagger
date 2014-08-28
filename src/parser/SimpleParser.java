@@ -48,16 +48,20 @@ public class SimpleParser implements HeaderUnitParser, ConceptTypeScores, Serial
 	ConceptTypeScores conceptClassifier;
 	protected QuantityCatalog quantityDict;
 	public SimpleParser(Element elem, QuantityCatalog dict) throws Exception {
+	  this(elem,dict,null);
+	}
+	public SimpleParser(Element elem, QuantityCatalog dict, ConceptTypeScores conceptClass) throws Exception {
 		this.options = elem;
 		if (dict==null) 
 			dict = new QuantityCatalog(elem);
 		quantityDict = dict;
 		
+		
 		if (elem != null && elem.hasAttribute("ConceptTypeScorer")) {
 			conceptTypeScorer = ConceptClassifierTypes.valueOf(elem.getAttribute("ConceptTypeScorer"));
 		}
 		if (conceptTypeScorer==ConceptClassifierTypes.classifier) {
-			conceptClassifier = new ConceptClassifier(elem,quantityDict,this,null);
+			conceptClassifier = conceptClass==null?new ConceptClassifier(elem,quantityDict,this,null):conceptClass;
 		} else if (conceptTypeScorer==ConceptClassifierTypes.perfectMatch) {
 			conceptClassifier = quantityDict;
 		} else {

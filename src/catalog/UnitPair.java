@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.commons.collections4.map.MultiValueMap;
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 
 import catalog.Unit;
 import catalog.UnitPair.OpType;

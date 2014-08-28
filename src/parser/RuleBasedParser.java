@@ -21,6 +21,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+import parser.coOccurMethods.ConceptTypeScores;
+
 import catalog.QuantityCatalog;
 import catalog.Unit;
 import catalog.WordFrequency;
@@ -376,34 +378,36 @@ public class RuleBasedParser extends SimpleParser {
 	protected void filterUselessTokens(List<String> hdrToks) {
 		;
 	}
+	public RuleBasedParser(Element elem, QuantityCatalog dict, ConceptTypeScores conceptClass) throws Exception {
+	  super(elem,dict,conceptClass);
+
+      if (elem != null && XMLConfigs.getElementAttributeBoolean(elem, "disable-wordnet", false)){ 
+          wordFreq = new WordFrequencyImpl();
+      } else{
+          wordFreq = new WordnetFrequency(elem);
+          
+      }
+      rules = new Vector<RuleBasedParser.Rule>();
+      rules.add(new IsUrl());
+      rules.add(new NumberCount());
+      rules.add(new NoUnit());
+      rules.add(new NoUnitPatterns());
+      rules.add(new PercentSymbolMatch());
+      rules.add(new DictConceptMatch1Unit());
+      rules.add(new YearUnit());
+      rules.add(new SingleLetterNotUnit());
+      rules.add(new SingleUnitWithinBrackets());
+      rules.add(new OnlyFreqUnitWords());
+      rules.add(new SingleUnitAfterIn());
+      // single words like meter, feet, points
+      // text in % .. ignore match of in to inch when a unit follows.
+      // truly ambiguous units (nm, km)
+      // multiples and units juxtaposed million $
+      // TODO: filter out easy cases using rules, and see cfg for complicated compound units etc.
+	}
 	public RuleBasedParser(Element elem, QuantityCatalog dict)
 	throws Exception {
-		super(elem, dict);
-		
-		if (elem != null && XMLConfigs.getElementAttributeBoolean(elem, "disable-wordnet", false)){	
-			wordFreq = new WordFrequencyImpl();
-		} else{
-			wordFreq = new WordnetFrequency(elem);
-			
-		}
-		
-		rules = new Vector<RuleBasedParser.Rule>();
-		rules.add(new IsUrl());
-		rules.add(new NumberCount());
-		rules.add(new NoUnit());
-		rules.add(new NoUnitPatterns());
-		rules.add(new PercentSymbolMatch());
-		rules.add(new DictConceptMatch1Unit());
-		rules.add(new YearUnit());
-		rules.add(new SingleLetterNotUnit());
-		rules.add(new SingleUnitWithinBrackets());
-		rules.add(new OnlyFreqUnitWords());
-		rules.add(new SingleUnitAfterIn());
-		// single words like meter, feet, points
-		// text in % .. ignore match of in to inch when a unit follows.
-		// truly ambiguous units (nm, km)
-		// multiples and units juxtaposed million $
-		// TODO: filter out easy cases using rules, and see cfg for complicated compound units etc.
+		this(elem, dict,null);
 	}
 	public static void main(String args[])  throws Exception {
 		List<String> vec = new Vector<String>();

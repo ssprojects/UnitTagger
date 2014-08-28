@@ -11,7 +11,10 @@ import iitb.shared.SignatureSetIndex.IndexImpl;
 import iitb.shared.SignatureSetIndex.Result;
 import iitb.shared.SignatureSetIndex.SignatureSetImpl;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -31,8 +34,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.collections4.map.AbstractMapDecorator;
 import org.apache.commons.collections4.map.MultiValueMap;
 import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import iitb.shared.XMLConfigs;
 import parser.UnitSpan;
 import parser.coOccurMethods.ConceptTypeScores;
 
@@ -158,10 +163,10 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores, Serial
 		return toks;
 	}
 	public QuantityCatalog(Element elem) throws IOException, ParserConfigurationException, SAXException {
-		this(QuantityReader.loadQuantityTaxonomy((elem != null && elem.hasAttribute("quantity-taxonomy"))?new FileInputStream(elem.getAttribute("quantity-taxonomy")):getRelativePath()));
+		this(QuantityReader.loadQuantityTaxonomy((elem != null && elem.hasAttribute("quantity-taxonomy"))?new FileInputStream(elem.getAttribute("quantity-taxonomy")):getRelativePath("/"+QuantTaxonomyFile)));
 	}
-	private static InputStream getRelativePath() {
-		return ClassLoader.class.getResourceAsStream("/"+QuantTaxonomyFile);
+	private static InputStream getRelativePath(String file) {
+		return ClassLoader.class.getResourceAsStream(file);
 	}
 	public QuantityCatalog(ArrayList<Quantity> taxonomy) throws IOException {
 		//analyzer =  new StandardAnalyzer(Version.LUCENE_33);
@@ -650,5 +655,8 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores, Serial
 	public Unit multipleOneUnit() {
 		return getUnitFromBaseName("");
 	}
-	
+	public static Element loadDefaultConfig() throws FileNotFoundException, ParserConfigurationException, SAXException, IOException {
+	  Element elem = XMLConfigs.load(new InputSource(ClassLoader.class.getResourceAsStream("/configs.xml")));
+	  return elem;
+	}
 }

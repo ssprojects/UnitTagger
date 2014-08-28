@@ -38,7 +38,7 @@ public class WordnetFrequency implements WordFrequency, Serializable {
 	public static HashSet<String> stopWordsHash=new HashSet<String>(Arrays.asList(stopWords));
 	public WordnetFrequency(Element options) throws ParserConfigurationException, SAXException, IOException {
 		if (options==null) {
-			options = XMLConfigs.load(new InputSource(ClassLoader.class.getResourceAsStream("/configs.xml")));
+			options = QuantityCatalog.loadDefaultConfig();
 		}
 		wordnetFile =  extractLoadFile(options);
 		loadData();

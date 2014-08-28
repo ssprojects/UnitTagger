@@ -4,8 +4,8 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?project=QuantityTagger&amp;ivyXmlPath=ivy.xml&amp;confs=*"/>
 	<classpathentry kind="lib" path="configs"/>
-	<classpathentry kind="lib" path="lib/shared.jar"/>
 	<classpathentry kind="lib" path="lib/jaws-bin.jar"/>
-	<classpathentry kind="lib" path="/usr/local/google/home/sarawagi/UnitTagger/lib/LibLINEAR.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Shared"/>
+	<classpathentry kind="lib" path="lib/LibLINEAR.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

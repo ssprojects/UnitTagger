@@ -21,7 +21,7 @@ import java.util.Vector;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
