@@ -130,7 +130,10 @@ public class CFGParser4Text extends CFGParser4Header {
 		return parseHeader(hdrQQ, null, debugLvl, k, null);
 	}
 	public String getValuesAndRemainingString(String taggedHdr, int numStart, float[][] values) {
-      int numStartEnd[] = new int[2];
+	  return getValuesAndRemainingString(taggedHdr, numStart, values,null);
+	}
+	public String getValuesAndRemainingString(String taggedHdr, int numStart, float[][] values,  int numStartEnd[]) {
+      numStartEnd = numStartEnd==null || numStartEnd.length < 2?new int[2]:numStartEnd;
       String prefix = taggedHdr.substring(numStart);
       values[0] = NumberParser.toFloats(prefix, values[0], numStartEnd);
       String hdrQQ = taggedHdr.substring(0,numStart+numStartEnd[0]).replaceAll(QuantityToken, "") 
@@ -184,9 +187,11 @@ public class CFGParser4Text extends CFGParser4Header {
 			
 		}
 	}
+	
 	public static void main(String args[]) throws Exception {
 		Vector<UnitFeatures> featureList = new Vector();
 		Vector<String> explanation = new Vector<String>();
+	
 		
 		String hdr = 
 			"Of these qqqq% are endemic";
@@ -195,6 +200,9 @@ public class CFGParser4Text extends CFGParser4Header {
 		//new CFGParser4Text(null).getTopKUnits(hdr, 12, 15, 1, 1);
 		float values[][] = new float[1][1];
 		CFGParser4Text parser = new CFGParser4Text(null);
+		testMultipleNumbers(parser);
+		// look for multiple numbers.
+		
 		List<? extends EntryWithScore<Unit>> unitsS = parser.getTopKUnitsValues("of these <b>1.1%</b> are endemic", "b", 1, 1,values);
 		//List<? extends EntryWithScore<Unit>> unitsS = new CFGParser4Text(null).parseHeader(hdr, null, 1,2, featureList);
 		
@@ -221,5 +229,20 @@ public class CFGParser4Text extends CFGParser4Header {
 	      out.writeObject(parser);
 	      out.close();
 	}
-	
+  /**
+   * @param parser
+   */
+  private static void testMultipleNumbers(CFGParser4Text parser) {
+    String dummy1 = "Dummy ";
+    float number1 = (float) 123.89;
+    String dummy2 = " square meters second number $";
+    float number2 = 34000;
+    String str = dummy1+number1+dummy2+number2;
+    float values[][] = new float[1][1];
+    int numStartEnd[] = new int[2];
+    String changedStr1 = parser.getValuesAndRemainingString(str, 0, values,numStartEnd);
+    assert(Math.abs(values[0][0]-number1) < 1e-6);
+    String changedStr2 = parser.getValuesAndRemainingString(str, numStartEnd[1], values,numStartEnd);
+    assert(Math.abs(values[0][0]-number2) < 1e-6);
+  }
 }
