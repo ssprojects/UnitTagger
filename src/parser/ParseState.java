@@ -29,6 +29,7 @@ public class ParseState {
 	public ParseState(String hdr) {
 		this.hdr= hdr;
 	}
+	public String text() {return hdr;}
 	public List<String> setTokens() {
 		if (tokens==null) {
 			brackets = new TIntArrayList();

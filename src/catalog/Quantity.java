@@ -54,6 +54,7 @@ public class Quantity implements Serializable {
 	public String toString() {
 		return concept;
 	}
+	public Unit getCanonicalUnit() {return SIUnit;}
 	public static boolean isUnitLess(Quantity quant) {
 		return quant == null || quant.getConcept().equalsIgnoreCase("Multiples");
 	}

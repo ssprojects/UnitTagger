@@ -14,7 +14,6 @@ import gnu.trove.map.hash.TObjectFloatHashMap;
 import iitb.shared.EntryWithScore;
 import iitb.shared.StringMap;
 import iitb.shared.SignatureSetIndex.DocResult;
-import iitb.shared.SignatureSetIndex.Result;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -52,10 +51,10 @@ public class TokenScorer implements ConditionalLexicon {
 	private static final float NegInfty = -100;
 	private static final float ScoreEps = 0.01f;
 	boolean disableNewUnits = true;
-	private DocResult dictMatches;
-	private List<Token> sentence;
-	protected List<String> hdrToks;
-	private TIntArrayList brackets;
+	transient private DocResult dictMatches;
+	transient private List<Token> sentence;
+	transient protected List<String> hdrToks;
+	transient private TIntArrayList brackets;
 	EnumIndex tagIndex;
 	Index<String> wordIndex;
 	StateIndex stateIndex;

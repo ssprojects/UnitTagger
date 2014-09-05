@@ -381,10 +381,10 @@ public class RuleBasedParser extends SimpleParser {
 	public RuleBasedParser(Element elem, QuantityCatalog dict, ConceptTypeScores conceptClass) throws Exception {
 	  super(elem,dict,conceptClass);
 
-      if (elem != null && XMLConfigs.getElementAttributeBoolean(elem, "disable-wordnet", false)){ 
+      if (options != null && XMLConfigs.getElementAttributeBoolean(options, "disable-wordnet", false)){ 
           wordFreq = new WordFrequencyImpl();
       } else{
-          wordFreq = new WordnetFrequency(elem);
+          wordFreq = new WordnetFrequency(options);
           
       }
       rules = new Vector<RuleBasedParser.Rule>();

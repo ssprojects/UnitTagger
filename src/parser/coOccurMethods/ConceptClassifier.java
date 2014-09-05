@@ -89,9 +89,7 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores,
     this(null,quantDict,null,null);
   }
   public ConceptClassifier(Element configs, QuantityCatalog quantDict, boolean trainMode, SimpleParser parser) throws Exception {
-    if (configs == null) {
-      configs = QuantityCatalog.loadDefaultConfig();
-    }
+    configs = QuantityCatalog.loadDefaultConfig(configs);
     this.quantDict = quantDict;
     this.concepts = quantDict.getQuantities();
     this.parser = parser;
@@ -458,7 +456,7 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores,
         , "/mnt/a99/d0/sunita/workspace.broken/WWT/expts/quant/PercentSymbolMatch"
     };
     float sampleRates[] = {1,1,1,1,0.07f};
-    Element elem = QuantityCatalog.loadDefaultConfig();
+    Element elem = QuantityCatalog.loadDefaultConfig(null);
     QuantityCatalog quantDict = new QuantityCatalog(elem);
     ConceptClassifier classifier = null;
     if (args.length > 0 && args[0].equalsIgnoreCase("train")) {
@@ -500,7 +498,7 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores,
       out.writeObject(classifier);
       out.close();
     }
-    String conceptTests[] = {"corporate income tax rate", "area code", "forest area", "Urban Area Population", "area 1000 sq km", "area", "area sq", "area km", "CO2 emissions", "distance from sun","net worth","year of first flight","weight", "pressure", "record low", "size", "volume","bandwidth","capacity"};
+    String conceptTests[] = {"dose", "corporate income tax rate", "area code", "forest area", "Urban Area Population", "area 1000 sq km", "area", "area sq", "area km", "CO2 emissions", "distance from sun","net worth","year of first flight","weight", "pressure", "record low", "size", "volume","bandwidth","capacity"};
     for (String hdr : conceptTests) {
       System.out.print(hdr);
       List<String> tokens = QuantityCatalog.getTokens(hdr);

@@ -4,8 +4,6 @@ import gnu.trove.list.array.TByteArrayList;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
 
-import iitb.shared.ArrayUtils;
-
 import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.Arrays;
@@ -80,7 +78,7 @@ public class NumberParser {
 			Number number = nfs[l].parse(tok, pos);
 			if (pos.getErrorIndex() < 0 && maxPos <= pos.getIndex()) {
 				maxPos = Math.max(maxPos, pos.getIndex());
-				if (ArrayUtils.find(numbers, number) < 0) {
+				if (!Arrays.asList(numbers).contains(number)) {
 					numbers[numFloats++] = number;
 					if (tok.indexOf(',') < 0) {
 						break;
@@ -244,7 +242,7 @@ public class NumberParser {
 				int expEnd = expStart+1;
 				for (; expEnd < remStr.length() && Character.isDigit(remStr.charAt(expEnd));expEnd++) {
 				}
-				if (Character.isDigit(remStr.charAt(expEnd-1))) {
+				if (expEnd-1 < remStr.length() && Character.isDigit(remStr.charAt(expEnd-1))) {
 					doubleStr += "E"+remStr.substring(expStart,expEnd).trim().replace('−', '-');
 					relEnd += expEnd;
 				}

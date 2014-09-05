@@ -2,6 +2,7 @@ package parser;
 
 import gnu.trove.iterator.TObjectFloatIterator;
 import gnu.trove.map.hash.TObjectFloatHashMap;
+
 import iitb.shared.EntryWithScore;
 import iitb.shared.RobustMath;
 import iitb.shared.XMLConfigs;
@@ -11,8 +12,10 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -25,6 +28,8 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+import parser.coOccurMethods.ConceptTypeScores;
+import catalog.Quantity;
 import parser.CFGParser4Header.EnumIndex.Tags;
 import parser.cfgTrainer.FeatureVector;
 import parser.coOccurMethods.Co_occurrenceScores;
@@ -525,7 +530,7 @@ public class CFGParser4Header extends RuleBasedParser {
  -       0.5267
 
 	 */
-	public static class Params {
+	public static class Params implements Serializable {
 		public int contextDiffThreshold = 2;
 		public enum FTypes {ContextWord,UnitBias,DictMatchWeight,
 			SINGLELetter,INLANG, MatchLength, Co_occurStats,Subsumed,
@@ -624,7 +629,16 @@ public class CFGParser4Header extends RuleBasedParser {
 		this(options,null);
 	}
 	public CFGParser4Header(Element options, QuantityCatalog quantMatcher) throws Exception {
-		super(options,quantMatcher);
+	  this(options,quantMatcher,null);
+	}
+	/**
+	   * @param options
+	   * @param quantDict
+	   * @param object
+	 * @throws Exception 
+	   */
+	  public CFGParser4Header(Element options, QuantityCatalog quantMatcher, ConceptTypeScores conceptClassifier) throws Exception {
+		super(options,quantMatcher,conceptClassifier);
 		//index.add(Lexicon.BOUNDARY_TAG);
 		EnumIndex tagIndex = new EnumIndex();
 		StateIndex index = new StateIndex(tagIndex);
@@ -648,8 +662,13 @@ public class CFGParser4Header extends RuleBasedParser {
 			coOccurStats = new Co_occurrenceStatistics(options, quantityDict);
 			coOccurMethod = (Co_occurrenceScores) iitb.shared.Utils.makeClassGivenArgs("parser.coOccurMethods." + options.getAttribute("co-occur-class"), new Class[]{Co_occurrenceStatistics.class}, new Object[]{coOccurStats});
 		} else {
-			coOccurMethod = new ConceptClassifier(options,quantityDict, this,null);////new LogisticUnitGivenWords(coOccurStats); //new PrUnitGivenWord(coOccurStats);
+			coOccurMethod = conceptClassifier!=null && 
+			    (conceptClassifier instanceof Co_occurrenceScores)?
+			        (Co_occurrenceScores)conceptClassifier
+			        :new ConceptClassifier(options,quantityDict, this,null);
+			        ////new LogisticUnitGivenWords(coOccurStats); //new PrUnitGivenWord(coOccurStats);
 		}
+		
 		if (options != null && options.hasAttribute("params")) {
 			params = new Params(options.getAttribute("params"));
 		} else
@@ -663,7 +682,8 @@ public class CFGParser4Header extends RuleBasedParser {
 		parser = new ConditionalCFGParser(bg, ug, tokenScorer, op, index, wordIndex, tagIndex);
 	}
 
-	private void initIndex(Index<String> index, Vector<BinaryRule> brules, Vector<UnaryRule> urules) throws IOException {
+	
+  private void initIndex(Index<String> index, Vector<BinaryRule> brules, Vector<UnaryRule> urules) throws IOException {
 		String line;
 		BufferedReader br  = new BufferedReader(new StringReader(getGrammar()));
 		while ((line = br.readLine())!=null) {
@@ -687,7 +707,7 @@ public class CFGParser4Header extends RuleBasedParser {
 
 	List<UnitFeatures > bestUnits = new Vector<UnitFeatures>();
 	List<UnitFeatures> bestUnits2 = new Vector<UnitFeatures>();
-	FeatureVector tmpFVec;
+	transient FeatureVector tmpFVec;
 
 	public List<? extends EntryWithScore<Unit>> getTopKUnits(String hdr, int k, Vector<UnitFeatures> featureList, int debugLvl) {
 		return parseHeader(hdr, null, debugLvl, k, featureList);
@@ -738,7 +758,10 @@ public class CFGParser4Header extends RuleBasedParser {
 				float treeScore = (float) parser.scoreBinarizedTree(tree, 0,debugLvl-1);
 				if (debugLvl > 0) System.out.println(tree + " " + tree.score()+ " "+treeScore);
 				FeatureVector treeFeatureVector=null;
-				if (featureList!=null) {treeFeatureVector = extractTreeFeatureVector(tree, 0,tmpFVec.clear());}
+				if (featureList!=null) {
+				  if (tmpFVec==null) tmpFVec = new FeatureVector(params.numFeatures());
+				  treeFeatureVector = extractTreeFeatureVector(tree, 0,tmpFVec.clear());
+				}
 				if (unitNodes.size() > 2) throw new NotImplementedException(hdr);
 				if (unitNodes.size()==0) continue;
 				Tree unitTree = unitNodes.get(0);
@@ -996,39 +1019,7 @@ public class CFGParser4Header extends RuleBasedParser {
 		}
 		return parseHeader(hdrMatches[0].hdr, hdrMatches[0],debugLvl,null,null,k, null);
 	}
-	public static void main(String args[]) throws Exception {
-		// ,  
-		//Max. 10-min. average sustained wind Km/h
-		//
-		//
-		// 
-		//  
-		//
-		Vector<UnitFeatures> featureList = new Vector();
-		//List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Header(XMLConfigs.load(new FileReader("configs/configs.xml"))).getTopKUnits("2000 Mt CO2",  2, featureList,1);
-		List<? extends EntryWithScore<Unit>> unitsR = 
-			new CFGParser4Header(XMLConfigs.load(new FileReader("configs/configs.xml"))).parseHeaderProbabilistic("CO2 Emissions 2000 thousands of metric tons of carbon",  null, 1, 2,null);
-			
-			//	List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).parseHeader("Wealth (in " + UnitSpan.StartXML + " $mil "+UnitSpan.EndXML+")",null, 2,null, 
-		//new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}
-		//,{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}}
-		//		new UnitSpan("united states dollar [million]"),	1,featureList);
-
-		//List<EntryWithScore<Unit>> unitsR = (List<EntryWithScore<Unit>>) new CFGParser4Header(null).parseHeader("Profit/(loss) before tax ( £m )", 
-		//			new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.Mult.ordinal()},{(short) Tags.SU_W.ordinal()},{(short) Tags.SU_W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()}}
-			//	null
-				//,1,1,featureList);
-
-		//"billions usd", new short[][]{{(short) Tags.Mult.ordinal()},{(short) Tags.SU.ordinal()}});
-		//Loading g / m ( gr / ft )"); 
-		// Max. 10-min. average sustained wind Km/h
-		// ("fl. oz (US)", new short[][]{{(short) Tags.SU_W.ordinal()},{(short) Tags.SU_W.ordinal()},{(short) Tags.SU_W.ordinal()}}); // getting wrongly matched to kg/L
-		if (unitsR != null) {
-			eval.Utils.printExtractedUnits(unitsR,true);
-			
-		}
-		
-	}
+	
 	public double[] getParamsArray() {
 		return params.weights;
 	}
@@ -1040,4 +1031,58 @@ public class CFGParser4Header extends RuleBasedParser {
 			int k, ParseState context) throws IOException {
 		return parseHeader(unitStr, null, context, 0, null,null, k, null);
 	}
+	public List<EntryWithScore<Unit>> parseCell(String cellString, List<EntryWithScore<Unit>> columnUnits, int k, ParseState colTokens) throws IOException {
+	    if (cellString == null || cellString.trim().length()==0) return columnUnits;
+	    //List<EntryWithScore<Unit>> unitMatches = quantityDict.getTopK(unit.trim().toLowerCase(), (String) colTokens, MinMatchThreshold);
+	    List<EntryWithScore<Unit>> cellUnits = (List<EntryWithScore<Unit>>) parseCell(cellString.trim().toLowerCase(), k, colTokens);
+	    if (cellUnits == null || cellUnits.size() == 0) return columnUnits;
+	    if (columnUnits == null || columnUnits.size()==0) return cellUnits;
+	    Unit columnUnit = columnUnits.get(0).getKey();
+	    if (columnUnit instanceof UnitMultPair) {
+	        columnUnit = ((UnitMultPair)columnUnit).getUnit(1);
+	    }
+	    for (int c = 0; c < cellUnits.size(); c++) {
+	        Unit cellUnit = cellUnits.get(c).getKey();
+	        if (cellUnit != columnUnit
+	                && (Quantity.isUnitLess(cellUnit.getParentQuantity()) ^ Quantity.isUnitLess(columnUnit.getParentQuantity()))
+	                && !(cellUnit instanceof UnitPair) 
+	                && !(columnUnit instanceof UnitPair)) {
+	            cellUnit = Quantity.isUnitLess(cellUnit.getParentQuantity())?new UnitMultPair(columnUnit, cellUnit):new UnitMultPair(cellUnit, columnUnit);
+	            cellUnits.get(c).setKey(cellUnit);
+	        }
+	    }
+	    return cellUnits;
+	}
+	
+	public static void main(String args[]) throws Exception {
+      // ,  
+      // 
+      //  
+	  CFGParser4Header parser =  new CFGParser4Header(XMLConfigs.load(new FileReader("configs/configs.xml")));
+      Vector<UnitFeatures> featureList = new Vector();
+      //List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Header(XMLConfigs.load(new FileReader("configs/configs.xml"))).getTopKUnits("2000 Mt CO2",  2, featureList,1);
+      ParseState state[] = new ParseState[1];
+      List<EntryWithScore<Unit>> unitsR = (List<EntryWithScore<Unit>>) parser.parseHeaderExplain("Speed (in Miles Per Hour)",  null, 1, state);
+      List<EntryWithScore<Unit>> cellUnits = parser.parseCell("$2.31", unitsR, 1, state[0]);
+      System.out.println("Base name=" + cellUnits.get(0).getKey().getBaseName());
+          //  List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).parseHeader("Wealth (in " + UnitSpan.StartXML + " $mil "+UnitSpan.EndXML+")",null, 2,null, 
+      //new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}
+      //,{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}}
+      //      new UnitSpan("united states dollar [million]"), 1,featureList);
+
+      //List<EntryWithScore<Unit>> unitsR = (List<EntryWithScore<Unit>>) new CFGParser4Header(null).parseHeader("Profit/(loss) before tax ( £m )", 
+      //          new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.Mult.ordinal()},{(short) Tags.SU_W.ordinal()},{(short) Tags.SU_W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()}}
+          //  null
+              //,1,1,featureList);
+
+      //"billions usd", new short[][]{{(short) Tags.Mult.ordinal()},{(short) Tags.SU.ordinal()}});
+      //Loading g / m ( gr / ft )"); 
+      // Max. 10-min. average sustained wind Km/h
+      // ("fl. oz (US)", new short[][]{{(short) Tags.SU_W.ordinal()},{(short) Tags.SU_W.ordinal()},{(short) Tags.SU_W.ordinal()}}); // getting wrongly matched to kg/L
+      if (unitsR != null) {
+          eval.Utils.printExtractedUnits(unitsR,true);
+          
+      }
+      
+  }
 }

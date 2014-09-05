@@ -28,7 +28,7 @@ public class WordnetFrequency implements WordFrequency, Serializable {
 	public static String quantitySearchString = "quantity";
 	public static String calendarMonth = "calendar month";
 	transient NounSynset quantSyn, calenderMonthSyn;
-	transient WordNetDatabase database;
+	static WordNetDatabase database=null;
 	float stopWordFreq = 0.9f;
 	String wordnetFile=null;
 	// p -- percent as against poise and poncelet.
@@ -37,9 +37,7 @@ public class WordnetFrequency implements WordFrequency, Serializable {
 		,"with","on","total","per","no","number","amp","apos","quot","hr","s"};
 	public static HashSet<String> stopWordsHash=new HashSet<String>(Arrays.asList(stopWords));
 	public WordnetFrequency(Element options) throws ParserConfigurationException, SAXException, IOException {
-		if (options==null) {
-			options = QuantityCatalog.loadDefaultConfig();
-		}
+	  options = QuantityCatalog.loadDefaultConfig(options);
 		wordnetFile =  extractLoadFile(options);
 		loadData();
 	}
@@ -47,6 +45,9 @@ public class WordnetFrequency implements WordFrequency, Serializable {
    * 
    */
   private void loadData() {
+    if (database != null) {
+      return;
+    }
     System.setProperty("wordnet.database.dir",wordnetFile);
     database = WordNetDatabase.getFileInstance();
     Synset syns[] = database.getSynsets(quantitySearchString, SynsetType.NOUN);
@@ -138,7 +139,10 @@ public class WordnetFrequency implements WordFrequency, Serializable {
 
 	@Override
 	public boolean getRelativeFrequency(String wordForm, List<EntryWithScore<String[]>> matches) {
-		Synset[] synsets = database.getSynsets(wordForm, SynsetType.NOUN);
+	  if (database==null) {
+	    loadData();
+	  }
+	  Synset[] synsets = database.getSynsets(wordForm, SynsetType.NOUN);
 		//  Display the word forms and definitions for synsets retrieved
 		matches.clear();
 		int total = 0;
@@ -170,6 +174,7 @@ public class WordnetFrequency implements WordFrequency, Serializable {
 		//if (foundMatch && matches.size()==0) {
 		//	matches.add(new EntryWithScore<String[]>(new String[]{wordForm}, 1e-6));
 		//}
+		//System.out.println("Did database lookup for "+wordForm);
 		return foundMatch;
 	}
 	private boolean isUnitDefn(Synset synset) {

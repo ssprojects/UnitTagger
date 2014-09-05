@@ -58,6 +58,7 @@ import edu.stanford.nlp.trees.LabeledScoredTreeFactory;
 import edu.stanford.nlp.util.*;
 import edu.stanford.nlp.util.PriorityQueue;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.regex.Matcher;
 
@@ -71,7 +72,7 @@ import java.util.regex.Matcher;
  *  @author Christopher Manning (I seem to maintain it....)
  *  @author Jenny Finkel (N-best and sampling code, former from Liang/Chiang)
  */
-public class ConditionalCFGParser implements Scorer, KBestViterbiParser {
+public class ConditionalCFGParser implements Scorer, KBestViterbiParser, Serializable {
 
   // public static long insideTime = 0;  // for profiling
   // public static long outsideTime = 0;
@@ -81,7 +82,7 @@ public class ConditionalCFGParser implements Scorer, KBestViterbiParser {
   protected final Index<String> wordIndex;
   protected final Index<String> tagIndex;
 
-  protected final TreeFactory tf;
+  transient protected TreeFactory tf;
 
   protected final BinaryGrammar bg;
   protected final UnaryGrammar ug;
@@ -346,6 +347,9 @@ public class ConditionalCFGParser implements Scorer, KBestViterbiParser {
 
 
   public boolean parse(List<? extends HasWord> sentence) {
+    if (tf==null) {
+      tf = new LabeledScoredTreeFactory();
+    }
     lr = null; // better nullPointer exception than silent error
     //System.out.println("is it a taggedword?" + (sentence.get(0) instanceof TaggedWord)); //debugging
     if (sentence != this.sentence) {

@@ -2,7 +2,9 @@ package parser;
 
 import iitb.shared.EntryWithScore;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
@@ -14,9 +16,10 @@ import numberParse.NumberParser;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+import parser.coOccurMethods.ConceptTypeScores;
+import parser.coOccurMethods.ConceptClassifier;
 import parser.CFGParser4Header.EnumIndex.Tags;
 import parser.CFGParser4Header.StateIndex;
-
 import catalog.QuantityCatalog;
 import catalog.Unit;
 import edu.stanford.nlp.parser.lexparser.Lexicon;
@@ -35,10 +38,19 @@ public class CFGParser4Text extends CFGParser4Header {
 	public static String WordToken="wwww";
 	public CFGParser4Text(Element options, QuantityCatalog quantMatcher)
 			throws Exception {
-		super(options, quantMatcher);
-		initParams();
+		this(options, quantMatcher, null);
 	}
-	// put the grammar before BU.
+	/**
+   * @param element
+   * @param quantDict
+   * @param classifier
+	 * @throws Exception 
+   */
+  public CFGParser4Text(Element options, QuantityCatalog quantDict, ConceptTypeScores classifier) throws Exception {
+    super(options, quantDict, null);
+    initParams();
+  }
+  // put the grammar before BU.
 	public static String textGrammar=
 		"ROOT ::- ROOT_ "+Lexicon.BOUNDARY_TAG + " 1f" + "\n" +
         "ROOT_ ::- Junk Q_U 1f" + "\n" +
@@ -117,6 +129,15 @@ public class CFGParser4Text extends CFGParser4Header {
 		+ QuantityToken + taggedHdr.substring(taggedHdr.indexOf("</"+tag+">")+tag.length()+3).replaceAll(QuantityToken, ""); 
 		return parseHeader(hdrQQ, null, debugLvl, k, null);
 	}
+	public String getValuesAndRemainingString(String taggedHdr, int numStart, float[][] values) {
+      int numStartEnd[] = new int[2];
+      String prefix = taggedHdr.substring(numStart);
+      values[0] = NumberParser.toFloats(prefix, values[0], numStartEnd);
+      String hdrQQ = taggedHdr.substring(0,numStart+numStartEnd[0]).replaceAll(QuantityToken, "") 
+      + QuantityToken + " " // whitespace may not exist after number e.g. 2.41bn
+      + prefix.substring(numStartEnd[1]).replaceAll(QuantityToken, "");
+      return hdrQQ;
+  }
 	public List<? extends EntryWithScore<Unit>> getTopKUnitsValues(String taggedHdr, int numStart, int k, int debugLvl, float[][] values) {
 		int numStartEnd[] = new int[2];
 		String prefix = taggedHdr.substring(numStart);
@@ -173,7 +194,8 @@ public class CFGParser4Text extends CFGParser4Header {
 	//		"Land area: 10,579 sq mi (27,400 sq km); total area: 11,100 sq mi (28,748 sq km). Population (2012 est.): qqqq (growth rate: 0.28%); birth rate: 12.38/1000; infant mortality rate: 14.12/1000; life expectancy: 77.59; density per sq mi: 340. Capital";
 		//new CFGParser4Text(null).getTopKUnits(hdr, 12, 15, 1, 1);
 		float values[][] = new float[1][1];
-		List<? extends EntryWithScore<Unit>> unitsS = new CFGParser4Text(null).getTopKUnitsValues("of these <b>1.1%</b> are endemic", "b", 1, 1,values);
+		CFGParser4Text parser = new CFGParser4Text(null);
+		List<? extends EntryWithScore<Unit>> unitsS = parser.getTopKUnitsValues("of these <b>1.1%</b> are endemic", "b", 1, 1,values);
 		//List<? extends EntryWithScore<Unit>> unitsS = new CFGParser4Text(null).parseHeader(hdr, null, 1,2, featureList);
 		
 		if (unitsS != null) {
@@ -184,7 +206,7 @@ public class CFGParser4Text extends CFGParser4Header {
 		System.out.println("----------");
 		
 	
-		List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Text(null).parseHeader(hdr,
+		List<? extends EntryWithScore<Unit>> unitsR = parser.parseHeader(hdr,
 				new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.Q.ordinal()},{(short) Tags.W.ordinal()},{(short) Tags.Number.ordinal()},{(short) Tags.SU_1W.ordinal()}}
 				//null
 				,1,1,featureList); 
@@ -194,7 +216,10 @@ public class CFGParser4Text extends CFGParser4Header {
 		} else {
 			System.out.println("No unit found");
 		}
-		
+		 ByteArrayOutputStream bos = new ByteArrayOutputStream() ;
+	      ObjectOutputStream out = new ObjectOutputStream(bos) ;
+	      out.writeObject(parser);
+	      out.close();
 	}
 	
 }

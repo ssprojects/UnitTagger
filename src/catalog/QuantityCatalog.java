@@ -3,7 +3,6 @@ package catalog;
 import gnu.trove.list.array.TByteArrayList;
 import gnu.trove.list.array.TIntArrayList;
 
-import iitb.shared.ArrayUtils;
 import iitb.shared.EntryWithScore;
 import iitb.shared.SignatureSetIndex.DocResult;
 import iitb.shared.SignatureSetIndex.Index;
@@ -22,6 +21,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -33,6 +33,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.collections4.map.AbstractMapDecorator;
 import org.apache.commons.collections4.map.MultiValueMap;
+import org.apache.commons.lang3.ArrayUtils;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -94,7 +95,7 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores, Serial
 	//Analyzer analyzer;
 	public static String impDelims = "£$#\\/%\\(\\)\\['";
 	// 17/7/2013: remove - because words like year-end and ten-year were getting marked as year.
-	public static String delims =impDelims +  "-!#&'\\*\\+,\\.:;\\<=\\>\\?@\\^\\_\\`\\|~ \t\\]\\{\\}";//NumberUnitParser.numberUnitDelims+"|\\p{Punct})";//)";
+	public static String delims =impDelims +  "-!#&'\\*\\+,\\.:;\\<=\\>\\?@\\^\\_\\`\\|~ \t\\]\\{\\}\r\n";//NumberUnitParser.numberUnitDelims+"|\\p{Punct})";//)";
 	public static List<String> getTokens(String name) {
 		return getTokens(name,null);
 	}
@@ -121,7 +122,7 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores, Serial
 			if (tokStr.equalsIgnoreCase("s") && apos) 
 				continue;
 			int tpos;
-			if (specialTokens != null && (tpos = ArrayUtils.find(specialTokens, tokStr)) >= 0) {
+			if (specialTokens != null && (tpos = ArrayUtils.indexOf(specialTokens, tokStr)) >= 0) {
 				if (specialTokenPosition !=null) {
 					specialTokenPosition.add((tpos << 16) + toks.size());
 				}
@@ -432,7 +433,7 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores, Serial
 		return tokenDict.findSubsequenceMatchesCosine(signSet.toSignSet(tokens), threshold, maximal);
 	}
 	public DocResult subSequenceMatch(List<String> tokens, float thresholds[]) {
-		float minThreshold = ArrayUtils.min(thresholds);
+		float minThreshold = Collections.min(Arrays.asList(ArrayUtils.toObject(thresholds)));
 		return tokenDict.findSubsequenceMatchesCosine(signSet.toSignSet(tokens), minThreshold);
 	}
 	static class NewUnit extends Unit {
@@ -655,7 +656,8 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores, Serial
 	public Unit multipleOneUnit() {
 		return getUnitFromBaseName("");
 	}
-	public static Element loadDefaultConfig() throws FileNotFoundException, ParserConfigurationException, SAXException, IOException {
+	public static Element loadDefaultConfig(Element configs) throws FileNotFoundException, ParserConfigurationException, SAXException, IOException {
+	  if (configs != null) return configs;
 	  Element elem = XMLConfigs.load(new InputSource(ClassLoader.class.getResourceAsStream("/configs.xml")));
 	  return elem;
 	}
