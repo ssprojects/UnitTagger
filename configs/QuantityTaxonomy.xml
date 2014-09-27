@@ -24,7 +24,6 @@
 	<String frequency="0.9">ABV</String>
       </lemmaset>
     </unit>
-
   </concept>		
 <!-- For the cases like 'per thousand, per metre, etc..' This won't help cause we don't know what's after per and hence it won't be able to match the per xxx quantity. 
   <concept name="Fraction">
@@ -3971,12 +3970,14 @@
       </lemmaset>
     </unit>
     </concept><concept name="Data rate">
+    <Synset>
+    </Synset>
      <unit name="bytes per second" symbol="bps" conversionFactor="= 1">
      <lemmaset>
      </lemmaset>
     </unit>    
   </concept>
-    </concept><concept name="Data size">
+<concept name="Data size">
     <Synset>
     </Synset>
     <typicalUsage>
