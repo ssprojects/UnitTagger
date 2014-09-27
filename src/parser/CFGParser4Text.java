@@ -200,12 +200,11 @@ public class CFGParser4Text extends CFGParser4Header {
 		//new CFGParser4Text(null).getTopKUnits(hdr, 12, 15, 1, 1);
 		float values[][] = new float[1][1];
 		CFGParser4Text parser = new CFGParser4Text(null);
-		testMultipleNumbers(parser);
+		//testMultipleNumbers(parser);
 		// look for multiple numbers.
 		
-		List<? extends EntryWithScore<Unit>> unitsS = parser.getTopKUnitsValues("of these <b>1.1%</b> are endemic", "b", 1, 1,values);
+		List<? extends EntryWithScore<Unit>> unitsS = parser.getTopKUnitsValues("<b>1938</b>St. Louis Browns Roster", "b", 1, 1,values);
 		//List<? extends EntryWithScore<Unit>> unitsS = new CFGParser4Text(null).parseHeader(hdr, null, 1,2, featureList);
-		
 		if (unitsS != null) {
 			eval.Utils.printExtractedUnits(unitsS,true);
 		} else {

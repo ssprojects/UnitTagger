@@ -9,15 +9,22 @@
     </Synset>
     <typicalUsage>
     </typicalUsage>
-    <unit name="percent" symbol="%" conversionFactor="">
+    <unit name="percent (SI base unit)" symbol="%" conversionFactor="">
       <lemmaset>
 	<String frequency="0.99">%</String>
 	<String>per</String>			  
 	<String>per cent</String>			  
-	<String frequency="0.99">p</String>			  
+	<String frequency="0.15">p</String>			  
 	<String frequency="1">percentage</String>			  
       </lemmaset>
     </unit>
+
+    <unit name="Alcohol by volume" symbol="ABV" conversionFactor="1">
+      <lemmaset>
+	<String frequency="0.9">ABV</String>
+      </lemmaset>
+    </unit>
+
   </concept>		
 <!-- For the cases like 'per thousand, per metre, etc..' This won't help cause we don't know what's after per and hence it won't be able to match the per xxx quantity. 
   <concept name="Fraction">
@@ -88,6 +95,7 @@
     </unit>
       <unit name="trillion" symbol="trillion" conversionFactor="= 1000000000000">
       <lemmaset>
+	<String>tn</String>			  
       </lemmaset>
     </unit>
   </concept>
@@ -1208,6 +1216,7 @@
     <unit name="inch (International)" symbol="in" conversionFactor="≡ 0.0254 m">
       <lemmaset>
 	<String>inches</String>
+	<String frequency="0.1">in</String>
       </lemmaset>
     </unit>
     <unit name="league (land)" symbol="lea" conversionFactor="= 4828.032 m">
@@ -1433,7 +1442,8 @@
     </unit>
     <unit name="yard (International)" symbol="yd" conversionFactor="≡ 0.9144 m">
       <lemmaset>
-	<String>y d</String>
+	<!-- do not enable this, it is causing Y-d when they represent year and day to be marked as yard-->
+	<!--<String>y d</String>-->
       </lemmaset>
     </unit>
     </concept><concept name="Area">
@@ -1519,10 +1529,13 @@
       <lemmaset>
       </lemmaset>
     </unit>
+<!--
     <unit name="square (roofing)" symbol="" conversionFactor="= 9.290 304 m2">
       <lemmaset>
+	<String frequency="0.01">square</String>			  
       </lemmaset>
     </unit>
+-->
     <unit name="square chain (international)" symbol="sq ch" conversionFactor="≡ 404.685 642 24 m2">
       <lemmaset>
       </lemmaset>
@@ -2477,7 +2490,7 @@
 	<String frequency="0.7">tons</String>
 	<String>metric ton</String>
 	<String>metric tons</String>
-	<String frequency="0.5">t</String>
+	<String frequency="0.1">t</String>
       </lemmaset>
     </unit>
     <unit name="kiloton" symbol="kt" conversionFactor="= 1 000 000 kg">
@@ -2947,6 +2960,7 @@
       <lemmaset>
 	<String>km/hr</String>
 	<String>kmph</String>
+	<String>kmh</String>
 	<String>kilometer per hour</String>
       </lemmaset>
     </unit>
@@ -3956,18 +3970,19 @@
       <lemmaset>
       </lemmaset>
     </unit>
+    </concept><concept name="Data rate">
+     <unit name="bytes per second" symbol="bps" conversionFactor="= 1">
+     <lemmaset>
+     </lemmaset>
+    </unit>    
+  </concept>
     </concept><concept name="Data size">
     <Synset>
     </Synset>
     <typicalUsage>
       <String>file size</String>
-      <String>file</String>
-      <String>size</String>
       <String>bytes served</String>
       <String>file size(bytes) : 62</String>
-      <String>kbps : 2191</String>
-      <String>bandwidth : 120</String>
-      <String>total : 203</String>
       <String>size (bytes) : 1409</String>
     </typicalUsage>
     <unit name="bit; shannon (SI unit)" symbol="bit; b; Sh" conversionFactor="= 1 b">

@@ -458,7 +458,8 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores, Serial
 			for(Object unit : symbolDict.getCollection(name))
 				return (Unit) unit;
 		}
-		return UnitPair.newUnitPair(unit1, unit2, op, conceptDict);
+		return UnitPair.newUnitPair(unit1, unit2, op, conceptDict,
+		    getCanonicalUnit(new UnitPair(unit1,unit2,op,null)));
 	}
 	
 	public boolean getRelativeFrequency(String str, List<EntryWithScore<String[]>> matchesArg) {
@@ -570,7 +571,9 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores, Serial
 				if (units != null && units.size()>0)
 					unit2 = units.iterator().next();
 				if (unit1 != null && unit2 != null) {
-					return UnitPair.newUnitPair(unit1, unit2, UnitPair.getOpTypeFromOpStr(parts[2]),conceptDict);
+					return UnitPair.newUnitPair(unit1, unit2, UnitPair.getOpTypeFromOpStr(parts[2])
+					    ,conceptDict
+					    ,getCanonicalUnit(new UnitPair(unit1,unit2,UnitPair.getOpTypeFromOpStr(parts[2]),null)));
 				}
 			}
 		}
@@ -580,10 +583,25 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores, Serial
 		List<EntryWithScore<Unit>> matches = getTopK(str, "", 0.9);
 		return (matches != null && matches.size()>0)?matches.get(0).getKey():null;
 	}
+	public Unit getCanonicalUnit(Unit unit) {
+	Unit canonical = unit.getParentQuantity()==null?null:unit.getParentQuantity().getCanonicalUnit();
+    if (canonical==null) {
+      canonical = unit;
+      if (canonical instanceof UnitMultPair) {
+        canonical = ((UnitMultPair)canonical).getUnit(0);
+      } else if (canonical instanceof UnitPair) {
+        UnitPair unitPair = (UnitPair) canonical;
+        canonical = new UnitPair(getCanonicalUnit(unitPair.getUnit(0))
+            , getCanonicalUnit(unitPair.getUnit(1))
+            , unitPair.op,unitPair.getParentQuantity());
+      }
+    }
+    return canonical;
+	}
 	public float convert(float value, Unit fromUnit, Unit toUnit, boolean success[]) {
 		if (fromUnit != null && toUnit != null && !fromUnit.sameConcept(toUnit)) { 
 			success[0] = false;
-			return 0;
+			return value;
 		}
 		success[0] = true;
 		if (toUnit == null)
@@ -595,7 +613,8 @@ public class QuantityCatalog implements WordFrequency, ConceptTypeScores, Serial
 		}
 		return (float) convValue;
 	}
-	public float convert(float value, List<? extends EntryWithScore<Unit>> fromUnits, Unit toUnit, QuantityCatalog quantDict, boolean success[]) throws Exception {
+	public float convert(float value, List<? extends EntryWithScore<Unit>> fromUnits
+	    , Unit toUnit, QuantityCatalog quantDict, boolean success[]) throws Exception {
 		for(EntryWithScore<Unit> fromUnitWScore : fromUnits) {
 			float retval = convert(value, fromUnitWScore.getKey(), toUnit, success);
 			if (success[0]) return retval;

@@ -9,11 +9,13 @@ import iitb.shared.StringMap;
 import iitb.shared.XMLConfigs;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
@@ -69,7 +71,7 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores,
   public static final String ClassifierFile = "conceptClassifier";
   public static final double UndecidedScore = 0.3;
   public static final double MinScore = 0.01;
-  public static String[][] ignoredConcepts = {{"Percent","%"}};
+  public static String[][] ignoredConcepts = {};//{"Percent","%"}};
   static Hashtable<String,String[]> ignoredConceptsHash=new Hashtable<String,String[]>();
   StringMap<String> wordIdMap = new StringMap<String>();
   TIntArrayList wordFreqs = new TIntArrayList();
@@ -150,7 +152,7 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores,
     StringMap<String> wordIdMap = new StringMap<String>();
 
   }
-  private Instances formInstances() {
+  private Instances formInstances(String arffFile) throws IOException {
     for (int i = 0; i < wordIdMap.size(); i++) {
       if (featureSelected(i)) {
         myclassifier.wordIdMap.add(wordIdMap.get(i));
@@ -174,17 +176,24 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores,
         dataset.add(inst);
       }
     }
+    if (arffFile != null) {
+      BufferedWriter writer = new BufferedWriter(new FileWriter(arffFile));
+      writer.write(dataset.toString());
+      writer.flush();
+      writer.close();
+    }
     return dataset;
   }
-  public void makeClassifier(String trainFile) throws Exception {
+  public void makeClassifier(String trainFile, boolean createArffFile) throws Exception {
     myclassifier = new MyClassifier();
-    Instances dataset = trainFile==null?formInstances():readTrainFile(myclassifier,trainFile);
+    Instances dataset = createArffFile?formInstances(trainFile):readTrainFile(myclassifier,trainFile);
     LibLINEAR classifier = new LibLINEAR();
     classifier.setDoNotReplaceMissingValues(true);
     myclassifier.classifier = classifier;
     String classifierOptions="-S:0:-P";
     ((OptionHandler)classifier).setOptions(classifierOptions.split(":"));
     int numFolds = 3;
+    dataset.randomize(new Random(1));
     for (int f = 0; f < numFolds; f++) {
       classifier.buildClassifier(dataset.trainCV(numFolds, f));
       System.out.println(classifier.toString());
@@ -219,6 +228,14 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores,
     data.setClassIndex(data.numAttributes() - 1);
     for (int i = 0; i < data.numAttributes()-1; i++) {
       myclassifier.wordIdMap.add(data.attribute(i).name());
+    }
+    for (int i = 0; i < data.numInstances(); i++) {
+      assert (!data.get(i).classIsMissing());
+      if (data.get(i).classValue()==0) {
+        for (int j = 0; j < data.get(i).numAttributes(); j++)
+          if (!data.get(i).isMissing(j) && data.get(i).value(j) > 0) System.out.print(data.get(i).attribute(j).name()+ " ");
+        System.out.println(data.get(i));
+      }
     }
     formEmptyInstance(data);
     return data;
@@ -352,7 +369,7 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores,
 			}
 		}
      */
-   
+
     return getConceptScores(hdrMatches[0].setTokens(),predLabel);
   }
   public List<EntryWithScore<Quantity>> getConceptScores(List<String> tokens, String predLabel[]) throws Exception {
@@ -448,65 +465,62 @@ public class ConceptClassifier implements ConceptTypeScores,Co_occurrenceScores,
    */
   public static void main(String[] args) throws Exception {
     Linear.resetRandom();
+    String dir = "data/tableHeaders/";///mnt/a99/d0/sunita/workspace.broken/WWT/expts/quant/";
     String paths[]={
-        "/mnt/a99/d0/sunita/workspace.broken/WWT/expts/quant/statParsed"
-        , "/mnt/a99/d0/sunita/workspace.broken/WWT/expts/quant/SingleUnitAfterIn"
-        , "/mnt/a99/d0/sunita/workspace.broken/WWT/expts/quant/DictConceptMatch1Unit"
-        , "/mnt/a99/d0/sunita/workspace.broken/WWT/expts/quant/SingleUnitWithinBrackets"
-        , "/mnt/a99/d0/sunita/workspace.broken/WWT/expts/quant/PercentSymbolMatch"
+        "PercentSymbolMatch",
+        "statParsed"
+        , "SingleUnitAfterIn"
+        , "DictConceptMatch1Unit"
+        , "SingleUnitWithinBrackets"
+        , "PercentSymbolMatch"
     };
-    float sampleRates[] = {1,1,1,1,0.07f};
+    float sampleRates[] = {0.07f,1,1,1,1};
     Element elem = QuantityCatalog.loadDefaultConfig(null);
     QuantityCatalog quantDict = new QuantityCatalog(elem);
     ConceptClassifier classifier = null;
+    String trainFile = QuantityCatalog.QuantConfigDirPath+ConceptClassifier.ClassifierFile+".arff";
     if (args.length > 0 && args[0].equalsIgnoreCase("train")) {
       classifier = new ConceptClassifier(elem,quantDict,false,null);
-      classifier.makeClassifier(QuantityCatalog.QuantConfigDirPath+ConceptClassifier.ClassifierFile+".arff");
-    }
-    /*	ConceptClassifier classifier = new ConceptClassifier(quantDict);
-		Co_occurrenceStatistics coOccur = new Co_occurrenceStatistics(quantDict);
-		Vector<String> explanation = new Vector<String>();
-		Random random = new Random(1);
-		for (int i = 0; i < paths.length; i++) {
-			for (int j = 0; j < 10; j++) {
-				File file = new File(paths[i]+j);
-				if (!file.exists()) {
-					System.out.println("did not find..."+paths[i]+j);
-					continue;
-				}
-				System.out.println("reading..."+paths[i]+j);
-				BufferedReader reader = new BufferedReader(new FileReader(file));
-				String line;
-				while ((line = reader.readLine())!= null) {
-					if (random.nextDouble()>sampleRates[i]) continue;
-					line = line.trim();
-					if (!line.startsWith("<h>")) continue;
-					String hdr = line.substring(3,line.indexOf("</h>")).trim();
-					classifier.addHeader(hdr, explanation);
-					coOccur.addHeader(hdr, explanation);
-				}
-			}
-		}
-		classifier.makeClassifier();
-     */
-    else {
-
+      classifier.makeClassifier(trainFile, false);
+    } else if (args.length > 0 && args[0].equalsIgnoreCase("parse-train")) {
+      classifier = new ConceptClassifier(null,quantDict,true,null);
+      Co_occurrenceStatistics coOccur = new Co_occurrenceStatistics(quantDict);
+      Vector<String> explanation = new Vector<String>();
+      Random random = new Random(1);
+      for (int i = 0; i < paths.length; i++) {
+        for (int j = 0; j < 10; j++) {
+          File file = new File(dir + paths[i]+j);
+          if (!file.exists()) {
+            System.out.println("did not find..."+dir + paths[i]+j);
+            continue;
+          }
+          System.out.println("reading..."+dir + paths[i]+j);
+          BufferedReader reader = new BufferedReader(new FileReader(file));
+          String line;
+          while ((line = reader.readLine())!= null) {
+            if (random.nextDouble()>sampleRates[i]) continue;
+            line = line.trim();
+            if (!line.startsWith("<h>")) continue;
+            String hdr = line.substring(3,line.indexOf("</h>")).trim();
+            classifier.addHeader(hdr, explanation);
+            coOccur.addHeader(hdr, explanation);
+          }
+        }
+      }
+    // classifier.makeClassifier(trainFile,true);
+    } else {
       classifier = new ConceptClassifier(quantDict); //,parser,
-      //QuantityCatalog.QuantConfigDirPath+ConceptClassifier.ClassifierFile); //+".withPercent"
-      ByteArrayOutputStream bos = new ByteArrayOutputStream() ;
-      ObjectOutputStream out = new ObjectOutputStream(bos) ;
-      out.writeObject(classifier);
-      out.close();
     }
-    String conceptTests[] = {"dose", "corporate income tax rate", "area code", "forest area", "Urban Area Population", "area 1000 sq km", "area", "area sq", "area km", "CO2 emissions", "distance from sun","net worth","year of first flight","weight", "pressure", "record low", "size", "volume","bandwidth","capacity"};
+    String conceptTests[] = {"umemployment rate", "rate", "dose", "corporate income tax rate", "area code", "forest area", "Urban Area Population", "area 1000 sq km", "area", "area sq", "area km", "CO2 emissions", "distance from sun","net worth","year of first flight","weight", "pressure", "record low", "size", "volume","bandwidth","capacity"};
     for (String hdr : conceptTests) {
       System.out.print(hdr);
       List<String> tokens = QuantityCatalog.getTokens(hdr);
       List<EntryWithScore<Quantity>> scores = classifier.getConceptScores(hdr);
       if (scores != null) {
-        for (Iterator<EntryWithScore<Quantity>> iter = scores.iterator(); iter.hasNext();) {
+        int cnt = 0;
+        for (Iterator<EntryWithScore<Quantity>> iter = scores.iterator(); iter.hasNext();cnt++) {
           EntryWithScore<Quantity> entry = iter.next();
-          System.out.print(" "+entry.getKey().getConcept()+ " "+entry.getScore());
+          System.out.print("\t"+entry.getKey().getConcept()+ " "+entry.getScore());
         }
         System.out.println();
         /*

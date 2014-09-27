@@ -536,7 +536,7 @@ public class CFGParser4Header extends RuleBasedParser {
 			SINGLELetter,INLANG, MatchLength, Co_occurStats,Subsumed,
 			WithinBracket,AfterIN,
 			SymbolDictMatchThreshold,LemmaDictMatchThreshold,
-			PercentUnkInUnit,PercenUnkInUnitThreshold, CU2Bias, MultBias,UL_Cont,PerMult}
+			PercentUnkInUnit,PercenUnkInUnitThreshold, CU2Bias, MultBias,UnitUnitCo_occur,UL_Cont,PerMult}
 		public static final int LargeWeight = 10000;;
 		double[] weights=null;
 		EntryWithScore<String> weightsIndexed[] = new EntryWithScore[]{
@@ -556,6 +556,7 @@ public class CFGParser4Header extends RuleBasedParser {
 				new EntryWithScore<String>("PercenUnkInUnitThreshold",0.5),
 				new EntryWithScore<String>("CU2Bias",0.25), // increasing from 0.06 to 0.2 to allow ton/s to be marked correctly. 
 				new EntryWithScore<String>("MultBias",0), // 27 Dec 2013, increasing to allow $m to be parsed preferentially as dollar million instead of dollar|meter
+				new EntryWithScore<String>("UnitUnitCo_occur",0.2), // 27 Dec 2013, increasing to allow $m to be parsed preferentially as dollar million instead of dollar|meter
 				new EntryWithScore<String>("UL_Cont", -2), /* units lists cannot be contiguous */
 				new EntryWithScore<String>("PerMult",0.4)
 		};
@@ -899,7 +900,7 @@ public class CFGParser4Header extends RuleBasedParser {
 				int endP = bestUTree.getSpan().getTarget();
 				for (int a1 = 0; a1 < bestUnitsBase.size(); a1++) {
 					Unit unit2 = bestUnitsBase.get(a1).getKey();
-					bestUnitsVec.add(new UnitFeatures(quantityDict.newUnit(unit1,unit2,UnitPair.OpType.Ratio),bestUnitsBase.get(a1).getScore(), 
+					bestUnitsVec.add(newUnitFeatures(bestUTree, quantityDict.newUnit(unit1,unit2,UnitPair.OpType.Ratio),bestUnitsBase.get(a1).getScore(), 
 							bestUnitsBase.get(a1), null,start,endP));
 					multTree = null; //reset multTree, because here multiplier is part of unit.
 				}
@@ -926,7 +927,7 @@ public class CFGParser4Header extends RuleBasedParser {
 							Unit unit2 = bestUnitsMult.get(a2).getKey();
 							int start = Math.min(bestUnitsBase.get(a1).start(),bestUnitsMult.get(a2).start());
 							int end = Math.max(bestUnitsBase.get(a1).end(),bestUnitsMult.get(a2).end());
-							bestUnitsVec.add(new UnitFeatures(quantityDict.newUnit(unit1,unit2,UnitPair.OpType.Ratio),newCompundScore(bestUnitsBase.get(a1).getScore(),bestUnitsMult.get(a2).getScore()), 
+							bestUnitsVec.add(newUnitFeatures(bestUTree, quantityDict.newUnit(unit1,unit2,UnitPair.OpType.Ratio),newCompundScore(bestUnitsBase.get(a1).getScore(),bestUnitsMult.get(a2).getScore()), 
 									bestUnitsBase.get(a1), bestUnitsMult.get(a2),start,end));
 							a++;
 						}
@@ -966,7 +967,7 @@ public class CFGParser4Header extends RuleBasedParser {
 					double score = bestUnitsVec.get(a).getScore();
 					int start = Math.min(bestUnitsVec.get(a).start(),multUnit.start());
 					int end = Math.max(bestUnitsVec.get(a).end(),multUnit.end());
-					bestUnitsVec.set(a,new UnitFeatures(new UnitMultPair(bestUnit, multUnit.getKey()), score+multScore, multUnit, bestUnitsVec.get(a),start,end));
+					bestUnitsVec.set(a,newUnitFeatures(unitTree, new UnitMultPair(bestUnit, multUnit.getKey()), score+multScore, multUnit, bestUnitsVec.get(a),start,end));
 				} 
 			}
 		} else if (multUnit!=null) {
@@ -977,7 +978,29 @@ public class CFGParser4Header extends RuleBasedParser {
 		}
 	}
 
-	protected double newCompundScore(double score, double score2) {
+	/**
+	 * TODO: 26 Sept 2014: this code need to be revamped to re-assign scores of the extracted
+	 * unit from the unitTree taking into account some of the unit-dependent feature 
+	 * that are not possible to account in the top-level tree. 
+   * @param bestUTree
+   * @param newUnit
+   * @param score
+   * @param unitFeatures
+   * @param object
+   * @param start
+   * @param endP
+   * @return
+   */
+  private UnitFeatures newUnitFeatures(Tree unitTree,
+      Unit unit,
+      double score,
+      UnitFeatures unit1,
+      UnitFeatures unit2,
+      int start,
+      int end) {
+    return new UnitFeatures(unit, score, unit1, unit2, start, end);
+  }
+  protected double newCompundScore(double score, double score2) {
 		// Jul 29, changing to sum to allow for training via a linear classifier.
 		return score + score2;
 	}
@@ -1062,9 +1085,7 @@ public class CFGParser4Header extends RuleBasedParser {
       Vector<UnitFeatures> featureList = new Vector();
       //List<? extends EntryWithScore<Unit>> unitsR = new CFGParser4Header(XMLConfigs.load(new FileReader("configs/configs.xml"))).getTopKUnits("2000 Mt CO2",  2, featureList,1);
       ParseState state[] = new ParseState[1];
-      List<EntryWithScore<Unit>> unitsR = (List<EntryWithScore<Unit>>) parser.parseHeaderExplain("Speed (in Miles Per Hour)",  null, 1, state);
-      List<EntryWithScore<Unit>> cellUnits = parser.parseCell("$2.31", unitsR, 1, state[0]);
-      System.out.println("Base name=" + cellUnits.get(0).getKey().getBaseName());
+      List<EntryWithScore<Unit>> unitsR = (List<EntryWithScore<Unit>>) parser.parseHeaderExplain("Net worth in dollars per year",  null, 1, state);
           //  List<EntryWithScore<Unit>> unitsR = new CFGParser4Header(null).parseHeader("Wealth (in " + UnitSpan.StartXML + " $mil "+UnitSpan.EndXML+")",null, 2,null, 
       //new short[][]{{(short) Tags.W.ordinal()},{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}
       //,{(short) Tags.SU.ordinal()},{(short) Tags.PER.ordinal()},{(short) Tags.SU.ordinal()}}
@@ -1081,8 +1102,10 @@ public class CFGParser4Header extends RuleBasedParser {
       // ("fl. oz (US)", new short[][]{{(short) Tags.SU_W.ordinal()},{(short) Tags.SU_W.ordinal()},{(short) Tags.SU_W.ordinal()}}); // getting wrongly matched to kg/L
       if (unitsR != null) {
           eval.Utils.printExtractedUnits(unitsR,true);
-          
       }
+      List<EntryWithScore<Unit>> cellUnits = new CFGParser4Text(parser.options, parser.quantityDict, parser.conceptClassifier)
+      .parseCell("$qqqq M", unitsR, 1, state[0]);
+      if (cellUnits != null) System.out.println("Base name=" + cellUnits.get(0).getKey().getBaseName());
       
   }
 }

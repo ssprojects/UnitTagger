@@ -26,6 +26,13 @@ public class Quantity implements Serializable {
 		typicalUsage=t;
 		Units=units;
 	}
+	public Quantity(String c,ArrayList<String> s,ArrayList<String> t,ArrayList<Unit> units, Unit SIUnit){
+      concept=c;
+      synsets=s;
+      typicalUsage=t;
+      Units=units;
+      this.SIUnit = SIUnit;
+  }
 
 	public String getConcept(){
 		return concept;

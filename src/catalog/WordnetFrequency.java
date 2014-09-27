@@ -142,6 +142,7 @@ public class WordnetFrequency implements WordFrequency, Serializable {
 	  if (database==null) {
 	    loadData();
 	  }
+	 //System.out.println("Did database lookup for "+wordForm);
 	  Synset[] synsets = database.getSynsets(wordForm, SynsetType.NOUN);
 		//  Display the word forms and definitions for synsets retrieved
 		matches.clear();
@@ -174,7 +175,7 @@ public class WordnetFrequency implements WordFrequency, Serializable {
 		//if (foundMatch && matches.size()==0) {
 		//	matches.add(new EntryWithScore<String[]>(new String[]{wordForm}, 1e-6));
 		//}
-		//System.out.println("Did database lookup for "+wordForm);
+		
 		return foundMatch;
 	}
 	private boolean isUnitDefn(Synset synset) {

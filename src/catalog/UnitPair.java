@@ -100,7 +100,7 @@ public class UnitPair extends Unit {
 			return unit1;
 		return this;
 	}
-	public static Unit newUnitPair(Unit unit12, Unit unit22, OpType opTypeFromOpStr, MultiValueMap conceptDict) {
+	public static Unit newUnitPair(Unit unit12, Unit unit22, OpType opTypeFromOpStr, MultiValueMap conceptDict, Unit canonicalUnit) {
 		switch (opTypeFromOpStr) {
 		case Mult:
 			return new UnitMultPair(unit12, unit22);
@@ -111,7 +111,7 @@ public class UnitPair extends Unit {
 		if (units != null && units.size()>0) {
 			quant = units.iterator().next();
 		} else {
-			quant = new Quantity(conceptName, null, null, null);
+			quant = new Quantity(conceptName, null, null, null,canonicalUnit);
 		}
 		return new UnitPair(unit12,unit22,opTypeFromOpStr,quant);
 	}
