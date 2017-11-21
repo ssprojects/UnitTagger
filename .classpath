@@ -5,7 +5,13 @@
 	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?project=QuantityTagger&amp;ivyXmlPath=ivy.xml&amp;confs=*"/>
 	<classpathentry kind="lib" path="configs"/>
 	<classpathentry kind="lib" path="lib/jaws-bin.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Shared"/>
 	<classpathentry kind="lib" path="lib/LibLINEAR.jar"/>
+	<classpathentry kind="lib" path="lib/shared.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections4-4.0.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang3-3.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/liblinear-1.94.jar"/>
+	<classpathentry kind="lib" path="lib/stanford-parser-3.3.1.jar"/>
+	<classpathentry kind="lib" path="lib/trove4j-3.0.3.jar"/>
+	<classpathentry kind="lib" path="lib/weka-dev-3.7.10.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

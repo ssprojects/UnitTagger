@@ -23,7 +23,7 @@ import edu.smu.tspell.wordnet.SynsetType;
 import edu.smu.tspell.wordnet.WordNetDatabase;
 
 public class WordnetFrequency implements WordFrequency, Serializable {
-	public static String WordNetDictPath="/mnt/b100/d0/library/public_html/wordnet/WordNet-2.1/dict";
+	public static String WordNetDictPath="/usr/local/WordNet-3.0/dict";
 	public static String quantityTypeString = "how much there is of something that you can quantify";
 	public static String quantitySearchString = "quantity";
 	public static String calendarMonth = "calendar month";

@@ -38,7 +38,7 @@ import parser.RuleBasedParser;
 public class Test {
 //	public static String GroundTruthFile = "/mnt/a99/d0/WWT/workspace/WWT_GroundTruthV2/unitLabel4Text.xml"; //"/mnt/a99/d0/sunita/workspace.broken/WWT/expts/out.uniq.0.xml"; //
 	
-	public static String GroundTruthFile = "/mnt/a99/d0/WWT/workspace/WWT_GroundTruthV2/unitLabel4Text.xml";
+	public static String GroundTruthFile = "data/unitLabel4Text.xml";
 	 //Added some code to write to output file.
     public static String ResultsFile = "/mnt/a99/d0/ashishm/dataset/version3/results2_context.txt";
     File resultFile;
